@@ -7,7 +7,7 @@
     </q-drawer>
 
     <q-page-container>
-      <q-scroll-area visible="false" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 100vh;">
+      <q-scroll-area :visible="false" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 100vh;">
         <router-view />
       </q-scroll-area>
     </q-page-container>

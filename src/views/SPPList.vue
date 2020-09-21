@@ -5,6 +5,7 @@
         <q-btn color="primary" label="Buat PO" />
         <q-btn label="Detail" />
       </div>
+      {{spp}}
       <q-markup-table separator="cell"  flat square>
         <thead class="bg-green text-white">
           <tr>
@@ -17,12 +18,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="d in dummy" :key="d.id">
+          <tr v-for="d in spp" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
             <td>
-              {{ d.name }} <q-chip color="teal" text-color="white" dense size="sm">{{ d.department }}</q-chip>
+              {{ d.name }} <q-chip color="teal" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
             <td>{{ d.create_at }}</td>
             <td>{{ d.item }}</td>
@@ -41,6 +42,7 @@ import moment from "moment";
 export default {
   data() {
     return {
+      spp:[],
       dummy: [
         {
           id: 1,
@@ -71,6 +73,12 @@ export default {
       ],
     };
   },
+  mounted(){
+    this.$http.get('/spp', {})
+      .then (result => {
+        this.spp = result.data
+      })
+  }
 };
 </script>
 

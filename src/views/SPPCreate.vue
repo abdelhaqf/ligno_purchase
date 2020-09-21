@@ -14,7 +14,7 @@
         <q-date v-model="spp.deadline" minimal :options="limitDate" />
         <q-input outlined v-model="spp.description" label="Description" stack-label dense type="textarea" />
         <div class="q-gutter-md row justify-end">
-          <q-btn color="primary" label="Submit" />
+          <q-btn color="primary" label="Submit" @click="createSPP()" />
         </div>
       </div>
     </div>
@@ -39,6 +39,12 @@ export default {
     limitDate(date) {
       return date >= moment().format("YYYY/MM/DD");
     },
+    createSPP(){
+      this.$http.post('/new_spp', this.spp, {})
+      .then (result => {
+        this.spp = result.data
+      })
+    }
   },
 };
 </script>
