@@ -4,7 +4,7 @@
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
         <q-item-section>{{ m.title }}</q-item-section>
       </q-item>
-
+      <q-separator />
       <q-card class="relative-position" flat>
         <q-card-section class="q-pb-none">
           <div class="text-h6">Currency</div>
@@ -18,27 +18,27 @@
                   <q-item-section>
                     <q-item-label>BCA</q-item-label>
                   </q-item-section>
-                   <q-item-section>
-                    <q-item-label>Rp {{kurs.Jsondata.bcarate | number('0,0')}}</q-item-label>
-                    <q-item-label caption>{{kurs.Jsondata.date3}}</q-item-label>
+                  <q-item-section>
+                    <q-item-label>Rp {{ kurs.Jsondata.bcarate | number("0,0") }}</q-item-label>
+                    <q-item-label caption>{{ kurs.Jsondata.date3 }}</q-item-label>
                   </q-item-section>
                 </q-item>
                 <q-item>
                   <q-item-section>
                     <q-item-label>BI</q-item-label>
                   </q-item-section>
-                   <q-item-section>
-                    <q-item-label>Rp {{kurs.Jsondata.birate | number('0,0')}}</q-item-label>
-                    <q-item-label caption>{{kurs.Jsondata.date2}}</q-item-label>
+                  <q-item-section>
+                    <q-item-label>Rp {{ kurs.Jsondata.birate | number("0,0") }}</q-item-label>
+                    <q-item-label caption>{{ kurs.Jsondata.date2 }}</q-item-label>
                   </q-item-section>
                 </q-item>
                 <q-item>
                   <q-item-section>
                     <q-item-label>MenKeu</q-item-label>
                   </q-item-section>
-                   <q-item-section>
-                    <q-item-label>Rp {{kurs.Jsondata.menkeurate | number('0,0')}}</q-item-label>
-                    <q-item-label caption>{{kurs.Jsondata.date1}}</q-item-label>
+                  <q-item-section>
+                    <q-item-label>Rp {{ kurs.Jsondata.menkeurate | number("0,0") }}</q-item-label>
+                    <q-item-label caption>{{ kurs.Jsondata.date1 }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -62,7 +62,6 @@
 
 <script>
 import axios from "axios";
-
 
 export default {
   data() {
