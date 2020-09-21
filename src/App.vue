@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-drawer show-if-above v-model="left" side="left" bordered>
+    <q-drawer v-if="isLogin" show-if-above v-model="left" side="left" bordered>
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
         <q-item-section>{{ m.title }}</q-item-section>
       </q-item>
@@ -18,6 +18,7 @@
 export default {
   data() {
     return {
+      isLogin: true,
       left: false,
       menu: [
         {
