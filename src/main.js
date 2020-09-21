@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import './quasar'
 import axios from 'axios'
+import Vue2Filters from 'vue2-filters'
 
 
 
@@ -12,6 +13,7 @@ Vue.prototype.$http = axios.create({
 });
 
 
+Vue.use(Vue2Filters)
 
 Vue.config.productionTip = false
 
