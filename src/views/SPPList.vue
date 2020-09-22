@@ -32,26 +32,74 @@
         </tbody>
       </q-markup-table>
     </div>
+
     <div class="container" v-if="formPO">
       <div class="formPO">
-          <div class="row">
-            <div class="col-6">
-              <div class="bg-green text-white text-h6 q-pa-md">PO Baru</div>
-              <div class="q-pa-md q-gutter-md ">
-                <q-input outlined v-model="po.po_id" label="No PO" stack-label dense />
-                <q-input outlined v-model="po.vendor" label="Vendor" stack-label dense />
-                <q-input outlined v-model="po.po_date" label="PO Date" stack-label dense readonly />
-                <q-date v-model="po.po_date" minimal :options="limitDate" />
-                <div class="q-gutter-md row justify-end">
-                  <q-btn color="grey" label="Kembali" @click="formPO = false" />
-                  <q-btn color="primary" label="Submit" @click="createPO()" />
-                </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="bg-green text-white text-h6 q-pa-md">PO Baru</div>
+            <div class="q-pa-md q-gutter-md ">
+              <q-input outlined v-model="po.po_id" label="No PO" stack-label dense />
+              <q-input outlined v-model="po.vendor" label="Vendor" stack-label dense />
+              <q-input outlined v-model="po.po_date" label="PO Date" stack-label dense readonly />
+              <q-date v-model="po.po_date" minimal :options="limitDate" />
+
+              <div>
+                <q-markup-table separator="cell"  flat square>
+                  <thead class="bg-green text-white">
+                    <tr>
+                      <th>No</th>
+                      <th>Item</th>
+                      <th>Price</th>
+                      <th>Curr</th>
+                      <th>Est_Arrival</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(x,i) in sppSelect" :key="i">
+                      <td>{{i+1}}</td>
+                      <td>{{x.item}}</td>
+                      <td style="padding: 0px;"><q-input outlined v-model="x.price" dense /></td>
+                      <td style="padding: 0px; width: 30px !important;">
+                        <q-input outlined v-model="x.currency" dense />
+                      </td>
+                      <td style="padding: 0px;">
+                        <q-input outlined v-model="x.est_arrival" dense >
+                          <template v-slot:append>
+                            <q-icon name="event" class="cursor-pointer">
+                              <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                                <q-date v-model="x.est_arrival">
+                                  <div class="row items-center justify-end">
+                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                  </div>
+                                </q-date>
+                              </q-popup-proxy>
+                            </q-icon>
+                          </template>
+                        </q-input>
+                      </td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+                <table>
+                  <tr>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="q-gutter-md row justify-end">
+                <q-btn color="grey" label="Kembali" @click="formPO = false" />
+                <q-btn color="primary" label="Submit" @click="createPO()" />
               </div>
             </div>
           </div>
+        </div>
+
 
       </div>
     </div>
+
+
     <q-dialog v-model="alert">
       <q-card>
         <q-card-section>
@@ -67,6 +115,7 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
   </div>
 </template>
 
@@ -77,18 +126,24 @@ export default {
   data() {
     return {
       sppList:[],
+      sppSelect:[],
       po:{
         po_date: moment()
           .add(1, "days")
           .format("YYYY/MM/DD"),
-
       },
       formPO: false,
       alert: false,
+      
     };
   },
   mounted(){
-    this.$http.get('/spp', {})
+    this.fetchData()
+  },
+  methods:{
+    fetchData(){
+      this.sppList = []
+      this.$http.get('/spp', {})
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
 
@@ -96,14 +151,24 @@ export default {
           this.sppList.push(result.data[i])
         }
       })
-  },
-  methods:{
+    },
     limitDate(date) {
       return date >= moment().format("YYYY/MM/DD");
     },
     openForm(){
-      var count = this.sppList.filter(spp => spp.select === true)
-      if(count.length > 0){
+      for(var i = 0; i < this.sppList.length; i++){
+          if(this.sppList[i].select ==  true){
+            let data = {
+              spp_id: this.sppList[i].spp_id,
+              item: this.sppList[i].item,
+              price: 0,
+              currency: 'IDR',
+              est_arrival: moment().add(1, "days").format("YYYY-MM-DD")
+            }
+            this.sppSelect.push(data)
+          }
+      }
+      if(this.sppSelect.length > 0){
         this.formPO = true
       }
       else{
@@ -113,19 +178,23 @@ export default {
     createPO(){
       this.$http.post('/new_po', this.po, {})
       .then (result => {
-        for(var i = 0; i < this.sppList.length; i++){
-          let data = {po_id: this.po.po_id}
-          if(this.sppList[i].select ==  true){
-              this.$http.put('/spp_byid/' + this.sppList[i].spp_id, data, {})
-              .then (result => {
-    
-              })
-          }
+        for(var i = 0; i < this.sppSelect.length; i++){
+
+          this.sppSelect[i].po_id = this.po.po_id
+
+          console.log(this.sppSelect[i]);
+
+          this.$http.put('/spp_byid/' + this.sppSelect[i].spp_id, this.sppSelect[i], {})
+          .then (result => {
+
+          })
+
         }
         this.formPO = false
         this. po = {po_date: moment()
           .add(1, "days")
           .format("YYYY/MM/DD"),}
+          this.fetchData()
         
       })
     }
@@ -141,5 +210,9 @@ export default {
   position: absolute;
   z-index: 1000;
   left: 0px; top: 0px;
+}
+
+table{
+
 }
 </style>
