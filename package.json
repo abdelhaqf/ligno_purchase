@@ -9,6 +9,7 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "core-js": "^3.6.5",
+    "md5": "^2.3.0",
     "moment": "^2.28.0",
     "quasar": "^1.0.0",
     "vue": "^2.6.11",
