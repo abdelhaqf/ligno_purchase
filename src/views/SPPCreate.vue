@@ -43,6 +43,7 @@ export default {
       this.$http.post('/new_spp', this.spp, {})
       .then (result => {
         this.spp = result.data
+        this.$q.notify('SPP Berhasil Dibuat!')
       })
     }
   },
