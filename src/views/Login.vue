@@ -11,7 +11,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import md5 from 'md5'
 
 export default {

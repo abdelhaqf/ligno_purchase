@@ -1,9 +1,55 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-drawer show-if-above v-model="left" side="left" bordered>
+    <q-drawer v-if="isLogin" show-if-above v-model="left" side="left" bordered>
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
         <q-item-section>{{ m.title }}</q-item-section>
       </q-item>
+      <q-separator />
+      <q-card class="relative-position" flat>
+        <q-card-section class="q-pb-none">
+          <div class="text-h6">Currency</div>
+        </q-card-section>
+
+        <q-card-section>
+          <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+            <div v-if="showKurs">
+              <q-list bordered separator>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>BCA</q-item-label>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Rp {{ kurs.Jsondata.bcarate | number("0,0") }}</q-item-label>
+                    <q-item-label caption>{{ kurs.Jsondata.date3 }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>BI</q-item-label>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Rp {{ kurs.Jsondata.birate | number("0,0") }}</q-item-label>
+                    <q-item-label caption>{{ kurs.Jsondata.date2 }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>MenKeu</q-item-label>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Rp {{ kurs.Jsondata.menkeurate | number("0,0") }}</q-item-label>
+                    <q-item-label caption>{{ kurs.Jsondata.date1 }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </div>
+          </transition>
+        </q-card-section>
+
+        <q-inner-loading :showing="isLoading">
+          <q-spinner-gears size="50px" color="primary" />
+        </q-inner-loading>
+      </q-card>
     </q-drawer>
 
     <q-page-container>
@@ -15,10 +61,16 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
+      isLogin: true,
       left: false,
+      isLoading: false,
+      showKurs: false,
+      kurs: [],
       menu: [
         {
           title: "Buat SPP",
@@ -62,6 +114,19 @@ export default {
     if(!localStorage.getItem("token")){
         this.$router.push('/login')
     }
-  }
+    
+    this.isLoading = true;
+    this.updateKurs();
+  },
+  methods: {
+    updateKurs() {
+      axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
+        this.kurs = result.data;
+        // console.log(result)
+        this.isLoading = false;
+        this.showKurs = true;
+      });
+    },
+  },
 };
 </script>

@@ -47,6 +47,8 @@ export default {
             .add(1, "days")
             .format("YYYY/MM/DD"),
         }
+        this.spp = result.data
+        this.$q.notify('SPP Berhasil Dibuat!')
       })
     }
   },
