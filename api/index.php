@@ -13,6 +13,7 @@ function getLink()
   Flight::route('GET /spp', function () {
     $q = "SELECT spp.*, user.name, user.dept FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
+          WHERE po_id IS NULL
     ";
     runQuery($q);
   });
@@ -22,7 +23,9 @@ function getLink()
   });
   
   Flight::route('GET /po', function () {
-    $q = "SELECT * FROM po";
+    $q = "SELECT po.*, spp.price, usr.name  FROM po
+          INNER JOIN spp on po.po_id = spp.po_id 
+          INNER JOIN `user` usr on usr.user_id = po.user_id";
     runQuery($q);
   });
   Flight::route('GET /po_byid/@id', function ($id) {
@@ -36,11 +39,24 @@ function getLink()
     runQuery($q);
   });
 //---------------------------------------------------------------------------------------------
-Flight::route('POST /new_spp', function () {
+  Flight::route('POST /new_spp', function () {
     $data = Flight::request()->getBody();
     $data = (array) json_decode($data);
 
     runQuery3('POST', 'spp', $data, '');
+  });
+  Flight::route('POST /new_po', function () {
+    $data = Flight::request()->getBody();
+    $data = (array) json_decode($data);
+
+    runQuery3('POST', 'po', $data, '');
+  });
+///
+  Flight::route('PUT /spp_byid/@spp_id', function ($spp_id) {
+    $data = Flight::request()->getBody();
+    $data = (array) json_decode($data);
+
+    runQuery3('PUT', 'spp', $data, 'spp_id', $spp_id);
   });
 
 
@@ -69,7 +85,7 @@ Flight::route('POST /new_spp', function () {
     Flight::json($arr[0]);
   }
   //update and post
-  function runQuery3($method, $table, $input = [], $val = '')
+  function runQuery3($method, $table, $input = [], $col = '', $val = '')
   {
     if ($input == null) {
       $input = [];
@@ -88,7 +104,7 @@ Flight::route('POST /new_spp', function () {
     $sql = '';
     switch ($method) {
       case 'PUT':
-        $sql = "update `$table` set $set" . ($val ? " where `id`='$val'" : '');
+        $sql = "update `$table` set $set" . ($val ? " where `$col`='$val'" : '');
         break;
       case 'POST':
         $sql = "insert into `$table` set $set";
@@ -116,7 +132,7 @@ Flight::route('POST /new_spp', function () {
     $password = $user->password;
 
     $link = getLink();
-    $q = "select id, username from m_user where username = '$username' and password = '$password'";
+    $q = "select user_id, name, username from user where username = '$username' and password = '$password'";
     $res = mysqli_query($link, $q) or die(mysqli_error($link));
 
     $arr = array();
@@ -134,7 +150,7 @@ Flight::route('POST /new_spp', function () {
         "nbf" => $notbefore_claim,
         "exp" => $expire_claim,
         "data" => array(
-          "id" => $arr[0]['id'],
+          "user_id" => $arr[0]['user_id'],
           "username" => $username,
         )
       );

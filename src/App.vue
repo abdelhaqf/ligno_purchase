@@ -110,7 +110,11 @@ export default {
       },
     };
   },
-  mounted() {
+  mounted(){
+    if(!localStorage.getItem("token")){
+        this.$router.push('/login')
+    }
+    
     this.isLoading = true;
     this.updateKurs();
   },

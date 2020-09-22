@@ -62,8 +62,15 @@ export default {
           is_received: "Fully Received",
         },
       ],
+      poList: [],
     };
   },
+  mounted(){
+
+  },
+  methods:{
+    
+  }
 };
 </script>
 
