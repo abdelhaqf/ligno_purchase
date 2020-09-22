@@ -42,6 +42,11 @@ export default {
     createSPP(){
       this.$http.post('/new_spp', this.spp, {})
       .then (result => {
+        this.spp = {
+          deadline: moment()
+            .add(1, "days")
+            .format("YYYY/MM/DD"),
+        }
         this.spp = result.data
         this.$q.notify('SPP Berhasil Dibuat!')
       })

@@ -23,9 +23,10 @@ function getLink()
   });
   
   Flight::route('GET /po', function () {
-    $q = "SELECT po.*, spp.price, usr.name  FROM po
+    $q = "SELECT po.po_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name, 'Half Received' as 'is_received'  FROM po
           INNER JOIN spp on po.po_id = spp.po_id 
-          INNER JOIN `user` usr on usr.user_id = po.user_id";
+          INNER JOIN `user` usr on usr.user_id = po.user_id
+          GROUP BY po.po_id, po.po_date, usr.name, po.vendor";
     runQuery($q);
   });
   Flight::route('GET /po_byid/@id', function ($id) {

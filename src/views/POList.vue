@@ -16,7 +16,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="d in dummy" :key="d.id">
+          <tr v-for="d in poList" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
@@ -40,35 +40,25 @@ import moment from "moment";
 export default {
   data() {
     return {
-      dummy: [
-        {
-          id: 1,
-          select: false,
-          po_id: 'PO/LSC/IX/0166',
-          po_date: moment().format("YYYY/MM/DD"),
-          name: "Wildan Abror Firdausy",
-          vendor: "PT Swadaya Bersama",
-          total_price: "Rp 2.400.000",
-          is_received: "Half Received",
-        },
-        {
-          id: 2,
-          select: false,
-          po_id: 'PO/LSC/IX/0167',
-          po_date: moment().format("YYYY/MM/DD"),
-          name: "Mansyur Ola Kopon",
-          vendor: "PT Inti Eka Prama",
-          total_price: "Rp 35.900.000",
-          is_received: "Fully Received",
-        },
-      ],
       poList: [],
     };
   },
   mounted(){
+    this.fetchData()
 
   },
   methods:{
+    fetchData(){
+      this.poList = []
+      this.$http.get('/po', {})
+      .then (result => {
+        for(var i = 0; i < result.data.length;i++){
+
+          result.data[i].select = false
+          this.poList.push(result.data[i])
+        }
+      })
+    },
     
   }
 };
