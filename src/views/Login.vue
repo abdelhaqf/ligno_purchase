@@ -39,6 +39,7 @@ export default {
         this.$router.push("/");
         this.$store.dispatch("getCurrentUser");
         this.$emit("isLogin", false);
+        this.$emit("updateKurs");
       });
     },
   },

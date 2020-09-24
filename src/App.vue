@@ -75,7 +75,7 @@
 
     <q-page-container>
       <q-scroll-area :visible="false" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 100vh;">
-        <router-view @isLogin="toggleLogin" />
+        <router-view @isLogin="toggleLogin" @updateKurs="updateKurs" />
       </q-scroll-area>
     </q-page-container>
   </q-layout>
@@ -131,15 +131,12 @@ export default {
       },
     };
   },
-  async beforeCreate() {
-    console.log("create app");
+  async mounted() {
     if (!localStorage.getItem("token")) {
       this.isLogin = true;
       this.$router.push("/login");
     } else {
-      console.log("dispatch action");
       await this.$store.dispatch("getCurrentUser");
-      console.log("dispatch done");
       this.isLogin = false;
       this.isLoading = true;
       this.updateKurs();
@@ -147,10 +144,10 @@ export default {
   },
   methods: {
     toggleLogin(val) {
-      console.log(val);
       this.isLogin = val;
     },
     updateKurs() {
+      this.isLoading = true;
       axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
         this.kurs = result.data;
         this.isLoading = false;

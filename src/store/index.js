@@ -14,7 +14,6 @@ export default new Vuex.Store({
   },
   mutations: {
     getCurrentUser(state, user) {
-      console.log('state change')
       state.currentUser = user;
     },
   },
@@ -24,7 +23,6 @@ export default new Vuex.Store({
         context.commit("getCurrentUser", null);
         return null;
       }
-      console.log('creating http req')
       await Vue.prototype.$http
         .get("/user/info/", {
           headers: {
@@ -32,7 +30,6 @@ export default new Vuex.Store({
           },
         })
         .then((result) => {
-          console.log('commiting to vuex')
           context.commit("getCurrentUser", result.data);
         })
         .catch(error => { })
