@@ -1,6 +1,27 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-drawer v-if="isLogin" show-if-above v-model="left" side="left" bordered>
+    <q-drawer v-if="!isLogin" show-if-above v-model="left" side="left" bordered>
+      <q-item>
+        <q-item-section avatar>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+          </q-avatar>
+        </q-item-section>
+
+        <q-item-section v-if="$store.state.currentUser">
+          <q-item-label>
+            {{ $store.state.currentUser.username }}
+          </q-item-label>
+          <q-item-label caption>
+            {{ $store.state.currentUser.dept }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-item-label caption><q-btn flat label="logout" size="sm" color="negative" @click="logout"/></q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-separator />
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
         <q-item-section>{{ m.title }}</q-item-section>
       </q-item>
@@ -54,7 +75,7 @@
 
     <q-page-container>
       <q-scroll-area :visible="false" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 100vh;">
-        <router-view />
+        <router-view @isLogin="toggleLogin" />
       </q-scroll-area>
     </q-page-container>
   </q-layout>
@@ -66,7 +87,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      isLogin: true,
+      isLogin: false,
       left: false,
       isLoading: false,
       showKurs: false,
@@ -110,22 +131,35 @@ export default {
       },
     };
   },
-  mounted(){
-    if(!localStorage.getItem("token")){
-        this.$router.push('/login')
+  async beforeCreate() {
+    console.log("create app");
+    if (!localStorage.getItem("token")) {
+      this.isLogin = true;
+      this.$router.push("/login");
+    } else {
+      console.log("dispatch action");
+      await this.$store.dispatch("getCurrentUser");
+      console.log("dispatch done");
+      this.isLogin = false;
+      this.isLoading = true;
+      this.updateKurs();
     }
-    
-    this.isLoading = true;
-    this.updateKurs();
   },
   methods: {
+    toggleLogin(val) {
+      console.log(val);
+      this.isLogin = val;
+    },
     updateKurs() {
       axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
         this.kurs = result.data;
-        // console.log(result)
         this.isLoading = false;
         this.showKurs = true;
       });
+    },
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login");
     },
   },
 };
