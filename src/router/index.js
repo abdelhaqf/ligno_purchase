@@ -25,6 +25,11 @@ const routes = [
     component: () => import('../views/SPPList.vue')
   },
   {
+    path: '/spp/detail/:id',
+    name: 'SPPDetail',
+    component: () => import('../views/SPPDetail.vue')
+  },
+  {
     path: '/spp/approve',
     name: 'SPPApprove',
     component: () => import('../views/SPPApprove.vue')

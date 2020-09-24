@@ -3,7 +3,7 @@
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
         <q-btn color="primary" label="Buat PO" @click="openForm" />
-        <q-btn label="Detail" />
+        <q-btn label="Detail" :disabled="selectCount > 1" @click="showDetail" />
       </div>
       <q-markup-table separator="cell"  flat square>
         <thead class="bg-green text-white">
@@ -88,7 +88,7 @@
               </div>
 
               <div class="q-gutter-md row justify-end">
-                <q-btn color="grey" label="Kembali" @click="formPO = false" />
+                <q-btn color="grey" label="Kembali" @click="closeForm" />
                 <q-btn color="primary" label="Submit" @click="createPO()" />
               </div>
             </div>
@@ -115,7 +115,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
   </div>
 </template>
 
@@ -175,6 +174,10 @@ export default {
         this.alert = true
       }
     },
+    closeForm(){
+      this.formPO = false
+      this.sppSelect = []
+    },
     createPO(){
       this.$http.post('/new_po', this.po, {})
       .then (result => {
@@ -197,8 +200,16 @@ export default {
           this.fetchData()
         
       })
-    }
+    },
+    showDetail(){
 
+    },
+  },
+  computed:{
+    selectCount(){
+      var count = this.sppList.filter(e => e.select === true).length
+      return count
+    }
   }
 };
 </script>
