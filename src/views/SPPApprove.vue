@@ -4,9 +4,8 @@
       <div class="q-pa-md q-gutter-md">
         <q-btn color="primary" label="Setuju" />
         <q-btn label="Tolak" />
-        <q-btn label="Detail" @click="showDetail = true" />
+        <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
       </div>
-      {{ spp }}
       <q-markup-table flat square dense>
         <thead class="bg-green text-white">
           <tr>
@@ -100,6 +99,7 @@ export default {
     return {
       showDetail: false,
       spp: [],
+      selected: {},
       dummy: [
         {
           id: 1,
@@ -138,6 +138,18 @@ export default {
       });
     },
   },
+  computed:{
+    selectCount(){
+      var data = this.spp.filter(e => e.select === true)
+      var count = data.length
+
+      if(data[0])
+        this.selected = data[0]
+
+      return count
+    }
+
+  }
 };
 </script>
 
