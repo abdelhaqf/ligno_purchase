@@ -23,8 +23,10 @@ function getLink()
   });
   
   Flight::route('GET /po', function () {
-    $q = "SELECT po.po_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name, 'Half Received' as 'is_received'  FROM po
-          INNER JOIN spp on po.po_id = spp.po_id 
+    $q = "SELECT po.po_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name, 
+              CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
+              WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
+          FROM po INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = po.user_id
           GROUP BY po.po_id, po.po_date, usr.name, po.vendor";
     runQuery($q);
@@ -33,12 +35,44 @@ function getLink()
     $q = "SELECT * FROM po where po_id = $id";
     runQuery2($q);
   });
+  Flight::route('POST /podetail_byid', function () {
+    $input = Flight::request()->getBody();
+    $input = (array) json_decode($input);
+
+    $po_id = $input["po_id"];
+
+
+    $q = "SELECT spp.spp_id, spp.price, spp.currency, spp.create_at, spp.is_received, spp.note, po.po_id, po.vendor, po.po_date, usr.name, hnd.name as 'handle_by' FROM po
+          INNER JOIN spp on po.po_id = spp.po_id 
+          INNER JOIN `user` usr on usr.user_id = po.user_id
+          INNER JOIN `user` hnd on hnd.user_id = spp.handle_by
+          WHERE po.po_id = '$po_id'"; //PO/2020/LSC/09
+    runQuery($q);
+  });
 
   Flight::route('GET /spp_history/@spp_id', function ($spp_id) {
     $q = "SELECT * FROM spp_history where spp_id = $spp_id
           ORDER BY history_id DESC";
     runQuery($q);
   });
+  
+  Flight::route('GET /list_item', function () {
+    $q = "SELECT DISTINCT item as 'value', item as 'label' FROM spp
+          WHERE po_id IS NOT NULL
+          ORDER BY item ASC";
+    runQuery($q);
+  });
+
+  
+  Flight::route('GET /pricelist/@item', function ($item) {
+    $q = "SELECT item, price, unit, spp.po_id, po.po_date, qty, vendor 
+          FROM spp INNER JOIN po ON po.po_id = spp.po_id
+          WHERE spp.item like '%$item%'
+          ";
+    runQuery($q);
+  });
+
+  
 //---------------------------------------------------------------------------------------------
   Flight::route('POST /new_spp', function () {
     $data = Flight::request()->getBody();
@@ -53,7 +87,7 @@ function getLink()
     runQuery3('POST', 'po', $data, '');
   });
 ///
-  Flight::route('PUT /spp_byid/@spp_id', function ($spp_id) {
+  Flight::route('PUT /update_spp/@spp_id', function ($spp_id) {
     $data = Flight::request()->getBody();
     $data = (array) json_decode($data);
 

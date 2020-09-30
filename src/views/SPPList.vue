@@ -159,10 +159,10 @@
             </q-item>
           </q-list>
         </q-card-section>
-        <q-card-actions align="right">
+        <!-- <q-card-actions align="right">
           <q-btn flat label="Tolak" color="primary" v-close-popup />
           <q-btn flat label="Setuju" color="primary" v-close-popup />
-        </q-card-actions>
+        </q-card-actions> -->
       </q-card>
     </q-dialog>
 
@@ -255,7 +255,7 @@ export default {
 
           console.log(this.sppSelect[i]);
 
-          this.$http.put('/spp_byid/' + this.sppSelect[i].spp_id, this.sppSelect[i], {})
+          this.$http.put('/update_spp/' + this.sppSelect[i].spp_id, this.sppSelect[i], {})
           .then (result => {
 
           })
@@ -294,7 +294,4 @@ export default {
   left: 0px; top: 0px;
 }
 
-table{
-
-}
 </style>
