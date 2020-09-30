@@ -18,12 +18,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="d in dummy" :key="d.id">
+          <tr v-for="d in sppList" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" dense />
             </td>
             <td>
-              {{ d.name }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.department }}</q-chip>
+              {{ d.name }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
             <td>{{ d.create_at }}</td>
             <td>{{ d.item }}</td>
@@ -37,7 +37,7 @@
     <q-dialog v-model="showDetail" persistent transition-show="flip-down" transition-hide="flip-up">
       <q-card >
         <q-bar class="bg-primary text-white">
-          <div>SPP 09/20/003</div>
+          <div>NO SPP: {{selected.spp_id}}</div>
 
           <q-space />
 
@@ -50,34 +50,48 @@
             <q-item>
               <q-item-section>
                 <q-item-label caption>Requester</q-item-label>
-                <q-item-label>Wildan</q-item-label>
+                <q-item-label>{{selected.name}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label caption>Request Date</q-item-label>
-                <q-item-label>21 Sept 2020</q-item-label>
+                <q-item-label>{{selected.create_at}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label caption>Deadline</q-item-label>
-                <q-item-label>24 Sept 2020</q-item-label>
+                <q-item-label>{{selected.deadline}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label caption>Item</q-item-label>
-                <q-item-label>2 buah Rompi Untuk Trial</q-item-label>
+                <q-item-label>{{selected.item}}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label caption>Quantity</q-item-label>
+                <q-item-label>{{selected.qty}} {{selected.unit}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label caption>Description</q-item-label>
                 <q-item-label
-                  >Untuk Keperluan trial di Surabaya, Wildan dan Roni, permintaan dokumentasi yang lebih baik, hasil
-                  rapat Maret 2020</q-item-label
+                  >{{selected.description}}</q-item-label
                 >
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label caption>Status</q-item-label>
+                <q-item-label>
+                  - disetujui manager <span :style="(selected.manager_approve==1?'color: green;':'color: red;')" >{{(selected.manager_approve==1?'&#10004;':'&#10008;')}}</span><br>
+                  - disetujui manager purchasing <span  :style="(selected.purch_manager_approve==1?'color: green;':'color: red;')" >{{(selected.purch_manager_approve==1?'&#10004;':'&#10008;')}}</span>
+                  </q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -98,49 +112,28 @@ export default {
   data() {
     return {
       showDetail: false,
-      spp: [],
+      sppList: [],
       selected: {},
-      dummy: [
-        {
-          id: 1,
-          select: false,
-          name: "Abdel Haq Firdausy",
-          department: "Marketing",
-          create_at: moment().format("YYYY/MM/DD"),
-          item: "rompi untuk trial",
-          qty: "2",
-          deadline: moment()
-            .add(3, "days")
-            .format("YYYY/MM/DD"),
-        },
-        {
-          id: 2,
-          select: false,
-          name: "Ahmad Darmawansyah",
-          department: "Accounting",
-          create_at: moment()
-            .add(1, "days")
-            .format("YYYY/MM/DD"),
-          item: "Materai Rp 10.000",
-          qty: "30",
-          deadline: moment()
-            .add(5, "days")
-            .format("YYYY/MM/DD"),
-        },
-      ],
     };
   },
-  mounted() {},
+  mounted() {
+    this.fetchData()
+  },
   methods: {
-    getSPP() {
-      this.$http.get("/spp", {}).then((result) => {
-        this.spp = result.data;
-      });
+    fetchData(){
+      this.sppList = []
+      this.$http.get('/spp', {})
+      .then (result => {
+        for(var i = 0; i < result.data.length;i++){
+          result.data[i].select = false
+          this.sppList.push(result.data[i])
+        }
+      })
     },
   },
   computed:{
     selectCount(){
-      var data = this.spp.filter(e => e.select === true)
+      var data = this.sppList.filter(e => e.select === true)
       var count = data.length
 
       if(data[0])
