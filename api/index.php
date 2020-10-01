@@ -179,7 +179,7 @@ Flight::route('GET /spp', function () {
     $password = $user->password;
 
     $link = getLink();
-    $q = "select user_id, name, username from user where username = '$username' and password = '$password'";
+    $q = "select user_id, name, username,dept from user where username = '$username' and password = '$password'";
     $res = mysqli_query($link, $q) or die(mysqli_error($link));
 
     $arr = array();
@@ -199,6 +199,7 @@ Flight::route('GET /spp', function () {
         "data" => array(
           "user_id" => $arr[0]['user_id'],
           "username" => $username,
+          "dept" => $arr[0]['dept'],
         )
       );
       $jwt = JWT::encode($token, Flight::get('secret'));
