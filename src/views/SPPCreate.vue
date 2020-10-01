@@ -3,7 +3,21 @@
     <div class="col-6">
       <div class="bg-green text-white text-h6 q-pa-md">SPP Baru</div>
       <div class="q-pa-md q-gutter-md ">
-        <q-input outlined v-model="spp.item" label="Item" stack-label dense />
+        <q-input outlined v-model="spp.item" label="Item" stack-label v-if="showInput" dense >
+          <template v-slot:append>
+            <q-btn round dense flat icon="arrow_drop_down" no-caps @click="showInput = !showInput" />
+          </template>
+        </q-input>
+        <q-select class="col-4" v-else
+          outlined dense stack-label
+          hide-dropdown-icon
+          v-model="spp.item" :options="option" 
+          map-options emit-value label="Item"
+          >
+            <template v-slot:append>
+              <q-btn round dense flat icon="add" no-caps @click="showInput = !showInput" />
+            </template>
+        </q-select>
         <div>
           <div class="row q-col-gutter-sm">
             <q-input type="number" class="col-7" outlined v-model="spp.qty" label="Qty" stack-label dense />
@@ -33,7 +47,15 @@ export default {
           .add(1, "days")
           .format("YYYY/MM/DD"),
       },
+      showInput: false,
+      option: [],
     };
+  },
+  mounted(){
+      this.$http.get('/list_item', {})
+      .then (result => {
+        this.option = result.data
+      })
   },
   methods: {
     limitDate(date) {

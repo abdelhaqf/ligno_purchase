@@ -62,6 +62,8 @@
 
 <script>
 import axios from "axios";
+import { mapState, mapActions } from "vuex";
+
 
 export default {
   data() {
@@ -111,6 +113,7 @@ export default {
     };
   },
   mounted(){
+    this.getCurrentUser();
     if(!localStorage.getItem("token")){
         this.$router.push('/login')
     }
@@ -119,6 +122,8 @@ export default {
     this.updateKurs();
   },
   methods: {
+    ...mapActions(["getCurrentUser"]),
+
     updateKurs() {
       axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
         this.kurs = result.data;
@@ -128,5 +133,7 @@ export default {
       });
     },
   },
+  computed: mapState(["currentUser"]),
+
 };
 </script>

@@ -2,8 +2,8 @@
   <div class="row">
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Setuju" />
-        <q-btn label="Tolak" />
+        <q-btn color="primary" label="Setuju" @click="promptApprove = true" />
+        <q-btn label="Tolak" @click="rejectSelected()" />
         <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
       </div>
       <q-markup-table flat square dense>
@@ -97,8 +97,50 @@
           </q-list>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Tolak" color="primary" v-close-popup />
-          <q-btn flat label="Setuju" color="primary" v-close-popup />
+          <q-btn flat label="Tolak" color="primary" @click="rejectSelected()" v-close-popup />
+          <q-btn flat label="Setuju" color="primary" @click="promptApprove = true"  />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="promptApprove" persistent>
+      <q-card style="min-width: 350px;">
+        <q-card-section>
+          <div class="text-h6">Handled By</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-select class="col-4"
+          outlined dense
+          hide-dropdown-icon
+          v-model="handleBy" :options="option" 
+          map-options emit-value
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup />
+          <q-btn flat label="OK" @click="approveSelected()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="promptReject" persistent>
+      <q-card style="min-width: 350px;">
+        <q-card-section>
+          <div class="text-h6">Handled By</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input class="col-4"
+          outlined dense
+          v-model="content" :options="option" 
+          map-options emit-value
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup />
+          <q-btn flat label="OK" @click="approveSelected()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -112,8 +154,12 @@ export default {
   data() {
     return {
       showDetail: false,
+      promptApprove: false, handleBy: '4',
+      promptReject: false, content: '',
       sppList: [],
       selected: {},
+      option:[],
+      currentUser: {}
     };
   },
   mounted() {
@@ -129,7 +175,64 @@ export default {
           this.sppList.push(result.data[i])
         }
       })
+
+      this.$http.get('/list_user', {})
+      .then (result => {
+        this.option = result.data
+      })
+
+      this.$http.get('/current_user/' + this.$store.state.currentUser.username ,{})
+      .then (result => {
+        this.currentUser = result.data
+      })
+      
     },
+    approve(val){
+      var data = {
+        handle_by : this.handleBy
+      }
+      if(this.currentUser.is_manager == 1)
+        data.manager_approve = 1
+      else if(this.currentUser.is_purch_manager == 1)
+        data.purch_manager_approve = 1
+
+      console.log(data);
+
+      this.$http.put('/update_spp/' + val.spp_id, data, {})
+      .then (result => {
+        
+      })
+    },
+    reject(val){
+      var data = {}
+      if(this.currentUser.is_manager == 1)
+        data.manager_approve = -1
+      else if(this.currentUser.is_purch_manager == 1)
+        data.purch_manager_approve = -
+        
+      console.log(data);
+      
+
+      this.$http.put('/update_spp/' + val.spp_id, data, {})
+      .then (result => {
+        
+      })
+    },
+    approveSelected(){
+      this.showDetail = false
+      var data = this.sppList.filter(e => e.select === true)
+      for(var i = 0; i<data.length; i++){
+        this.approve(data[i])
+      }
+      this.fetchData()
+    },
+    rejectSelected(){
+      var data = this.sppList.filter(e => e.select === true)
+      for(var i = 0; i<data.length; i++){
+        this.reject(data[i])
+      }
+      this.fetchData()
+    }
   },
   computed:{
     selectCount(){

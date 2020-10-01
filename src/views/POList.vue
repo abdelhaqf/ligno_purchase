@@ -18,7 +18,7 @@
         <tbody>
           <tr v-for="d in poList" :key="d.id">
             <td>
-              <q-checkbox v-model="d.select" />
+              <q-radio v-model="slcPO" :val="d.po_id" />
             </td>
             <td>
               {{ d.po_id }} <q-chip color="teal" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
@@ -113,7 +113,7 @@ export default {
   data() {
     return {
       poList: [],
-
+      slcPO: null,
       selected: [],
       is_received: [
         { label: "no", value: "0" },
@@ -134,27 +134,19 @@ export default {
       this.poList = []
       this.$http.get('/po', {})
       .then (result => {
-        for(var i = 0; i < result.data.length;i++){
-
-          result.data[i].select = false
-          this.poList.push(result.data[i])
-        }
+        this.poList = result.data
       })
     },
     openForm(){
-      var data = this.poList.filter(e => e.select === true)
-      if(data.length == 1){
-        this.$http.post('/podetail_byid', {po_id : data[0].po_id}, {})
+      if(!this.slcPO){
+        this.alert = true
+      }
+      else{
+        this.$http.post('/podetail_byid', {po_id : this.slcPO}, {})
         .then (result => {
           this.selected = result.data
           this.showDetail = true
         })
-      }
-      else if(data.length == 0){
-        this.alert = true
-      }
-      else {
-        this.alert = true
       }
     },
     closeForm(){
@@ -162,12 +154,12 @@ export default {
     },
     updateSPP(){
       for(var i = 0; i< this.selected.length; i++){
-        let newData = {
+        let data = {
           is_received : this.selected[i].is_received,
           note: this.selected[i].note
         }
         
-        this.$http.put('/update_spp/' + this.selected[i].spp_id, newData, {})
+        this.$http.put('/update_spp/' + this.selected[i].spp_id, data, {})
         .then (result => {
           
         })
