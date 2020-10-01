@@ -7,7 +7,6 @@
             <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
           </q-avatar>
         </q-item-section>
-
         <q-item-section v-if="$store.state.currentUser">
           <q-item-label>
             {{ $store.state.currentUser.username }}
@@ -83,6 +82,8 @@
 
 <script>
 import axios from "axios";
+import { mapState, mapActions } from "vuex";
+
 
 export default {
   data() {
@@ -132,6 +133,8 @@ export default {
     };
   },
   async mounted() {
+    
+    await this.getCurrentUser();
     if (!localStorage.getItem("token")) {
       this.isLogin = true;
       this.$router.push("/login");
@@ -143,6 +146,8 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["getCurrentUser"]),
+
     toggleLogin(val) {
       this.isLogin = val;
     },
@@ -159,5 +164,7 @@ export default {
       this.$router.push("/login");
     },
   },
+  computed: mapState(["currentUser"]),
+
 };
 </script>

@@ -10,7 +10,14 @@ function getLink()
 }
 
 //---------------------------------------------------------------------------------------------
-  Flight::route('GET /spp', function () {
+  
+Flight::route('GET /current_user/@username', function ($username) {
+
+    $q = "SELECT * FROM user WHERE username like '$username'";
+    runQuery2($q);
+  });
+
+Flight::route('GET /spp', function () {
     $q = "SELECT spp.*, user.name, user.dept FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           WHERE po_id IS NULL
@@ -60,6 +67,11 @@ function getLink()
     $q = "SELECT DISTINCT item as 'value', item as 'label' FROM spp
           WHERE po_id IS NOT NULL
           ORDER BY item ASC";
+    runQuery($q);
+  });
+  Flight::route('GET /list_user', function () {
+    $q = "SELECT DISTINCT `user_id` as 'value', `name` as 'label' FROM user
+          ORDER BY name ASC";
     runQuery($q);
   });
 
