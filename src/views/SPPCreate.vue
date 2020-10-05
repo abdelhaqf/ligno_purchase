@@ -10,14 +10,24 @@
         </q-input>
         <q-select class="col-4" v-else
           outlined dense stack-label
-          hide-dropdown-icon
           v-model="spp.item" :options="option" 
           map-options emit-value label="Item"
           >
-            <template v-slot:append>
-              <q-btn round dense flat icon="add" no-caps @click="showInput = !showInput" />
-            </template>
+          <template v-slot:option="scope">
+            <q-item
+              v-bind="scope.itemProps"
+              v-on="scope.itemEvents"
+            >
+              <q-item-section class="text-grey text-italic" v-if="scope.opt.value == ''" @click="test()"  >
+                {{scope.opt.label}}
+              </q-item-section>
+              <q-item-section v-else >
+                {{scope.opt.label}}
+              </q-item-section>
+            </q-item>
+          </template>
         </q-select>
+
         <div>
           <div class="row q-col-gutter-sm">
             <q-input type="number" class="col-7" outlined v-model="spp.qty" label="Qty" stack-label dense />
@@ -55,9 +65,17 @@ export default {
       this.$http.get('/list_item', {})
       .then (result => {
         this.option = result.data
+        this.option.unshift({
+          value: '',
+          label: ' input baru'
+        })
       })
   },
   methods: {
+    test(){
+      console.log('tes masuk');
+      this.showInput = true
+    },
     limitDate(date) {
       return date >= moment().format("YYYY/MM/DD");
     },

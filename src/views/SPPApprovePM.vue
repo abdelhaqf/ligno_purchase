@@ -2,8 +2,8 @@
   <div class="row">
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Setuju" @click="confirmApprove = true" />
-        <q-btn label="Tolak" @click="confirmReject = true" />
+        <q-btn color="primary" label="Setuju" @click="promptApprove = true" />
+        <q-btn label="Tolak" @click="promptReject=true" />
         <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
       </div>
       <q-markup-table flat square dense>
@@ -97,20 +97,25 @@
           </q-list>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Tolak" color="primary" @click="confirmReject=true" v-close-popup />
-          <q-btn flat label="Setuju" color="primary" @click="confirmApprove = true"  />
+          <q-btn flat label="Tolak" color="primary" @click="promptReject=true" v-close-popup />
+          <q-btn flat label="Setuju" color="primary" @click="promptApprove = true"  />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <q-dialog v-model="confirmApprove" persistent>
+    <q-dialog v-model="promptApprove" persistent>
       <q-card style="min-width: 350px;">
         <q-card-section>
-          <div class="text-bold">Approve Confirmation</div>
+          <div class="text-h6">Handled By</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          Setujui SPP yang dipilih?
+          <q-select class="col-4"
+          outlined dense
+          hide-dropdown-icon
+          v-model="handleBy" :options="option" 
+          map-options emit-value
+          />
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
@@ -119,10 +124,10 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="confirmReject" persistent>
+    <q-dialog v-model="promptReject" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section> 
-          <div class="text-bold">Reject Reason</div>
+        <q-card-section>
+          <div class="text-h6">Rejected Reason</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -134,7 +139,7 @@
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="OK" @click="rejectSelected()" v-close-popup />
+          <q-btn flat label="OK" @click="approveSelected()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -148,8 +153,8 @@ export default {
   data() {
     return {
       showDetail: false,
-      confirmApprove: false,
-      confirmReject: false, content: '',
+      promptApprove: false, handleBy: '4',
+      promptReject: false, content: '',
       sppList: [],
       selected: {},
       option:[],
@@ -164,21 +169,21 @@ export default {
       this.$http.get('/spp', {})
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
-          if(result.data[i].manager_approve == 0 && result.data[i].manager_id == this.$store.state.currentUser.user_id){
+          if(result.data[i].manager_approve == 1 && result.data[i].purch_manager_approve == 0){
             result.data[i].select = false
             this.sppList.push(result.data[i])
           }
         }
       })
-
       this.$http.get('/list_user', {})
       .then (result => {
         this.option = result.data
-      })      
+      })
     },
     approve(val){
       var data = {
-        manager_approve: 1
+        purch_manager_approve: 1,
+        handle_by : this.handleBy
       }
 
       this.$http.put('/update_spp/' + val.spp_id, data, {})
@@ -195,9 +200,8 @@ export default {
       .then (result => {
         
       })
-
       var data = {
-        manager_approve: -1,
+        purch_manager_approve: -1,
         note: this.content
       }
 

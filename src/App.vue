@@ -1,6 +1,26 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-drawer v-if="isLogin" show-if-above v-model="left" side="left" bordered>
+    <q-drawer v-if="!isLogin" show-if-above v-model="left" side="left" bordered>
+      <q-item>
+        <q-item-section avatar>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+          </q-avatar>
+        </q-item-section>
+        <q-item-section v-if="$store.state.currentUser">
+          <q-item-label>
+            {{ $store.state.currentUser.username }}
+          </q-item-label>
+          <q-item-label caption>
+            {{ $store.state.currentUser.dept }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-item-label caption><q-btn flat label="logout" size="sm" color="negative" @click="logout"/></q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-separator />
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
         <q-item-section>{{ m.title }}</q-item-section>
       </q-item>
@@ -54,7 +74,7 @@
 
     <q-page-container>
       <q-scroll-area :visible="false" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 100vh;">
-        <router-view />
+        <router-view @isLogin="toggleLogin" @updateKurs="updateKurs" />
       </q-scroll-area>
     </q-page-container>
   </q-layout>
@@ -68,7 +88,7 @@ import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      isLogin: true,
+      isLogin: false,
       left: false,
       isLoading: false,
       showKurs: false,
@@ -81,10 +101,6 @@ export default {
         {
           title: "List SPP",
           link: "/spp/list",
-        },
-        {
-          title: "Persetujuan Manager",
-          link: "/spp/approve",
         },
         {
           title: "List PO",
@@ -112,25 +128,51 @@ export default {
       },
     };
   },
-  mounted(){
-    this.getCurrentUser();
-    if(!localStorage.getItem("token")){
-        this.$router.push('/login')
-    }
+  async mounted() {
     
-    this.isLoading = true;
-    this.updateKurs();
+    await this.getCurrentUser();
+    if (!this.$store.state.currentUser) {
+      this.isLogin = true;
+      this.$router.push("/login");
+    } 
+    else {
+      // await this.$store.dispatch("getCurrentUser");
+
+      if(this.$store.state.currentUser.is_purch_manager=='1'){
+        this.menu.splice(2,0, {
+          title: "Persetujuan Manager Purchasing",
+          link: "/spp/approve-pm",
+        })
+      }
+      if(this.$store.state.currentUser.is_manager=='1'){
+        this.menu.splice(2,0, {
+          title: "Persetujuan Manager",
+          link: "/spp/approve",
+        })
+      }
+
+      this.isLogin = false;
+      this.isLoading = true;
+      this.updateKurs();
+    }
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
 
+    toggleLogin(val) {
+      this.isLogin = val;
+    },
     updateKurs() {
+      this.isLoading = true;
       axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
         this.kurs = result.data;
-        // console.log(result)
         this.isLoading = false;
         this.showKurs = true;
       });
+    },
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login");
     },
   },
   computed: mapState(["currentUser"]),
