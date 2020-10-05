@@ -2,7 +2,7 @@
   <div class="row relative">
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Buat PO" @click="openForm" />
+        <q-btn color="primary" label="Buat PO" @click="openForm" v-if="$store.state.currentUser.is_purchasing == 1" />
         <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
       </div>
       <q-markup-table separator="cell"  flat square dense>
@@ -152,9 +152,8 @@
               <q-item-section>
                 <q-item-label caption>Status</q-item-label>
                 <q-item-label>
-                  - disetujui manager <span :style="(selected.manager_approve==1?'color: green;':'color: red;')" >{{(selected.manager_approve==1?'&#10004;':'&#10008;')}}</span><br>
-                  - disetujui manager purchasing <span  :style="(selected.purch_manager_approve==1?'color: green;':'color: red;')" >{{(selected.purch_manager_approve==1?'&#10004;':'&#10008;')}}</span>
-                  </q-item-label>
+                  {{status}}
+                </q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -283,6 +282,23 @@ export default {
         this.selected = data[0]
 
       return count
+    },
+    status(){
+      if(this.selected.manager_approve == 0){
+        return 'Menunggu persetujuan manager'
+      }
+      else if(this.selected.manager_approve == -1){
+        return 'Ditolak oleh manager'
+      }
+      else if(this.selected.purch_manager_approve == 0){
+        return 'Menunggu persetujuan manager purchasing'
+      }
+      else if(this.selected.purch_manager_approve == -1){
+        return 'Ditolak oleh manager purchasing'
+      }
+      else {
+        return 'Sedang diproses oleh ' + this.selected.handler_name
+      }
     }
   }
 };

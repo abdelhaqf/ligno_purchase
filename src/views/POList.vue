@@ -24,7 +24,7 @@
               {{ d.po_id }} <q-chip color="teal" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
             </td>
             <td>{{ d.po_date }}</td>
-            <td>{{ d.name }}</td>
+            <td>{{ d.handler_name }}</td>
             <td>{{ d.vendor }}</td>
             <td>{{ d.total_price }}</td>
           </tr>
