@@ -185,7 +185,8 @@ Flight::route('GET /spp', function () {
     $password = $user->password;
 
     $link = getLink();
-    $q = "select user_id, name, username, is_manager, is_purch_manager from user where username = '$username' and password = '$password'";
+    $q = "select user_id, name, username, is_manager, is_purch_manager, dept from user where username = '$username' and password = '$password'";
+
     $res = mysqli_query($link, $q) or die(mysqli_error($link));
 
     $arr = array();
@@ -207,6 +208,7 @@ Flight::route('GET /spp', function () {
           "username" => $username,
           "is_manager" => $arr[0]['is_manager'],
           "is_purch_manager" => $arr[0]['is_purch_manager'],
+          "dept" => $arr[0]['dept'],
         )
       );
       $jwt = JWT::encode($token, Flight::get('secret'));

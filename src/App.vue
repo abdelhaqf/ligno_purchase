@@ -150,7 +150,6 @@ export default {
           link: "/spp/approve",
         })
       }
-
       this.isLogin = false;
       this.isLoading = true;
       this.updateKurs();
