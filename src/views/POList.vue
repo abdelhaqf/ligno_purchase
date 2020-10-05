@@ -49,6 +49,7 @@
                     <th>Vendor</th>
                     <th>value</th>
                     <th>Received</th>
+                    <th>COA</th>
                     <th>Note</th>
                   </tr>
                 </thead>
@@ -67,6 +68,15 @@
                         outlined  dense 
                         v-model="d.is_received"
                         :options="is_received"
+                        emit-value
+                        map-options
+                      />
+                    </td>
+                    <td style="padding:0px;">
+                      <q-select 
+                        outlined  dense 
+                        v-model="d.coa"
+                        :options="is_COA"
                         emit-value
                         map-options
                       />
@@ -120,7 +130,10 @@ export default {
         { label: "partial", value: "1" },
         { label: "full", value: "2" },
       ],
-
+      is_COA:[
+        {label: 'no', value: "0"},
+        {label: 'yes', value: "1"}
+      ],
       alert: false,
       showDetail: false,
     };
@@ -156,6 +169,7 @@ export default {
       for(var i = 0; i< this.selected.length; i++){
         let data = {
           is_received : this.selected[i].is_received,
+          coa: this.selected[i].coa,
           note: this.selected[i].note
         }
         

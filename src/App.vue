@@ -103,10 +103,6 @@ export default {
           link: "/spp/list",
         },
         {
-          title: "Persetujuan Manager",
-          link: "/spp/approve",
-        },
-        {
           title: "List PO",
           link: "/po/list",
         },
@@ -135,11 +131,25 @@ export default {
   async mounted() {
     
     await this.getCurrentUser();
-    if (!localStorage.getItem("token")) {
+    if (!this.$store.state.currentUser) {
       this.isLogin = true;
       this.$router.push("/login");
-    } else {
-      await this.$store.dispatch("getCurrentUser");
+    } 
+    else {
+      // await this.$store.dispatch("getCurrentUser");
+
+      if(this.$store.state.currentUser.is_purch_manager=='1'){
+        this.menu.splice(2,0, {
+          title: "Persetujuan Manager Purchasing",
+          link: "/spp/approve-pm",
+        })
+      }
+      if(this.$store.state.currentUser.is_manager=='1'){
+        this.menu.splice(2,0, {
+          title: "Persetujuan Manager",
+          link: "/spp/approve",
+        })
+      }
       this.isLogin = false;
       this.isLoading = true;
       this.updateKurs();

@@ -5,7 +5,7 @@
         <q-btn color="primary" label="Buat PO" @click="openForm" />
         <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
       </div>
-      <q-markup-table separator="cell"  flat square>
+      <q-markup-table separator="cell"  flat square dense>
         <thead class="bg-green text-white">
           <tr>
             <th style="width:10px;"></th>
@@ -214,8 +214,10 @@ export default {
       this.$http.get('/spp', {})
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
-          result.data[i].select = false
-          this.sppList.push(result.data[i])
+          if(result.data[i].user_id == this.$store.state.currentUser.user_id || result.data[i].handle_by == this.$store.state.currentUser.user_id){
+            result.data[i].select = false
+            this.sppList.push(result.data[i])
+          }
         }
       })
     },
@@ -247,6 +249,7 @@ export default {
       this.sppSelect = []
     },
     createPO(){
+      this.po.user_id = this.$store.state.currentUser.user_id
       this.$http.post('/new_po', this.po, {})
       .then (result => {
         for(var i = 0; i < this.sppSelect.length; i++){
