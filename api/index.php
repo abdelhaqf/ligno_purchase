@@ -18,8 +18,9 @@ Flight::route('GET /current_user/@username', function ($username) {
   });
 
 Flight::route('GET /spp', function () {
-    $q = "SELECT spp.*, user.name, user.dept, user.manager_id FROM spp
+    $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
+          LEFT JOIN user hnd on hnd.user_id = spp.handle_by
           WHERE po_id IS NULL
     ";
     runQuery($q);
@@ -30,7 +31,7 @@ Flight::route('GET /spp', function () {
   });
   
   Flight::route('GET /po', function () {
-    $q = "SELECT po.po_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name, 
+    $q = "SELECT po.po_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name AS 'handler_name', 
               CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
               WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
           FROM po INNER JOIN spp on po.po_id = spp.po_id 
@@ -49,7 +50,7 @@ Flight::route('GET /spp', function () {
     $po_id = $input["po_id"];
 
 
-    $q = "SELECT spp.spp_id, spp.price, spp.currency, spp.create_at, spp.is_received, spp.coa, spp.note, po.po_id, po.vendor, po.po_date, usr.name, hnd.name as 'handle_by' FROM po
+    $q = "SELECT spp.spp_id, spp.price, spp.currency, spp.create_at, spp.is_received, spp.coa, spp.note, po.po_id, po.vendor, po.po_date, usr.name, hnd.name as 'handler_name' FROM po
           INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = po.user_id
           INNER JOIN `user` hnd on hnd.user_id = spp.handle_by
@@ -185,7 +186,7 @@ Flight::route('GET /spp', function () {
     $password = $user->password;
 
     $link = getLink();
-    $q = "select user_id, name, username, is_manager, is_purch_manager, dept from user where username = '$username' and password = '$password'";
+    $q = "select user_id, name, username, is_manager, is_purchasing, is_purch_manager, dept from user where username = '$username' and password = '$password'";
 
     $res = mysqli_query($link, $q) or die(mysqli_error($link));
 
@@ -207,6 +208,7 @@ Flight::route('GET /spp', function () {
           "user_id" => $arr[0]['user_id'],
           "username" => $username,
           "is_manager" => $arr[0]['is_manager'],
+          "is_purchasing" => $arr[0]['is_purchasing'],
           "is_purch_manager" => $arr[0]['is_purch_manager'],
           "dept" => $arr[0]['dept'],
         )

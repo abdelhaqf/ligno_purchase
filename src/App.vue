@@ -101,15 +101,7 @@ export default {
         {
           title: "List SPP",
           link: "/spp/list",
-        },
-        {
-          title: "List PO",
-          link: "/po/list",
-        },
-        {
-          title: "List Harga",
-          link: "/price/list",
-        },
+        }
       ],
       thumbStyle: {
         right: "4px",
@@ -138,16 +130,26 @@ export default {
     else {
       // await this.$store.dispatch("getCurrentUser");
 
+      if(this.$store.state.currentUser.is_manager=='1'){
+        this.menu.push({
+          title: "Persetujuan Manager",
+          link: "/spp/approve",
+        })
+      }
       if(this.$store.state.currentUser.is_purch_manager=='1'){
-        this.menu.splice(2,0, {
+        this.menu.push({
           title: "Persetujuan Manager Purchasing",
           link: "/spp/approve-pm",
         })
       }
-      if(this.$store.state.currentUser.is_manager=='1'){
-        this.menu.splice(2,0, {
-          title: "Persetujuan Manager",
-          link: "/spp/approve",
+      if(this.$store.state.currentUser.is_purchasing=='1'){
+        this.menu.push({
+          title: "List PO",
+          link: "/po/list",
+        })
+        this.menu.push({
+          title: "List Harga",
+          link: "/price/list",
         })
       }
       this.isLogin = false;
