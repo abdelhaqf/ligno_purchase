@@ -22,7 +22,14 @@
 
       <q-separator />
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
-        <q-item-section>{{ m.title }}</q-item-section>
+        <q-item-section>
+          <q-item-label class="row items-center">
+            <div>{{ m.title }}</div>
+            <div style="height: 30px; padding: 0 5px;">
+              <q-badge color="orange"  v-if="m.count> 0">{{m.count}}</q-badge>
+            </div>
+          </q-item-label>
+        </q-item-section>
       </q-item>
       <q-separator />
       <q-card class="relative-position" flat>
@@ -93,15 +100,12 @@ export default {
       isLoading: false,
       showKurs: false,
       kurs: [],
+      count: {},
       menu: [
         {
           title: "Buat SPP",
           link: "/spp/create",
         },
-        {
-          title: "List SPP",
-          link: "/spp/list",
-        }
       ],
       thumbStyle: {
         right: "4px",
@@ -124,34 +128,49 @@ export default {
     
     await this.getCurrentUser();
     if (!this.$store.state.currentUser) {
+      this.logout()
+      this.$router.push("/login").catch(() => {});
       this.isLogin = true;
-      this.$router.push("/login");
     } 
     else {
-      // await this.$store.dispatch("getCurrentUser");
+      
+      this.$http.get('/count_data/' + this.$store.state.currentUser.user_id, {})
+        .then (result => {
+          this.count = result.data
+          this.menu.push({
+            title: "List SPP",
+            link: "/spp/list",
+            count: result.data.count_spp
+          })
 
-      if(this.$store.state.currentUser.is_manager=='1'){
-        this.menu.push({
-          title: "Persetujuan Manager",
-          link: "/spp/approve",
+          if(this.$store.state.currentUser.is_manager=='1'){
+            this.menu.push({
+              title: "Persetujuan Manager",
+              link: "/spp/approve",
+              count: result.data.count_approve
+            })
+          }
+          if(this.$store.state.currentUser.is_purch_manager=='1'){
+            this.menu.push({
+              title: "Persetujuan Manager Purchasing",
+              link: "/spp/approve-pm",
+              count: result.data.count_approvePM
+            })
+          }
+          if(this.$store.state.currentUser.is_purchasing=='1'){
+            this.menu.push({
+              title: "List PO",
+              link: "/po/list",
+              count: result.data.count_po
+            })
+            this.menu.push({
+              title: "List Harga",
+              link: "/price/list",
+            })
+          }
+
         })
-      }
-      if(this.$store.state.currentUser.is_purch_manager=='1'){
-        this.menu.push({
-          title: "Persetujuan Manager Purchasing",
-          link: "/spp/approve-pm",
-        })
-      }
-      if(this.$store.state.currentUser.is_purchasing=='1'){
-        this.menu.push({
-          title: "List PO",
-          link: "/po/list",
-        })
-        this.menu.push({
-          title: "List Harga",
-          link: "/price/list",
-        })
-      }
+
       this.isLogin = false;
       this.isLoading = true;
       this.updateKurs();

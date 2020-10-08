@@ -213,7 +213,8 @@ export default {
       this.$http.get('/spp', {})
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
-          if(result.data[i].user_id == this.$store.state.currentUser.user_id || result.data[i].handle_by == this.$store.state.currentUser.user_id){
+          if(result.data[i].user_id == this.$store.state.currentUser.user_id || 
+             (result.data[i].handle_by == this.$store.state.currentUser.user_id && result.data[i].po_id == null)){
             result.data[i].select = false
             this.sppList.push(result.data[i])
           }
@@ -296,8 +297,15 @@ export default {
       else if(this.selected.purch_manager_approve == -1){
         return 'Ditolak oleh manager purchasing'
       }
-      else {
+      else if(this.selected.is_received == 0) {
         return 'Sedang diproses oleh ' + this.selected.handler_name
+      }
+      else if(this.selected.is_received == 1) {
+        return 'Barang sudah diterima sebagian'
+      }
+      
+      else if(this.selected.is_received == 2) {
+        return 'Barang sudah diterima'
       }
     }
   }

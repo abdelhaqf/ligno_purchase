@@ -32,7 +32,8 @@ export default new Vuex.Store({
         .then((result) => {
           context.commit("getCurrentUser", result.data);
         })
-        .catch(error => { })
+        .catch(error => {
+         })
     },
   },
   modules: {},
