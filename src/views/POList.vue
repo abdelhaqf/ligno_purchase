@@ -37,7 +37,7 @@
       <div class="showDetail">
         <div class="row">
           <div class="col-12">
-            <div class="bg-green text-white text-h6 q-pa-md">Detail PO Nomor:  {{selected[0].po_id}} </div>
+            <div class="text-grey-8 text-h6 q-pa-md">Detail PO Nomor:  {{selected[0].po_id}} </div>
             <div class="q-pa-md q-gutter-md ">
               <q-markup-table separator="cell"  flat square dense>
                 <thead class="bg-green text-white">
@@ -60,7 +60,7 @@
                     </td>
                     <td>{{ d.po_date }}</td>
                     <td>{{ d.name }}</td>
-                    <td>{{ d.handle_by }}</td>
+                    <td>{{ d.handler_name }}</td>
                     <td>{{ d.vendor }}</td>
                     <td>{{ d.price }}</td>
                     <td style="padding:0px;">
@@ -147,7 +147,13 @@ export default {
       this.poList = []
       this.$http.get('/po', {})
       .then (result => {
-        this.poList = result.data
+        for(var i = 0; i < result.data.length; i++){
+          if(this.$store.state.currentUser.is_purch_manager=='1' ||
+             result.data[i].user_id == this.$store.state.currentUser.user_id)
+          {
+            this.poList.push(result.data[i])
+          }
+        }
       })
     },
     openForm(){

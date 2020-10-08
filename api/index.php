@@ -10,18 +10,18 @@ function getLink()
 }
 
 //---------------------------------------------------------------------------------------------
-  
-Flight::route('GET /current_user/@username', function ($username) {
+
+  Flight::route('GET /current_user/@username', function ($username) {
 
     $q = "SELECT * FROM user WHERE username like '$username'";
     runQuery2($q);
   });
 
-Flight::route('GET /spp', function () {
+  Flight::route('GET /spp', function () {
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          WHERE po_id IS NULL
+          -- WHERE po_id IS NULL
     ";
     runQuery($q);
   });
@@ -31,12 +31,12 @@ Flight::route('GET /spp', function () {
   });
   
   Flight::route('GET /po', function () {
-    $q = "SELECT po.po_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name AS 'handler_name', 
+    $q = "SELECT po.po_id, po.user_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name AS 'handler_name', 
               CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
               WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
           FROM po INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = po.user_id
-          GROUP BY po.po_id, po.po_date, usr.name, po.vendor";
+          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor";
     runQuery($q);
   });
   Flight::route('GET /po_byid/@id', function ($id) {
@@ -52,9 +52,9 @@ Flight::route('GET /spp', function () {
 
     $q = "SELECT spp.spp_id, spp.price, spp.currency, spp.create_at, spp.is_received, spp.coa, spp.note, po.po_id, po.vendor, po.po_date, usr.name, hnd.name as 'handler_name' FROM po
           INNER JOIN spp on po.po_id = spp.po_id 
-          INNER JOIN `user` usr on usr.user_id = po.user_id
+          INNER JOIN `user` usr on usr.user_id = spp.user_id
           INNER JOIN `user` hnd on hnd.user_id = spp.handle_by
-          WHERE po.po_id = '$po_id'"; //PO/2020/LSC/09
+          WHERE po.po_id = '$po_id'";
     runQuery($q);
   });
 
@@ -83,6 +83,29 @@ Flight::route('GET /spp', function () {
           WHERE spp.item like '%$item%'
           ";
     runQuery($q);
+  });
+
+  Flight::route('GET /count_data/@userid', function ($userid) {
+    $q = "SELECT SUM(col1) 'count_spp', SUM(col2) 'count_approve', SUM(col3) 'count_approvePM', SUM(col4) 'count_po' FROM (
+
+            SELECT COUNT(spp_id) AS 'col1',0 AS 'col2',0 AS 'col3',0 AS 'col4'  FROM `spp` 
+            WHERE po_id IS NULL AND spp.handle_by = $userid
+                UNION ALL
+            SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp` 
+            INNER JOIN user ON user.user_id = spp.user_id
+            WHERE manager_approve = 0 AND user.manager_id = $userid
+                UNION ALL
+            SELECT 0 AS 'col1',0 AS 'col2',COUNT(spp_id) AS 'col3',0 AS 'col4' FROM `spp` 
+            INNER JOIN user ON user.user_id = spp.user_id
+            WHERE purch_manager_approve = 0 
+            AND $userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) 
+                UNION ALL
+            SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3',COUNT(DISTINCT po.po_id) AS 'col4' FROM `po` 
+            INNER JOIN spp ON spp.po_id = po.po_id
+            WHERE spp.is_received <> 2
+            AND ($userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) OR po.user_id = $userid) 
+              ) tb";
+    runQuery2($q);
   });
 
   
