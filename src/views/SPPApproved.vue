@@ -3,7 +3,9 @@
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
         <q-btn color="primary" label="Buat PO" @click="openForm" v-if="$store.state.currentUser.is_purchasing == 1" />
-        <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
+        <q-btn label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+        <q-btn label="History" :disabled="selectCount != 1" @click="showHistory()" />
+        <q-btn label="Batalkan" :disabled="selectCount != 1" @click="confirmCancel  = true" />
       </div>
       <q-markup-table separator="cell"  flat square dense>
         <thead class="bg-green text-white">
@@ -42,16 +44,28 @@
           <div class="col-8">
             <div class="bg-green text-white text-h6 q-pa-md">PO Baru</div>
             <div class="q-pa-md q-gutter-md ">
-              <q-input outlined v-model="po.po_id" label="No PO" stack-label dense />
+
+<!-- {{po.po_id}} -->
+{{po}}
+
               <div class="row">
-                <q-input class="col-11"  outlined v-model="po.vendor" label="Vendor" stack-label dense />
-                <q-select class="col-1" outlined dense v-model="curr" :options="['IDR', 'USD']" 
-                          @input="chgCurrency" hide-dropdown-icon />
+                <q-input class="col-10" outlined v-model="po.po_id" label="No PO" stack-label dense v-if="type == 'PO'" />
+                <q-input class="col-10" outlined v-model="po.po_id" label="Nomor" readonly stack-label dense v-else />
+                <div class="col-2">
+                  <q-select class="q-ml-sm" outlined dense v-model="type" :options="['PO', 'Non-PO']" 
+                            @input="changeType()" hide-dropdown-icon />
+                </div>
+              </div>
+              <div class="row">
+                <q-input class="col-10"  outlined v-model="po.vendor" label="Vendor" stack-label dense />
+                <div class="col-2">
+                  <q-select class="q-ml-sm" outlined dense v-model="curr" :options="['IDR', 'USD']" 
+                            @input="chgCurrency" hide-dropdown-icon />
+                </div>
               </div>
               <q-input outlined v-model="po.po_date" label="PO Date" stack-label dense readonly />
               <q-date v-model="po.po_date" minimal :options="limitDate" />
               <div>
-{{sppSelect}}
                 <q-markup-table separator="cell"  flat square>
                   <thead class="bg-green text-white">
                     <tr>
@@ -98,8 +112,8 @@
       </div>
     </div>
 
-    <q-dialog v-model="showDetail" persistent transition-show="flip-down" transition-hide="flip-up">
-      <q-card >
+    <q-dialog v-model="show_detail" persistent transition-show="flip-down" transition-hide="flip-up">
+      <q-card style="min-width: 350px;">
         <q-bar class="bg-primary text-white">
           <div>NO SPP: {{selected.spp_id}}</div>
 
@@ -149,6 +163,14 @@
                 >
               </q-item-section>
             </q-item>
+            <q-item v-if="selected.est_arrival">
+              <q-item-section>
+                <q-item-label caption>Arrival Estimation</q-item-label>
+                <q-item-label
+                  >{{selected.est_arrival}}</q-item-label
+                >
+              </q-item-section>
+            </q-item>
             <q-item>
               <q-item-section>
                 <q-item-label caption>Status</q-item-label>
@@ -158,6 +180,33 @@
               </q-item-section>
             </q-item>
           </q-list>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    
+    <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
+      <q-card style="min-width: 350px;">
+        <q-bar class="bg-primary text-white">
+          <div>NO SPP: {{history[0]?history[0].spp_id:''}}</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+        <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
+          <q-timeline>
+            <q-timeline-entry v-for="x in history" :key="x.id"
+              :title="x.status"
+              :subtitle="dateHistory(x.create_at)"
+              :color="getColor(x.status)"
+              :icon="getIcon(x.status)"
+            >
+              <div>
+                {{x.content}}
+              </div>
+            </q-timeline-entry>
+          </q-timeline>
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -177,6 +226,29 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    
+    <q-dialog v-model="confirmCancel" persistent>
+      <q-card style="min-width: 350px;">
+        <q-card-section> 
+          <div class="text-bold">Alasan Pembatalan SPP</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input class="col-4"
+          outlined dense
+          v-model="content"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancel" v-close-popup />
+          <q-btn flat label="OK" @click="cancelSPP()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+
   </div>
 </template>
 
@@ -199,10 +271,10 @@ export default {
       formPO: false,
       alert: false,
 
-
-      showDetail: false,    
+      show_detail: false,    
+      history: [], show_history: false, 
       selected : {},  
-      curr: 'IDR',
+      curr: 'IDR', type: 'PO',
       money: {
           decimal: ',',
           thousands: '.',
@@ -211,42 +283,25 @@ export default {
           precision: 0,
           masked: false
         },
+      confirmCancel: false, content: ''
     };
   },
   mounted(){
     this.fetchData()
   },
   methods:{
-    chgCurrency(){
-      for(var i =0;i < this.sppSelect.length;i++){
-        this.sppSelect[i].currency = this.curr
-      }
-      
-      if(this.curr == 'IDR'){
-        this.money.precision = 0
-        this.money.prefix = 'Rp '
-      }
-      else{
-        this.money.precision = 2
-        this.money.prefix = '$ '
-      }
-    },
     fetchData(){
       this.sppList = []
-      this.$http.get('/spp', {})
+      this.$http.get('/spp_approved/' + 
+                      this.$store.state.currentUser.user_id +'/' + 
+                      this.$store.state.currentUser.is_purch_manager, {
+                      })
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
-          if(result.data[i].handle_by == this.$store.state.currentUser.user_id && result.data[i].po_id == null)
-            {
-              result.data[i].status = this.status(result.data[i])
-              result.data[i].select = false
-              this.sppList.push(result.data[i])
-            }
+          result.data[i].select = false
+          this.sppList.push(result.data[i])
         }
       })
-    },
-    limitDate(date) {
-      return date >= moment().format("YYYY/MM/DD");
     },
     openForm(){
       for(var i = 0; i < this.sppList.length; i++){
@@ -287,6 +342,17 @@ export default {
 
           })
 
+          
+          var history = {
+                spp_id: this.sppSelect[i].spp_id,
+                status: 'process',
+                content: 'Sudah dibuat PO dengan nomor: ' + this.po.po_id
+          }
+          this.$http.post('/new_history', history, {})
+          .then (result => {
+          })
+          
+
         }
         this.formPO = false
         this. po = {po_date: moment()
@@ -298,34 +364,85 @@ export default {
       await this.fetchData()
       await this.$root.$emit('refresh')
     },
+    changeType(){
+      if(this.type == 'PO')
+        this.po.po_id = ''
+      else
+        this.po.po_id = 'NON-PO/'+ this.sppSelect[0].spp_id
+    },
+    cancelSPP(){
+      var data = {
+        purch_manager_cancel: 1,
+        note: this.content
+      }
+      this.$http.put('/update_spp/' + this.selected.spp_id, data, {})
+      .then (result => {
+        this.$root.$emit('refresh')
+        this.fetchData()
+      })
+      
+      var history = {
+        spp_id: this.selected.spp_id,
+        status: 'canceled',
+        content: this.content
+      }
+      this.$http.post('/new_history', history, {})
+      .then (result => {
+      })
+      
+    },
+    showHistory(){
+      this.$http.get('/spp_history/' + this.selected.spp_id, {})
+      .then (result => {
+        this.history = result.data
+      })
+      this.show_history = true
+    },
+    chgCurrency(){
+      for(var i =0;i < this.sppSelect.length;i++){
+        this.sppSelect[i].currency = this.curr
+      }
+      
+      if(this.curr == 'IDR'){
+        this.money.precision = 0
+        this.money.prefix = 'Rp '
+      }
+      else{
+        this.money.precision = 2
+        this.money.prefix = '$ '
+      }
+    },
+    limitDate(date) {
+      return date >= moment().format("YYYY/MM/DD");
+    },
     formatDate(dt){
       return moment(dt).format('YYYY-MM-DD');
     },
-    status(val){
-      if(val.manager_approve == 0){
-        return 'waiting'
-      }
-      else if(val.manager_approve == -1){
-        return 'rejected'
-      }
-      else if(val.purch_manager_approve == 0){
-        return 'waiting'
-      }
-      else if(val.purch_manager_approve == -1){
-        return 'rejected'
-      }
-      else if(val.is_received == 0) {
-        return 'process'
-      }
-      else if(val.is_received == 1) {
-        return 'process'
-      }
-      
-      else if(val.is_received == 2) {
-        return 'done'
-      }
+    dateHistory(dt){
+      return moment(dt).format('DD MMMM YYYY');
+    },
+    getColor(val){
+      if(val == 'done')
+        return 'positive'
+      else if(val == 'rejected' || val == 'canceled')
+        return 'red-7'
+      else if(val == 'process')
+        return 'primary'
+      else return 'orange'
+    },
+    getIcon(val){
+      if(val == 'done')
+        return 'done_all'
+      else if(val == 'rejected')
+        return 'error_outline'
+      else if(val == 'process')
+        return 'hourglass_bottom'
+      else if(val == 'created')
+        return 'library_add'
+      else if(val == 'canceled')
+        return 'close'
+      else return 'pending_actions'
     }
-
   },
   computed:{
     selectCount(){

@@ -17,10 +17,11 @@ function getLink()
     runQuery2($q);
   });
 
-  Flight::route('GET /spp', function () {
+  Flight::route('GET /spp_byuserid/@id', function ($id) {
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+          WHERE spp.user_id = $id
           ORDER BY spp.spp_id DESC
     ";
     runQuery($q);
@@ -29,6 +30,17 @@ function getLink()
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+    ";
+    runQuery($q);
+  });
+  Flight::route('GET /spp_approved/@id/@ispurch', function ($id, $ispurch) {
+    $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
+          INNER JOIN user ON spp.user_id = user.user_id
+          LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+          WHERE spp.po_id is null 
+                AND (spp.handle_by = $id OR $ispurch = 1)
+                AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1 
+          ORDER BY spp.spp_id DESC
     ";
     runQuery($q);
   });
@@ -69,7 +81,7 @@ function getLink()
 
   Flight::route('GET /spp_history/@spp_id', function ($spp_id) {
     $q = "SELECT * FROM spp_history where spp_id = $spp_id
-          ORDER BY history_id DESC";
+          ORDER BY history_id ASC";
     runQuery($q);
   });
   
@@ -81,11 +93,11 @@ function getLink()
   });
   Flight::route('GET /list_user', function () {
     $q = "SELECT DISTINCT `user_id` as 'value', `name` as 'label' FROM user
+          WHERE is_purchasing = 1
           ORDER BY name ASC";
     runQuery($q);
   });
 
-  
   Flight::route('GET /pricelist/@item', function ($item) {
     $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor 
           FROM spp INNER JOIN po ON po.po_id = spp.po_id
@@ -116,7 +128,6 @@ function getLink()
               ) tb";
     runQuery2($q);
   });
-
   
 //---------------------------------------------------------------------------------------------
   Flight::route('POST /new_spp', function () {

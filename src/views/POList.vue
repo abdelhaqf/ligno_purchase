@@ -21,7 +21,8 @@
               <q-radio v-model="slcPO" :val="d.po_id" />
             </td>
             <td>
-              {{ d.po_id }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
+              {{ d.po_id }} 
+              <q-chip :color="(d.is_received=='fully received'?'grey-7':'orange')" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
             </td>
             <td>{{ d.po_date }}</td>
             <td>{{ d.handler_name }}</td>
@@ -33,102 +34,85 @@
     </div>
 
     
-    <div class="container" v-if="showDetail">
-      <div class="showDetail">
-        <div class="row">
-          <div class="col-12">
-            <div class="text-grey-8 text-h6 q-pa-md">Detail PO Nomor:  {{selected[0].po_id}} </div>
-            <div class="q-pa-md">
-              <table>
+    <div class="container" v-if="show_detail">
+      <div class="row">
+        <div class="col-12">
+          <div class="text-grey-8 text-h6 q-pa-md">Detail PO Nomor:  {{selected[0].po_id}} </div>
+          <div class="q-pa-md">
+            <table>
+              <tr>
+                <td>PO Date</td>
+                <td>: {{selected[0].po_date}}</td>
+              </tr>
+              <tr>
+                <td>Handle By</td>
+                <td>: {{selected[0].handler_name}}</td>
+              </tr>
+              <tr>
+                <td>Vendor</td>
+                <td>: {{selected[0].vendor}}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="q-pa-md q-gutter-md ">
+            <q-markup-table separator="cell"  flat square dense>
+              <thead class="bg-green text-white">
                 <tr>
-                  <td>PO Date</td>
-                  <td>: {{selected[0].po_date}}</td>
+                  <th>SPP Number</th>
+                  <th>Request By</th>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>value</th>
+                  <th>Est Arrival</th>
+                  <th>Received</th>
+                  <th>COA</th>
+                  <th>Note</th>
                 </tr>
-                <tr>
-                  <td>Handle By</td>
-                  <td>: {{selected[0].handler_name}}</td>
+              </thead>
+              <tbody>
+                <tr v-for="d in selected" :key="d.id">
+                  <td>
+                    {{ d.spp_id }}
+                  </td>
+                  <td>{{ d.name }}</td>
+                  <td>{{ d.item }}</td>
+                  <td>{{ d.qty }} {{d.unit}} </td>
+                  <td>{{ setCurrency(d.price, d.currency) }}</td>
+                  <td>{{ d.est_arrival }}</td>
+                  <td style="padding:0px;">
+                    <q-select 
+                      outlined  dense 
+                      v-model="d.is_received"
+                      :options="is_received"
+                      emit-value
+                      map-options
+                    />
+                  </td>
+                  <td style="padding:0px;">
+                    <q-select 
+                      outlined  dense 
+                      v-model="d.coa"
+                      :options="is_COA"
+                      emit-value
+                      map-options
+                    />
+                  </td>
+                  <td style="padding: 0px;">
+                    <q-input v-model="d.note" outlined dense />
+                  </td>
                 </tr>
-                <tr>
-                  <td>Vendor</td>
-                  <td>: {{selected[0].vendor}}</td>
-                </tr>
-              </table>
-            </div>
-            <div class="q-pa-md q-gutter-md ">
-              <q-markup-table separator="cell"  flat square dense>
-                <thead class="bg-green text-white">
-                  <tr>
-                    <th>SPP Number</th>
-                    <th>Request By</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>value</th>
-                    <th>Est Arrival</th>
-                    <th>Received</th>
-                    <th>COA</th>
-                    <th>Note</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="d in selected" :key="d.id">
-                    <td>
-                      {{ d.spp_id }}
-                    </td>
-                    <td>{{ d.name }}</td>
-                    <td>{{ d.item }}</td>
-                    <td>{{ d.qty }} {{d.unit}} </td>
-                    <td>{{ setCurrency(d.price, d.currency) }}</td>
-                    <td>{{ d.est_arrival }}</td>
-                    <td style="padding:0px;">
-                      <q-select 
-                        outlined  dense 
-                        v-model="d.is_received"
-                        :options="is_received"
-                        emit-value
-                        map-options
-                      />
-                    </td>
-                    <td style="padding:0px;">
-                      <q-select 
-                        outlined  dense 
-                        v-model="d.coa"
-                        :options="is_COA"
-                        emit-value
-                        map-options
-                      />
-                    </td>
-                    <td style="padding: 0px;">
-                      <q-input v-model="d.note" outlined dense />
-                    </td>
-                  </tr>
-                </tbody>
-              </q-markup-table>
+              </tbody>
+            </q-markup-table>
 
-              <div class="q-gutter-md row justify-end">
-                <q-btn color="grey" label="Kembali" @click="closeForm" />
-                <q-btn color="primary" label="Update" @click="updateSPP()" />
-              </div>
+            <div class="q-gutter-md row justify-end">
+              <q-btn color="grey" label="Kembali" @click="closeForm" />
+              <q-btn color="primary" label="Update" @click="updateSPP()" />
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <q-dialog v-model="alert">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6"></div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          Pilih hanya 1 PO yang akan diupdate.
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -150,8 +134,7 @@ export default {
         {label: 'no', value: "0"},
         {label: 'yes', value: "1"}
       ],
-      alert: false,
-      showDetail: false,
+      show_detail: false,
     };
   },
   mounted(){
@@ -174,18 +157,18 @@ export default {
     },
     openForm(){
       if(!this.slcPO){
-        this.alert = true
+        return
       }
       else{
         this.$http.post('/podetail_byid', {po_id : this.slcPO}, {})
         .then (result => {
           this.selected = result.data
-          this.showDetail = true
+          this.show_detail = true
         })
       }
     },
     closeForm(){
-      this.showDetail = false
+      this.show_detail = false
     },
     async updateSPP(){
       for(var i = 0; i< this.selected.length; i++){
@@ -199,8 +182,21 @@ export default {
         .then (result => {
           
         })
+        
+        let history = {
+              spp_id: this.selected[i].spp_id,
+              status: 'process',
+              content: this.selected[i].note
+        }
+        if(this.selected[i].is_received == 2){
+          history.status = 'done'
+        }
+        this.$http.post('/new_history', history, {})
+        .then (result => {
+        })
+
       }
-      this.showDetail = false
+      this.show_detail = false
       await this.fetchData()
       await this.$root.$emit('refresh')
     },

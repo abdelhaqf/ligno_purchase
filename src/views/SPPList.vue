@@ -3,6 +3,7 @@
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
         <q-btn label="Detail" @click="showDetail()" />
+        <q-btn label="History" @click="showHistory()" />
       </div>
       <q-markup-table separator="cell"  flat square dense>
         <thead class="bg-green text-white">
@@ -87,7 +88,7 @@
                 >
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item v-if="selected.est_arrival">
               <q-item-section>
                 <q-item-label caption>Arrival Estimation</q-item-label>
                 <q-item-label
@@ -108,6 +109,32 @@
       </q-card>
     </q-dialog>
 
+    <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
+      <q-card style="min-width: 350px;">
+        <q-bar class="bg-primary text-white">
+          <div>NO SPP: {{history[0]?history[0].spp_id:''}}</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+        <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
+          <q-timeline>
+            <q-timeline-entry v-for="x in history" :key="x.id"
+              :title="x.status"
+              :subtitle="dateHistory(x.create_at)"
+              :color="getColor(x.status)"
+              :icon="getIcon(x.status)"
+            >
+              <div>
+                {{x.content}}
+              </div>
+            </q-timeline-entry>
+          </q-timeline>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
   </div>
 </template>
 
@@ -119,7 +146,8 @@ export default {
   data() {
     return {
       sppList:[], slcIndex: '',
-      show_detail: false,    
+      show_detail: false,
+      history: [], show_history: false, 
       selected : {},  
     };
   },
@@ -127,33 +155,38 @@ export default {
     this.fetchData()
   },
   methods:{
+    fetchData(){
+      this.sppList = []
+      this.$http.get('/spp_byuserid/' + this.$store.state.currentUser.user_id, {})
+      .then (result => {
+        for(var i = 0; i < result.data.length;i++){
+          result.data[i].status = this.status(result.data[i])
+          this.sppList.push(result.data[i])
+        }
+      })
+    },
     showDetail(){
       this.selected = this.sppList[this.slcIndex]
       this.show_detail = true
     },
-
-
-    fetchData(){
-      this.sppList = []
-      this.$http.get('/spp', {})
+    showHistory(){
+      this.$http.get('/spp_history/' + this.sppList[this.slcIndex].spp_id, {})
       .then (result => {
-        for(var i = 0; i < result.data.length;i++){
-          if(result.data[i].user_id == this.$store.state.currentUser.user_id)
-            {
-              result.data[i].status = this.status(result.data[i])
-              this.sppList.push(result.data[i])
-            }
-        }
+        this.history = result.data
       })
-    },
-    limitDate(date) {
-      return date >= moment().format("YYYY/MM/DD");
+      this.show_history = true
     },
     formatDate(dt){
       return moment(dt).format('YYYY-MM-DD');
     },
+    dateHistory(dt){
+      return moment(dt).format('DD MMMM YYYY');
+    },
     status(val){
-      if(val.manager_approve == 0){
+      if(val.purch_manager_cancel == 1){
+        return 'canceled'
+      }
+      else if(val.manager_approve == 0){
         return 'waiting'
       }
       else if(val.manager_approve == -1){
@@ -171,7 +204,6 @@ export default {
       else if(val.is_received == 1) {
         return 'process'
       }
-      
       else if(val.is_received == 2) {
         return 'done'
       }
@@ -179,12 +211,24 @@ export default {
     getColor(val){
       if(val == 'done')
         return 'positive'
-      else if(val == 'rejected')
+      else if(val == 'rejected' || val == 'canceled')
         return 'red-7'
       else if(val == 'process')
         return 'primary'
       else return 'orange'
-      
+    },
+    getIcon(val){
+      if(val == 'done')
+        return 'done_all'
+      else if(val == 'rejected')
+        return 'error_outline'
+      else if(val == 'process')
+        return 'hourglass_bottom'
+      else if(val == 'created')
+        return 'library_add'
+      else if(val == 'canceled')
+        return 'close'
+      else return 'pending_actions'
     }
   },
   computed:{
@@ -236,6 +280,11 @@ export default {
 .v-money:focus {
   outline: none;
   box-shadow: inset 0 0 0 1.5pt #0e84eb;
+}
+</style>
+<style>
+.q-timeline__title{
+  font-size: 16px;
 }
 
 </style>

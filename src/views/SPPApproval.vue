@@ -4,7 +4,8 @@
       <div class="q-pa-md q-gutter-md">
         <q-btn color="primary" label="Setuju" @click="confirmApprove = true" />
         <q-btn label="Tolak" @click="confirmReject = true" />
-        <q-btn label="Detail" :disabled="selectCount != 1" @click="showDetail = true" />
+        <q-btn label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+        <q-btn label="History" :disabled="selectCount != 1" @click="showHistory()" />
       </div>
       <q-markup-table flat square dense>
         <thead class="bg-green text-white">
@@ -34,8 +35,8 @@
       </q-markup-table>
     </div>
 
-    <q-dialog v-model="showDetail" persistent transition-show="flip-down" transition-hide="flip-up">
-      <q-card >
+    <q-dialog v-model="show_detail" persistent transition-show="flip-down" transition-hide="flip-up">
+      <q-card style="min-width: 350px;">
         <q-bar class="bg-primary text-white">
           <div>NO SPP: {{selected.spp_id}}</div>
 
@@ -101,6 +102,32 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    
+    <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
+      <q-card style="min-width: 350px;">
+        <q-bar class="bg-primary text-white">
+          <div>NO SPP: {{history[0]?history[0].spp_id:''}}</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+        <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
+          <q-timeline>
+            <q-timeline-entry v-for="x in history" :key="x.id"
+              :title="x.status"
+              :subtitle="dateHistory(x.create_at)"
+              :color="getColor(x.status)"
+              :icon="getIcon(x.status)"
+            >
+              <div>
+                {{x.content}}
+              </div>
+            </q-timeline-entry>
+          </q-timeline>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
     <q-dialog v-model="confirmApprove" persistent>
       <q-card style="min-width: 350px;">
@@ -121,7 +148,7 @@
     <q-dialog v-model="confirmReject" persistent>
       <q-card style="min-width: 350px;">
         <q-card-section> 
-          <div class="text-bold">Reject Reason</div>
+          <div class="text-bold">Alasan Penolakan SPP</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -146,7 +173,8 @@ import moment from "moment";
 export default {
   data() {
     return {
-      showDetail: false,
+      show_detail: false,
+      history: [], show_history: false, 
       confirmApprove: false,
       confirmReject: false, content: '',
       sppList: [],
@@ -177,42 +205,49 @@ export default {
     },
     async approve(val){
       var data = {
-        manager_approve: 1
+        manager_approve: 1,
+        handle_by : this.handleBy
       }
-
       await this.$http.put('/update_spp/' + val.spp_id, data, {})
       .then (result => {
         
       })
-    },
-    async reject(val){
+
       var history = {
         spp_id: val.spp_id,
-        content: this.content
+        status: 'waiting',
+        content: 'Menunggu persetujuan manager purchasing'
       }
       await this.$http.post('/new_history', history, {})
       .then (result => {
-        
       })
-
+    },
+    async reject(val){
       var data = {
         manager_approve: -1,
         note: this.content
       }
-
       await this.$http.put('/update_spp/' + val.spp_id, data, {})
       .then (result => {
         
       })
+      
+      var history = {
+        spp_id: val.spp_id,
+        status: 'rejected',
+        content: this.content
+      }
+      await this.$http.post('/new_history', history, {})
+      .then (result => {
+      })
     },
     async approveSelected(){
-      this.showDetail = false
+      this.show_detail = false
       var data = this.sppList.filter(e => e.select === true)
       for(var i = 0; i<data.length; i++){
         await this.approve(data[i])
       }
       await this.fetchData()
-      console.log('approve selected');
       await this.$root.$emit('refresh')
     },
     async rejectSelected(){
@@ -223,8 +258,40 @@ export default {
       await this.fetchData()
       await this.$root.$emit('refresh')
     },
+    showHistory(){
+      this.$http.get('/spp_history/' + this.selected.spp_id, {})
+      .then (result => {
+        this.history = result.data
+      })
+      this.show_history = true
+    },
     formatDate(dt){
       return moment(dt).format('YYYY-MM-DD');
+    },
+    dateHistory(dt){
+      return moment(dt).format('DD MMMM YYYY');
+    },
+    getColor(val){
+      if(val == 'done')
+        return 'positive'
+      else if(val == 'rejected' || val == 'canceled')
+        return 'red-7'
+      else if(val == 'process')
+        return 'primary'
+      else return 'orange'
+    },
+    getIcon(val){
+      if(val == 'done')
+        return 'done_all'
+      else if(val == 'rejected')
+        return 'error_outline'
+      else if(val == 'process')
+        return 'hourglass_bottom'
+      else if(val == 'created')
+        return 'library_add'
+      else if(val == 'canceled')
+        return 'close'
+      else return 'pending_actions'
     }
   },
   computed:{
