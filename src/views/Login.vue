@@ -25,8 +25,6 @@ export default {
     };
   },
   mounted() {
-    console.log("mount login");
-
     this.$emit("isLogin", true);
   },
   methods: {
@@ -39,10 +37,8 @@ export default {
         // await this.$store.dispatch("getCurrentUser");
         this.$emit("isLogin", false);
         this.$emit("updateKurs");
-        console.log('before routing to home');
         // await this.$router.push("/");
         this.$router.push("/");
-        console.log('after routing to home');
       });
     },
   },

@@ -73,7 +73,6 @@ export default {
   },
   methods: {
     test(){
-      console.log('tes masuk');
       this.showInput = true
     },
     limitDate(date) {
@@ -89,7 +88,18 @@ export default {
             .format("YYYY/MM/DD"),
         }
         this.spp = result.data
+
+        var history = {
+          spp_id: result.data,
+              status: 'created',
+              content: 'Dibuat oleh ' + this.$store.state.currentUser.username
+        }
+        this.$http.post('/new_history', history, {})
+        .then (result => {
+          })
+        
         this.$q.notify('SPP Berhasil Dibuat!')
+        this.$router.push('/spp/list')
       })
     }
   },

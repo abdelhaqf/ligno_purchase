@@ -21,7 +21,7 @@
            <td>{{p.po_id}}</td>
            <td>{{p.po_date}}</td>
            <td>{{p.vendor}}</td>
-           <td>{{setCurrency(p.price, p.currency)}} / {{p.unit}}</td>
+           <td>{{setCurrency(parseFloat(p.price)/parseFloat(p.qty), p.currency)}} / {{p.unit}}</td>
            <td>{{p.qty}}</td>
          </tr>
        </tbody>
