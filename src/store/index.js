@@ -23,6 +23,7 @@ export default new Vuex.Store({
         context.commit("getCurrentUser", null);
         return null;
       }
+      console.log(1);
       await Vue.prototype.$http
         .get("/user/info/", {
           headers: {
@@ -31,6 +32,7 @@ export default new Vuex.Store({
         })
         .then((result) => {
           context.commit("getCurrentUser", result.data);
+          console.log('2');
         })
         .catch(error => {
          })

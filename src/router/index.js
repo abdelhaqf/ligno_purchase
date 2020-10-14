@@ -25,14 +25,19 @@ const routes = [
     component: () => import("../views/SPPList.vue"),
   },
   {
-    path: '/spp/approve',
+    path: '/spp/approval',
     name: 'SPPApprove',
-    component: () => import('../views/SPPApprove.vue')
+    component: () => import('../views/SPPApproval.vue')
   },
   {
-    path: '/spp/approve-pm',
+    path: '/spp/approval-pm',
     name: 'SPPApprovePM',
-    component: () => import('../views/SPPApprovePM.vue')
+    component: () => import('../views/SPPApprovalPM.vue')
+  },
+  {
+    path: '/spp/approved',
+    name: 'SPPApproved',
+    component: () => import('../views/SPPApproved.vue')
   },
   {
     path: '/po/list',

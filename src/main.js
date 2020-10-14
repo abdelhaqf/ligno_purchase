@@ -5,8 +5,7 @@ import store from './store'
 import './quasar'
 import axios from 'axios'
 import Vue2Filters from 'vue2-filters'
-
-
+// import money from 'v-money'
 
 Vue.prototype.$http = axios.create({
   baseURL: "http://localhost/ligno_purchase/api",
@@ -14,6 +13,14 @@ Vue.prototype.$http = axios.create({
 
 
 Vue.use(Vue2Filters)
+// Vue.use(money, {
+//   decimal: ',',
+//   thousands: '.',
+//   prefix: 'Rp ',
+//   suffix: '',
+//   precision: 0,
+//   masked: false
+// })
 
 Vue.config.productionTip = false
 

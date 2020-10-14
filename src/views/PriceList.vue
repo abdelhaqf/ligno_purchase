@@ -5,7 +5,7 @@
        outlined dense
        v-model="selectOption" :options="option" 
        map-options emit-value label="Product"
-       @input="test()"
+       @input="change()"
         />
     </div>
      <q-markup-table flat dense  square>
@@ -21,7 +21,7 @@
            <td>{{p.po_id}}</td>
            <td>{{p.po_date}}</td>
            <td>{{p.vendor}}</td>
-           <td>{{p.price}} / {{p.unit}}</td>
+           <td>{{setCurrency(p.price, p.currency)}} / {{p.unit}}</td>
            <td>{{p.qty}}</td>
          </tr>
        </tbody>
@@ -30,7 +30,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 
 export default {
   data() {
@@ -50,12 +49,32 @@ export default {
         this.option = result.data
       })
     },
-    test(val){
+    change(val){
       this.$http.get('/pricelist/' + this.selectOption, {})
       .then (result => {
         this.priceList = result.data
       })
-    }
+    },
+    setCurrency(price, cur) {
+      if(cur == 'IDR'){
+        const formatter = new Intl.NumberFormat('ID', {
+          style: 'currency',
+          currency: 'IDR',
+          currencyDisplay: "symbol",
+          minimumFractionDigits: 0
+        })
+        return formatter.format(price)
+      }
+      else if (cur == 'USD'){
+        const formatter = new Intl.NumberFormat('US', {
+          style: 'currency',
+          currency: 'USD',
+          currencyDisplay: "symbol",
+          minimumFractionDigits: 2
+        })
+        return formatter.format(price)
+      }
+    },
     
   }
 };
