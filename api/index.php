@@ -21,7 +21,14 @@ function getLink()
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          -- WHERE po_id IS NULL
+          ORDER BY spp.spp_id DESC
+    ";
+    runQuery($q);
+  });
+  Flight::route('GET /spp-approval', function () {
+    $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
+          INNER JOIN user ON spp.user_id = user.user_id
+          LEFT JOIN user hnd on hnd.user_id = spp.handle_by
     ";
     runQuery($q);
   });
@@ -31,12 +38,12 @@ function getLink()
   });
   
   Flight::route('GET /po', function () {
-    $q = "SELECT po.po_id, po.user_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', usr.name AS 'handler_name', 
+    $q = "SELECT po.po_id, po.user_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
               CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
               WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
           FROM po INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = po.user_id
-          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor";
+          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency";
     runQuery($q);
   });
   Flight::route('GET /po_byid/@id', function ($id) {
@@ -50,7 +57,9 @@ function getLink()
     $po_id = $input["po_id"];
 
 
-    $q = "SELECT spp.spp_id, spp.price, spp.currency, spp.create_at, spp.is_received, spp.coa, spp.note, po.po_id, po.vendor, po.po_date, usr.name, hnd.name as 'handler_name' FROM po
+    $q = "SELECT spp.spp_id, spp.price, spp.currency, spp.create_at, spp.item, spp.qty, spp.unit, 
+                spp.est_arrival, spp.is_received, spp.coa, spp.note, po.po_id, po.vendor, po.po_date, 
+                usr.name, hnd.name as 'handler_name' FROM po
           INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = spp.user_id
           INNER JOIN `user` hnd on hnd.user_id = spp.handle_by
@@ -78,7 +87,7 @@ function getLink()
 
   
   Flight::route('GET /pricelist/@item', function ($item) {
-    $q = "SELECT item, price, unit, spp.po_id, po.po_date, qty, vendor 
+    $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor 
           FROM spp INNER JOIN po ON po.po_id = spp.po_id
           WHERE spp.item like '%$item%'
           ";
@@ -97,7 +106,7 @@ function getLink()
                 UNION ALL
             SELECT 0 AS 'col1',0 AS 'col2',COUNT(spp_id) AS 'col3',0 AS 'col4' FROM `spp` 
             INNER JOIN user ON user.user_id = spp.user_id
-            WHERE purch_manager_approve = 0 
+            WHERE purch_manager_approve = 0 AND manager_approve = 1
             AND $userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) 
                 UNION ALL
             SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3',COUNT(DISTINCT po.po_id) AS 'col4' FROM `po` 

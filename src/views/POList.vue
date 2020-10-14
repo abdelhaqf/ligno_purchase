@@ -21,12 +21,12 @@
               <q-radio v-model="slcPO" :val="d.po_id" />
             </td>
             <td>
-              {{ d.po_id }} <q-chip color="teal" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
+              {{ d.po_id }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
             </td>
             <td>{{ d.po_date }}</td>
             <td>{{ d.handler_name }}</td>
             <td>{{ d.vendor }}</td>
-            <td>{{ d.total_price }}</td>
+            <td>{{ setCurrency(d.total_price, d.currency) }}</td>
           </tr>
         </tbody>
       </q-markup-table>
@@ -38,16 +38,32 @@
         <div class="row">
           <div class="col-12">
             <div class="text-grey-8 text-h6 q-pa-md">Detail PO Nomor:  {{selected[0].po_id}} </div>
+            <div class="q-pa-md">
+              <table>
+                <tr>
+                  <td>PO Date</td>
+                  <td>: {{selected[0].po_date}}</td>
+                </tr>
+                <tr>
+                  <td>Handle By</td>
+                  <td>: {{selected[0].handler_name}}</td>
+                </tr>
+                <tr>
+                  <td>Vendor</td>
+                  <td>: {{selected[0].vendor}}</td>
+                </tr>
+              </table>
+            </div>
             <div class="q-pa-md q-gutter-md ">
               <q-markup-table separator="cell"  flat square dense>
                 <thead class="bg-green text-white">
                   <tr>
                     <th>SPP Number</th>
-                    <th>PO Date</th>
                     <th>Request By</th>
-                    <th>Handle By</th>
-                    <th>Vendor</th>
+                    <th>Item</th>
+                    <th>Qty</th>
                     <th>value</th>
+                    <th>Est Arrival</th>
                     <th>Received</th>
                     <th>COA</th>
                     <th>Note</th>
@@ -58,11 +74,11 @@
                     <td>
                       {{ d.spp_id }}
                     </td>
-                    <td>{{ d.po_date }}</td>
                     <td>{{ d.name }}</td>
-                    <td>{{ d.handler_name }}</td>
-                    <td>{{ d.vendor }}</td>
-                    <td>{{ d.price }}</td>
+                    <td>{{ d.item }}</td>
+                    <td>{{ d.qty }} {{d.unit}} </td>
+                    <td>{{ setCurrency(d.price, d.currency) }}</td>
+                    <td>{{ d.est_arrival }}</td>
                     <td style="padding:0px;">
                       <q-select 
                         outlined  dense 
@@ -171,7 +187,7 @@ export default {
     closeForm(){
       this.showDetail = false
     },
-    updateSPP(){
+    async updateSPP(){
       for(var i = 0; i< this.selected.length; i++){
         let data = {
           is_received : this.selected[i].is_received,
@@ -179,13 +195,34 @@ export default {
           note: this.selected[i].note
         }
         
-        this.$http.put('/update_spp/' + this.selected[i].spp_id, data, {})
+        await this.$http.put('/update_spp/' + this.selected[i].spp_id, data, {})
         .then (result => {
           
         })
       }
       this.showDetail = false
-      this.fetchData()
+      await this.fetchData()
+      await this.$root.$emit('refresh')
+    },
+    setCurrency(price, cur) {
+      if(cur == 'IDR'){
+        const formatter = new Intl.NumberFormat('ID', {
+          style: 'currency',
+          currency: 'IDR',
+          currencyDisplay: "symbol",
+          minimumFractionDigits: 0
+        })
+        return formatter.format(price)
+      }
+      else if (cur == 'USD'){
+        const formatter = new Intl.NumberFormat('US', {
+          style: 'currency',
+          currency: 'USD',
+          currencyDisplay: "symbol",
+          minimumFractionDigits: 2
+        })
+        return formatter.format(price)
+      }
     },
   },
   computed:{

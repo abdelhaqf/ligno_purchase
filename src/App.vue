@@ -102,10 +102,6 @@ export default {
       kurs: [],
       count: {},
       menu: [
-        {
-          title: "Buat SPP",
-          link: "/spp/create",
-        },
       ],
       thumbStyle: {
         right: "4px",
@@ -124,42 +120,76 @@ export default {
       },
     };
   },
-  async mounted() {
+  mounted() {
+    this.$root.$on('refresh', async ()=>{
+      // this.menu = []
+      console.log('emit refresh')
+      await this.fetchData()
+    })
+
+    console.log(5);
+    this.preRun()
     
-    await this.getCurrentUser();
-    if (!this.$store.state.currentUser) {
-      this.logout()
-      this.$router.push("/login").catch(() => {});
-      this.isLogin = true;
-    } 
-    else {
-      
+  },
+  methods: {
+    ...mapActions(["getCurrentUser"]),
+
+    async preRun(){
+      console.log('prerun before getuser');
+      await this.getCurrentUser();
+      this.fetchData()
+      console.log('prerun after getuser');
+
+      if (!this.$store.state.currentUser) {
+        this.logout()
+        this.$router.push("/login").catch(() => {});
+        this.isLogin = true;
+      } 
+      else {
+        
+        this.isLogin = false;
+        this.isLoading = true;
+        this.updateKurs();
+      }
+    },
+
+    fetchData(){
+      this.menu = []
+      console.log('start fetch data');
+      this.menu.push({
+                  title: "Buat SPP",
+                  link: "/spp/create",
+                })
+
       this.$http.get('/count_data/' + this.$store.state.currentUser.user_id, {})
         .then (result => {
           this.count = result.data
           this.menu.push({
-            title: "List SPP",
+            title: "SPP",
             link: "/spp/list",
-            count: result.data.count_spp
           })
-
           if(this.$store.state.currentUser.is_manager=='1'){
             this.menu.push({
               title: "Persetujuan Manager",
-              link: "/spp/approve",
+              link: "/spp/approval",
               count: result.data.count_approve
             })
           }
           if(this.$store.state.currentUser.is_purch_manager=='1'){
             this.menu.push({
               title: "Persetujuan Manager Purchasing",
-              link: "/spp/approve-pm",
+              link: "/spp/approval-pm",
               count: result.data.count_approvePM
             })
           }
           if(this.$store.state.currentUser.is_purchasing=='1'){
             this.menu.push({
-              title: "List PO",
+              title: "SPP Disetujui",
+              link: "/spp/approved",
+              count: result.data.count_spp
+            })
+            this.menu.push({
+              title: "PO",
               link: "/po/list",
               count: result.data.count_po
             })
@@ -170,24 +200,21 @@ export default {
           }
 
         })
-
-      this.isLogin = false;
-      this.isLoading = true;
-      this.updateKurs();
-    }
-  },
-  methods: {
-    ...mapActions(["getCurrentUser"]),
-
+    },
     toggleLogin(val) {
-      this.isLogin = val;
+      this.isLogin = val
+      if(this.isLogin == false)
+      this.preRun()
     },
     updateKurs() {
+      // this.menu = []
       this.isLoading = true;
       axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
         this.kurs = result.data;
         this.isLoading = false;
         this.showKurs = true;
+
+        // this.fetchData()
       });
     },
     logout() {

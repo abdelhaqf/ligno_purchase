@@ -80,6 +80,7 @@ export default {
       return date >= moment().format("YYYY/MM/DD");
     },
     createSPP(){
+      this.spp.user_id = this.$store.state.currentUser.user_id
       this.$http.post('/new_spp', this.spp, {})
       .then (result => {
         this.spp = {

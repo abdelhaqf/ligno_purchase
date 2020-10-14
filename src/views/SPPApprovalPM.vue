@@ -25,7 +25,7 @@
             <td>
               {{ d.name }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
-            <td>{{ d.create_at }}</td>
+            <td>{{ formatDate(d.create_at) }}</td>
             <td>{{ d.item }}</td>
             <td>{{ d.qty }}</td>
             <td>{{ d.deadline }}</td>
@@ -138,7 +138,7 @@
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="OK" @click="approveSelected()" v-close-popup />
+          <q-btn flat label="OK" @click="rejectSelected()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -165,7 +165,7 @@ export default {
   methods: {
     fetchData(){
       this.sppList = []
-      this.$http.get('/spp', {})
+      this.$http.get('/spp-approval', {})
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
           if(result.data[i].manager_approve == 1 && result.data[i].purch_manager_approve == 0){
@@ -179,52 +179,53 @@ export default {
         this.option = result.data
       })
     },
-    approve(val){
+    async approve(val){
       var data = {
         purch_manager_approve: 1,
         handle_by : this.handleBy
       }
 
-      this.$http.put('/update_spp/' + val.spp_id, data, {})
+      await this.$http.put('/update_spp/' + val.spp_id, data, {})
       .then (result => {
         
       })
     },
-    reject(val){
+    async reject(val){
       var history = {
         spp_id: val.spp_id,
         content: this.content
       }
       this.$http.post('/new_history', history, {})
       .then (result => {
-        
       })
       var data = {
         purch_manager_approve: -1,
         note: this.content
       }
-
-      this.$http.put('/update_spp/' + val.spp_id, data, {})
+      await this.$http.put('/update_spp/' + val.spp_id, data, {})
       .then (result => {
         
       })
     },
-    approveSelected(){
+    async approveSelected(){
       this.showDetail = false
       var data = this.sppList.filter(e => e.select === true)
       for(var i = 0; i<data.length; i++){
-        this.approve(data[i])
-        if(i == data.length-1)
-          this.fetchData()
+        await this.approve(data[i])
       }
+      await this.fetchData()
+      await this.$root.$emit('refresh')
     },
-    rejectSelected(){
+    async rejectSelected(){
       var data = this.sppList.filter(e => e.select === true)
       for(var i = 0; i<data.length; i++){
-        this.reject(data[i])
-        if(i == data.length-1)
-          this.fetchData()
+        await this.reject(data[i])
       }
+      await this.fetchData()
+      await this.$root.$emit('refresh')
+    },
+    formatDate(dt){
+      return moment(dt).format('YYYY-MM-DD');
     }
   },
   computed:{
