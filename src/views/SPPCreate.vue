@@ -87,7 +87,7 @@ export default {
             .add(1, "days")
             .format("YYYY/MM/DD"),
         }
-        this.spp = result.data
+        // this.spp = result.data
 
         var history = {
           spp_id: result.data,
@@ -99,7 +99,7 @@ export default {
           })
         
         this.$q.notify('SPP Berhasil Dibuat!')
-        this.$router.push('/spp/list')
+        // this.$router.push('/spp/list')
       })
     }
   },

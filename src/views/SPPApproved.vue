@@ -2,10 +2,10 @@
   <div class="row relative">
     <div class="col-12">
       <div class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Buat PO" @click="openForm" v-if="$store.state.currentUser.is_purchasing == 1" />
+        <q-btn color="primary" label="Buat PO" @click="openForm"/>
         <q-btn label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
         <q-btn label="History" :disabled="selectCount != 1" @click="showHistory()" />
-        <q-btn label="Batalkan" :disabled="selectCount != 1" @click="confirmCancel  = true" />
+        <q-btn label="Batalkan" :disabled="selectCount != 1" @click="confirmCancel  = true" v-if="$store.state.currentUser.is_purch_manager == 1" />
       </div>
       <q-markup-table separator="cell"  flat square dense>
         <thead class="bg-green text-white">
@@ -29,7 +29,7 @@
             </td>
             <td>{{ formatDate(d.create_at)}}</td>
             <td>{{ d.item }}</td>
-            <td>{{ d.qty }}</td>
+            <td>{{ d.qty }} {{d.unit}}</td>
             <td style="width: 100px;">
               {{ d.deadline }}
             </td>
@@ -44,9 +44,6 @@
           <div class="col-8">
             <div class="bg-green text-white text-h6 q-pa-md">PO Baru</div>
             <div class="q-pa-md q-gutter-md ">
-
-<!-- {{po.po_id}} -->
-{{po}}
 
               <div class="row">
                 <q-input class="col-10" outlined v-model="po.po_id" label="No PO" stack-label dense v-if="type == 'PO'" />
@@ -267,6 +264,7 @@ export default {
         po_date: moment()
           .add(1, "days")
           .format("YYYY/MM/DD"),
+          po_id: ''
       },
       formPO: false,
       alert: false,
@@ -363,10 +361,11 @@ export default {
       })
       await this.fetchData()
       await this.$root.$emit('refresh')
+      this.$q.notify('Berhasil membuat PO!')
     },
     changeType(){
       if(this.type == 'PO')
-        this.po.po_id = ''
+        this.po.po_id = '-'
       else
         this.po.po_id = 'NON-PO/'+ this.sppSelect[0].spp_id
     },
@@ -389,6 +388,7 @@ export default {
       this.$http.post('/new_history', history, {})
       .then (result => {
       })
+      this.$q.notify('SPP berhasil dibatalkan!')
       
     },
     showHistory(){
