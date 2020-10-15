@@ -21,13 +21,10 @@
             <td>
               <q-radio v-model="slcIndex" :val="index" />
             </td>
-            <td>
-               {{ d.name }} 
-              <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
-            </td>
+            <td> {{ d.name }} </td>
             <td>{{ formatDate(d.create_at)}}</td>
             <td>{{ d.item }}</td>
-            <td>{{ d.qty }}</td>
+            <td>{{d.qty}} {{d.unit}}</td>
             <td style="width: 100px;">
               {{ d.deadline }}
               <q-badge :color="getColor(d.status)" text-color="white" dense size="sm">{{d.status}}</q-badge>
@@ -233,7 +230,10 @@ export default {
   },
   computed:{
     status_note(){
-      if(this.selected.manager_approve == 0){
+      if(this.selected.purch_manager_cancel == 1){
+        return 'SPP dibatalkan oleh manager purchasing'
+      }
+      else if(this.selected.manager_approve == 0){
         return 'Menunggu persetujuan manager'
       }
       else if(this.selected.manager_approve == -1){

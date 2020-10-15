@@ -199,6 +199,8 @@ export default {
       this.show_detail = false
       await this.fetchData()
       await this.$root.$emit('refresh')
+      this.$q.notify('Data PO berhasil diubah!')
+
     },
     setCurrency(price, cur) {
       if(cur == 'IDR'){

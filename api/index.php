@@ -106,11 +106,13 @@ function getLink()
     runQuery($q);
   });
 
-  Flight::route('GET /count_data/@userid', function ($userid) {
+  Flight::route('GET /count_data/@userid/@ispurch', function ($userid, $ispurch) {
     $q = "SELECT SUM(col1) 'count_spp', SUM(col2) 'count_approve', SUM(col3) 'count_approvePM', SUM(col4) 'count_po' FROM (
 
             SELECT COUNT(spp_id) AS 'col1',0 AS 'col2',0 AS 'col3',0 AS 'col4'  FROM `spp` 
-            WHERE po_id IS NULL AND spp.handle_by = $userid
+            WHERE spp.po_id is null 
+                AND (spp.handle_by = $userid OR $ispurch = 1)
+                AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1
                 UNION ALL
             SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp` 
             INNER JOIN user ON user.user_id = spp.user_id

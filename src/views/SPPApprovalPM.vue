@@ -28,7 +28,7 @@
             </td>
             <td>{{ formatDate(d.create_at) }}</td>
             <td>{{ d.item }}</td>
-            <td>{{ d.qty }}</td>
+            <td>{{ d.qty }} {{d.unit}}</td>
             <td>{{ d.deadline }}</td>
           </tr>
         </tbody>
@@ -128,19 +128,19 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-
     <q-dialog v-model="promptApprove" persistent>
       <q-card style="min-width: 350px;">
         <q-card-section>
           <div class="text-h6">Handled By</div>
         </q-card-section>
+{{handleBy}}
 
         <q-card-section class="q-pt-none">
           <q-select class="col-4"
           outlined dense
           hide-dropdown-icon
           v-model="handleBy" :options="option" 
-          map-options emit-value
+          map-options
           />
         </q-card-section>
 
@@ -180,7 +180,7 @@ export default {
     return {
       show_detail: false,
       history: [], show_history: false, 
-      promptApprove: false, handleBy: '4',
+      promptApprove: false, handleBy: {},
       promptReject: false, content: '',
       sppList: [],
       selected: {},
@@ -205,12 +205,13 @@ export default {
       this.$http.get('/list_user', {})
       .then (result => {
         this.option = result.data
+        this.handleBy = result.data[0]
       })
     },
     async approve(val){
       var data = {
         purch_manager_approve: 1,
-        handle_by : this.handleBy
+        handle_by : this.handleBy.value
       }
       await this.$http.put('/update_spp/' + val.spp_id, data, {})
       .then (result => {
@@ -220,7 +221,7 @@ export default {
       var history = {
         spp_id: val.spp_id,
         status: 'process',
-        content: 'Sudah disetujui manager purchasing'
+        content: 'Sudah disetujui manager purchasing, diproses oleh: ' + this.handleBy.label
       }
       await this.$http.post('/new_history', history, {})
       .then (result => {
@@ -239,7 +240,7 @@ export default {
       var history = {
         spp_id: val.spp_id,
         status: 'rejected',
-        content: this.content
+        content: 'SPP ditolak manager purchasing: ' + this.content
       }
       await this.$http.post('/new_history', history, {})
       .then (result => {
@@ -253,6 +254,7 @@ export default {
       }
       await this.fetchData()
       await this.$root.$emit('refresh')
+      this.$q.notify('SPP berhasil disetujui!')
     },
     async rejectSelected(){
       var data = this.sppList.filter(e => e.select === true)
@@ -261,6 +263,7 @@ export default {
       }
       await this.fetchData()
       await this.$root.$emit('refresh')
+      this.$q.notify('SPP ditolak!')
     },
     showHistory(){
       this.$http.get('/spp_history/' + this.selected.spp_id, {})

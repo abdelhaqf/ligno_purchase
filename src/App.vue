@@ -161,7 +161,9 @@ export default {
                   link: "/spp/create",
                 })
 
-      this.$http.get('/count_data/' + this.$store.state.currentUser.user_id, {})
+      this.$http.get('/count_data/' 
+                      + this.$store.state.currentUser.user_id+'/'
+                      + this.$store.state.currentUser.is_purch_manager, {})
         .then (result => {
           this.count = result.data
           this.menu.push({

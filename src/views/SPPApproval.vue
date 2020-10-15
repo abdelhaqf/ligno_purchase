@@ -28,7 +28,7 @@
             </td>
             <td>{{formatDate(d.create_at)}}</td>
             <td>{{ d.item }}</td>
-            <td>{{ d.qty }}</td>
+            <td>{{ d.qty }} {{d.unit}}</td>
             <td>{{ d.deadline }}</td>
           </tr>
         </tbody>
@@ -216,7 +216,7 @@ export default {
       var history = {
         spp_id: val.spp_id,
         status: 'waiting',
-        content: 'Menunggu persetujuan manager purchasing'
+        content: 'Disetujui manager, menunggu persetujuan manager purchasing'
       }
       await this.$http.post('/new_history', history, {})
       .then (result => {
@@ -235,7 +235,7 @@ export default {
       var history = {
         spp_id: val.spp_id,
         status: 'rejected',
-        content: this.content
+        content: 'SPP ditolak manager: ' + this.content
       }
       await this.$http.post('/new_history', history, {})
       .then (result => {
@@ -249,6 +249,7 @@ export default {
       }
       await this.fetchData()
       await this.$root.$emit('refresh')
+      this.$q.notify('SPP berhasil disetujui!')
     },
     async rejectSelected(){
       var data = this.sppList.filter(e => e.select === true)
@@ -257,6 +258,7 @@ export default {
       }
       await this.fetchData()
       await this.$root.$emit('refresh')
+      this.$q.notify('SPP ditolak!')
     },
     showHistory(){
       this.$http.get('/spp_history/' + this.selected.spp_id, {})
