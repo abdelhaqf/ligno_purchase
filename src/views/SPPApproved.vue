@@ -1,42 +1,51 @@
 <template>
-  <div class="row relative">
-    <div class="col-12">
-      <div class="q-pa-md q-gutter-md">
+  <div class="row relative  q-px-lg q-pt-lg">
+    <q-card class="col-12 bg-white rounded-borders">
+      <q-card-section class="q-pa-md q-gutter-md">
         <q-btn color="primary" label="Buat PO" @click="openForm"/>
-        <q-btn label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
-        <q-btn label="History" :disabled="selectCount != 1" @click="showHistory()" />
-        <q-btn label="Batalkan" :disabled="selectCount != 1" @click="confirmCancel  = true" v-if="$store.state.currentUser.is_purch_manager == 1" />
-      </div>
-      <q-markup-table separator="cell"  flat square dense>
-        <thead class="bg-green text-white">
+        <q-btn outline color="primary" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+        <q-btn outline color="primary" label="History" :disabled="selectCount != 1" @click="showHistory()" />
+        <q-btn class="q-ml-xl" color="negative" label="Batalkan" :disabled="selectCount != 1" @click="confirmCancel  = true" v-if="$store.state.currentUser.is_purch_manager == 1" />
+      </q-card-section>
+      <q-markup-table  bordered flat square dense>
+        <thead class="bg-green-4 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th>user</th>
-            <th>date</th>
-            <th>item</th>
-            <th>qty</th>
-            <th>deadline</th>
+            <th class="text-left">user</th>
+            <th class="text-left">date</th>
+            <th class="text-left">item</th>
+            <th class="text-right">qty</th>
+            <th class="text-left">deadline</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="sppList.length" class="bg-green-1">
           <tr v-for="d in sppList" :key="d.spp_id">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
-            <td>
+            <td class="text-left">
                {{ d.name }} 
-              <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
+              <q-chip color="info" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
-            <td>{{ formatDate(d.create_at)}}</td>
-            <td>{{ d.item }}</td>
-            <td>{{ d.qty }} {{d.unit}}</td>
-            <td style="width: 100px;">
+            <td class="text-left">{{ formatDate(d.create_at)}}</td>
+            <td class="text-left">{{ d.item }}</td>
+            <td class="text-right">{{ d.qty }} {{d.unit}}</td>
+            <td class="text-left" style="width: 100px;">
               {{ d.deadline }}
             </td>
           </tr>
         </tbody>
+        <tbody v-else class="bg-green-1">
+          <tr>
+            <td class="text-center text-grey" colspan="99">
+              tidak ada data
+            </td>
+          </tr>
+        </tbody>
+        
       </q-markup-table>
-    </div>
+      <q-card-section></q-card-section>
+    </q-card>
 
     <div class="container" v-if="formPO">
       <div class="formPO">
