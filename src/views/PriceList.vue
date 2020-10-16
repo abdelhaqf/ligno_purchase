@@ -3,17 +3,28 @@
     <q-card class="col-12 bg-white rounded-borders">
       <q-card-section class="row">
         <q-select
-          outlined
-          dense
-          stack-label
-          class="col-3"
+          outlined dense
           v-model="selectOption"
-          :options="option"
-          map-options
-          emit-value
-          label="Product"
+          map-options emit-value
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
+          :options="filtered"
+          @filter="filterOP"
+          label="Nama Barang"
+          class="col-3"
           @input="change()"
-        />
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        
       </q-card-section>
       <q-markup-table flat dense square>
         <thead class="bg-green-4 text-white">
@@ -49,7 +60,7 @@
 export default {
   data() {
     return {
-      option: [],
+      option: [], filtered: [],
       selectOption: null,
       priceList: [],
     };
@@ -86,6 +97,12 @@ export default {
         });
         return formatter.format(price);
       }
+    },
+    filterOP (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.filtered = this.option.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+      })
     },
   },
 };

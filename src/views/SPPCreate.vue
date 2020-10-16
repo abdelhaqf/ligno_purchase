@@ -4,7 +4,40 @@
       <q-card-section class="bg-green-4 text-white text-h6">SPP Baru</q-card-section>
       <!-- form  -->
       <q-card-section class="q-gutter-md ">
-        <q-input outlined v-model="spp.item" label="Nama Barang" stack-label v-if="showInput" dense>
+        <div class="row">
+
+            <q-input 
+              outlined v-model="spp.item" label="Nama Barang"  class="col-10"
+              stack-label v-if="showInput" dense
+              />
+            <q-select v-else
+              outlined dense
+              v-model="spp.item"
+              map-options emit-value
+              use-input
+              hide-selected
+              fill-input
+              input-debounce="0"
+              :options="filtered"
+              @filter="filterOP"
+              label="Nama Barang"
+              @input="select" class="col-10"
+            >
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+            <q-toggle
+              v-model="showInput"
+              color="green" icon="add"
+              keep-color
+            />
+        </div>
+        <!-- <q-input outlined v-model="spp.item" label="Nama Barang" stack-label v-if="showInput" dense>
           <template v-slot:append>
             <q-btn round dense flat icon="arrow_drop_down" no-caps @click="showInput = !showInput" />
           </template>
@@ -31,7 +64,7 @@
               </q-item-section>
             </q-item>
           </template>
-        </q-select>
+        </q-select> -->
 
         <div>
           <div class="row q-col-gutter-sm">
@@ -83,24 +116,25 @@ export default {
         deadline: moment()
           .add(1, "days")
           .format("YYYY/MM/DD"),
+          item: ''
       },
       showInput: false,
-      option: [],
+      option: [], filtered: []
     };
   },
   mounted() {
     this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
-      this.option.unshift({
-        value: "",
-        label: " input baru",
-      });
+      // this.option.unshift({
+      // value: "",
+      // label: " input baru",
+      // });
     });
   },
   methods: {
-    test() {
-      this.showInput = true;
-    },
+    // test() {
+    //   this.showInput = true;
+    // },
     limitDate(date) {
       return date >= moment().format("YYYY/MM/DD");
     },
@@ -111,8 +145,8 @@ export default {
           deadline: moment()
             .add(1, "days")
             .format("YYYY/MM/DD"),
+            item: ''
         };
-        // this.spp = result.data
 
         var history = {
           spp_id: result.data,
@@ -124,6 +158,12 @@ export default {
         this.$q.notify("SPP Berhasil Dibuat!");
         // this.$router.push('/spp/list')
       });
+    },
+    filterOP (val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase()
+        this.filtered = this.option.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+      })
     },
   },
 };
