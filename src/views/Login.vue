@@ -8,9 +8,9 @@
 
       <q-separator />
 
-      <q-card-actions vertical>
-        <q-btn label="login" @click="login" no-caps dense flat color="primary" />
-      </q-card-actions>
+      <!-- <q-card-actions vertical> -->
+        <q-btn no-caps dense class="full-width no-border-radius"  label="login" @click="login" color="primary" />
+      <!-- </q-card-actions> -->
     </q-card>
   </div>
 </template>

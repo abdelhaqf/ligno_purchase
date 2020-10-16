@@ -31,7 +31,7 @@
           <q-item-label class="row items-center">
             <div>{{ m.title }}</div>
             <div style="height: 30px; padding: 0 5px;">
-              <q-badge color="orange"  v-if="m.count> 0">{{m.count}}</q-badge>
+              <q-badge color="orange-4"  v-if="m.count> 0">{{m.count}}</q-badge>
             </div>
           </q-item-label>
         </q-item-section>
