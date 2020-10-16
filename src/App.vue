@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh LpR fFf">
     <!-- left drawer  -->
-    <q-drawer v-if="!isLogin" show-if-above v-model="left" side="left" bordered>
+    <q-drawer v-if="!isLogin" content-class="bg-grey-2" show-if-above v-model="left" side="left" bordered>
       <!-- current user  -->
       <q-item class="bg-blue-2">
         <q-item-section avatar>
@@ -23,7 +23,7 @@
       </q-item>
       <q-separator />
       <!-- menus -->
-      <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
+      <q-item clickable v-ripple v-for="m in menu" :key="m.title"  :to="m.link">
           <q-item-section avatar>
                 <q-icon :name="m.icon" color="indigo-2" />
               </q-item-section>
@@ -37,18 +37,18 @@
         </q-item-section>
       </q-item>
       <q-separator />
-      <q-card class="relative-position" flat>
+      <q-card class="relative-position bg-grey-2" flat>
         <q-card-section class="q-pb-none">
           <div class="text-h6">Currency</div>
         </q-card-section>
-
+        <!-- kurs -->
         <q-card-section>
           <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
             <div v-if="showKurs">
-              <q-list bordered separator>
+              <q-list bordered separator class="bg-white rounded-borders">
                 <q-item>
                   <q-item-section>
-                    <q-item-label>BCA</q-item-label>
+                    <q-item-label class="text-subtitle2">BCA</q-item-label>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Rp {{ kurs.Jsondata.bcarate | number("0,0") }}</q-item-label>
@@ -57,7 +57,7 @@
                 </q-item>
                 <q-item>
                   <q-item-section>
-                    <q-item-label>BI</q-item-label>
+                    <q-item-label class="text-subtitle2">BI</q-item-label>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Rp {{ kurs.Jsondata.birate | number("0,0") }}</q-item-label>
@@ -66,7 +66,7 @@
                 </q-item>
                 <q-item>
                   <q-item-section>
-                    <q-item-label>MenKeu</q-item-label>
+                    <q-item-label class="text-subtitle2">MenKeu</q-item-label>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>Rp {{ kurs.Jsondata.menkeurate | number("0,0") }}</q-item-label>
@@ -128,11 +128,9 @@ export default {
   mounted() {
     this.$root.$on('refresh', async ()=>{
       // this.menu = []
-      console.log('emit refresh')
       await this.fetchData()
     })
 
-    console.log(5);
     this.preRun()
     
   },
@@ -140,10 +138,8 @@ export default {
     ...mapActions(["getCurrentUser"]),
 
     async preRun(){
-      console.log('prerun before getuser');
       await this.getCurrentUser();
       this.fetchData()
-      console.log('prerun after getuser');
 
       if (!this.$store.state.currentUser) {
         this.logout()
@@ -221,14 +217,11 @@ export default {
       this.preRun()
     },
     updateKurs() {
-      // this.menu = []
       this.isLoading = true;
       axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
         this.kurs = result.data;
         this.isLoading = false;
         this.showKurs = true;
-
-        // this.fetchData()
       });
     },
     logout() {
