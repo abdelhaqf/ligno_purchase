@@ -1,15 +1,17 @@
 <template>
   <q-layout view="hHh LpR fFf">
+    <!-- left drawer  -->
     <q-drawer v-if="!isLogin" show-if-above v-model="left" side="left" bordered>
-      <q-item>
+      <!-- current user  -->
+      <q-item class="bg-blue-2">
         <q-item-section avatar>
           <q-avatar>
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+            <img src="/avatar.png" />
           </q-avatar>
         </q-item-section>
         <q-item-section v-if="$store.state.currentUser">
-          <q-item-label>
-            {{ $store.state.currentUser.username }}
+          <q-item-label class="text-subtitle2">
+            {{ $store.state.currentUser.username | capitalize}}
           </q-item-label>
           <q-item-label caption>
             {{ $store.state.currentUser.dept }}
@@ -19,9 +21,12 @@
           <q-item-label caption><q-btn flat label="logout" size="sm" color="negative" @click="logout"/></q-item-label>
         </q-item-section>
       </q-item>
-
       <q-separator />
+      <!-- menus -->
       <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
+          <q-item-section avatar>
+                <q-icon :name="m.icon" color="indigo-2" />
+              </q-item-section>
         <q-item-section>
           <q-item-label class="row items-center">
             <div>{{ m.title }}</div>
@@ -157,6 +162,7 @@ export default {
       this.menu = []
       console.log('start fetch data');
       this.menu.push({
+                  icon: 'create',
                   title: "Buat SPP",
                   link: "/spp/create",
                 })
@@ -167,11 +173,13 @@ export default {
         .then (result => {
           this.count = result.data
           this.menu.push({
-            title: "SPP",
+            icon: 'inbox',
+            title: "SPP Anda",
             link: "/spp/list",
           })
           if(this.$store.state.currentUser.is_manager=='1'){
             this.menu.push({
+              icon: 'group',
               title: "Persetujuan Manager",
               link: "/spp/approval",
               count: result.data.count_approve
@@ -179,23 +187,27 @@ export default {
           }
           if(this.$store.state.currentUser.is_purch_manager=='1'){
             this.menu.push({
-              title: "Persetujuan Manager Purchasing",
+              icon: 'how_to_reg',
+              title: "Persetujuan Man.Purchasing",
               link: "/spp/approval-pm",
               count: result.data.count_approvePM
             })
           }
           if(this.$store.state.currentUser.is_purchasing=='1'){
             this.menu.push({
+              icon: 'beenhere',
               title: "SPP Disetujui",
               link: "/spp/approved",
               count: result.data.count_spp
             })
             this.menu.push({
+              icon: 'ballot',
               title: "PO",
               link: "/po/list",
               count: result.data.count_po
             })
             this.menu.push({
+              icon: 'bar_chart',
               title: "List Harga",
               link: "/price/list",
             })
