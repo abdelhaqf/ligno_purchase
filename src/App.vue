@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh LpR fFf">
+  <q-layout view="hHh LpR fFf" class="bg-grey-1">
     <!-- left drawer  -->
     <q-drawer v-if="!isLogin" content-class="bg-grey-2" show-if-above v-model="left" side="left" bordered>
       <!-- current user  -->

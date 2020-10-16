@@ -1,39 +1,47 @@
 <template>
-  <div class="row">
-    <div class="col-12">
-      <div class="q-pa-md q-gutter-md">
+  <div class="row  relative q-px-lg q-pt-lg">
+    <q-card class="col-12 bg-white rounded-borders">
+      <q-card-section class="q-pa-md q-gutter-md">
         <q-btn color="primary" label="Setuju" @click="confirmApprove = true" />
-        <q-btn label="Tolak" @click="confirmReject = true" />
-        <q-btn label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
-        <q-btn label="History" :disabled="selectCount != 1" @click="showHistory()" />
-      </div>
+        <q-btn color="negative" label="Tolak" @click="confirmReject = true" />
+        <q-btn outline class="q-ml-xl" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+        <q-btn outline label="History" :disabled="selectCount != 1" @click="showHistory()" />
+      </q-card-section>
       <q-markup-table flat square dense>
-        <thead class="bg-green text-white">
+        <thead class="bg-green-4 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th>user</th>
-            <th>date</th>
-            <th>item</th>
-            <th>qty</th>
-            <th>deadline</th>
+            <th class="text-left">user</th>
+            <th class="text-left">date</th>
+            <th class="text-left">item</th>
+            <th class="text-right">qty</th>
+            <th class="text-left">deadline</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="sppList.length" class="bg-green-4">
           <tr v-for="d in sppList" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
-            <td>
+            <td class="text-left">
               {{ d.name }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
-            <td>{{formatDate(d.create_at)}}</td>
-            <td>{{ d.item }}</td>
-            <td>{{ d.qty }} {{d.unit}}</td>
-            <td>{{ d.deadline }}</td>
+            <td class="text-left">{{formatDate(d.create_at)}}</td>
+            <td class="text-left">{{ d.item }}</td>
+            <td class="text-right">{{ d.qty }} {{d.unit}}</td>
+            <td class="text-left">{{ d.deadline }}</td>
           </tr>
         </tbody>
+        <tbody v-else class="bg-green-1">
+          <tr>
+            <td class="text-center text-grey" colspan="99">
+              tidak ada data
+            </td>
+          </tr>
+        </tbody>
+        <q-card-section></q-card-section>
       </q-markup-table>
-    </div>
+    </q-card>
 
     <q-dialog v-model="show_detail" persistent transition-show="flip-down" transition-hide="flip-up">
       <q-card style="min-width: 350px;">

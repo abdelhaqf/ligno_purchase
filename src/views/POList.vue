@@ -1,37 +1,45 @@
 <template>
-  <div class="row">
-    <div class="col-12">
-      <div class="q-pa-md q-gutter-md">
-        <q-btn label="Update" @click="openForm" />
-      </div>
-      <q-markup-table separator="cell"  flat square dense>
-        <thead class="bg-green text-white">
+  <div class="row  relative q-px-lg q-pt-lg">
+    <q-card class="col-12 bg-white rounded-borders">
+      <q-card-section class="q-pa-md q-gutter-md">
+        <q-btn color="primary" label="Update" @click="openForm" />
+      </q-card-section>
+      <q-markup-table bordered flat square dense>
+        <thead class="bg-green-4 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th>PO Number</th>
-            <th>PO Date</th>
-            <th>Handle By</th>
-            <th>Vendor</th>
-            <th>value</th>
+            <th class="text-left">PO Number</th>
+            <th class="text-left">PO Date</th>
+            <th class="text-left">Handle By</th>
+            <th class="text-left">Vendor</th>
+            <th class="text-right">value</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="poList.length" class="bg-green-1">
           <tr v-for="d in poList" :key="d.id">
             <td>
               <q-radio v-model="slcPO" :val="d.po_id" />
             </td>
-            <td>
+            <td class="text-left">
               {{ d.po_id }} 
               <q-chip :color="(d.is_received=='fully received'?'grey-7':'orange')" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
             </td>
-            <td>{{ d.po_date }}</td>
-            <td>{{ d.handler_name }}</td>
-            <td>{{ d.vendor }}</td>
-            <td>{{ setCurrency(d.total_price, d.currency) }}</td>
+            <td class="text-left">{{ d.po_date }}</td>
+            <td class="text-left">{{ d.handler_name }}</td>
+            <td class="text-left">{{ d.vendor }}</td>
+            <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>
+          </tr>
+        </tbody>
+        <tbody v-else class="bg-green-1">
+          <tr>
+            <td class="text-center text-grey" colspan="99">
+              tidak ada data
+            </td>
           </tr>
         </tbody>
       </q-markup-table>
-    </div>
+        <q-card-section></q-card-section>
+    </q-card>
 
     
     <div class="container" v-if="show_detail">
