@@ -2,8 +2,8 @@
   <div class="row  relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
       <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Setuju" @click="promptApprove = true" />
-        <q-btn  color="negative" label="Tolak" @click="promptReject=true" />
+        <q-btn color="primary" label="Setuju" @click="promptApprove = true" :disable="!selectCount"/>
+        <q-btn  color="negative" label="Tolak" @click="promptReject=true" :disable="!selectCount"/>
         <q-btn  outline class="q-ml-xl" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
         <q-btn outline  label="History" :disabled="selectCount != 1" @click="showHistory()" />
       </q-card-section>
@@ -18,7 +18,7 @@
             <th class="text-left">deadline</th>
           </tr>
         </thead>
-        <tbody v-if="sppList.length" class="bg-green-4">
+        <tbody v-if="sppList.length" class="bg-green-1">
           <tr v-for="d in sppList" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" />
@@ -138,15 +138,14 @@
     </q-dialog>
     <q-dialog v-model="promptApprove" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section>
-          <div class="text-h6">Handled By</div>
+        <q-card-section class="bg-primary text-white">
+          <q-item-label class="">Tugaskan Kepada</q-item-label>
         </q-card-section>
-{{handleBy}}
+        <q-separator></q-separator>
 
-        <q-card-section class="q-pt-none">
+        <q-card-section class="">
           <q-select class="col-4"
           outlined dense
-          hide-dropdown-icon
           v-model="handleBy" :options="option" 
           map-options
           />
@@ -160,14 +159,17 @@
     </q-dialog>
     <q-dialog v-model="promptReject" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section>
-          <div class="text-h6">Alasan Penolakan SPP</div>
+        <q-card-section class="bg-primary text-white">
+          <div >Penolakan SPP</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
+        <q-card-section>
           <q-input class="col-4"
-          outlined dense
+          outlined 
+          stack-label
           v-model="content"
+          type="textarea"
+          label="Alasan Penolakan"
           />
         </q-card-section>
 

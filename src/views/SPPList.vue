@@ -2,18 +2,18 @@
   <div class="row relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
       <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn label="Detail" color="primary" @click="showDetail()" />
-        <q-btn outline label="History" color="primary" @click="showHistory()" />
+        <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex" />
+        <q-btn outline label="History" color="primary" @click="showHistory()" :disable="slcIndex"  />
       </q-card-section>
       <q-markup-table bordered flat square dense>
         <thead class="bg-green-4 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th class="text-left">user</th>
-            <th class="text-left">date</th>
+            <!-- <th class="text-left">user</th> -->
+            <th class="text-left">Diajukan Tanggal</th>
+            <th class="text-left">Deadline</th>
             <th class="text-left">item</th>
             <th class="text-right">qty</th>
-            <th class="text-left">deadline</th>
           </tr>
         </thead>
         <tbody v-if="sppList.length" class="bg-green-1">
@@ -21,14 +21,16 @@
             <td>
               <q-radio v-model="slcIndex" :val="index" />
             </td>
-            <td class="text-left">{{ d.name }}</td>
-            <td class="text-left">{{ formatDate(d.create_at) }}</td>
-            <td class="text-left">{{ d.item }}</td>
-            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
-            <td class="text-left" style="width: 100px;">
-              {{ d.deadline }}
+            <!-- <td class="text-left">{{ d.name }}</td> -->
+            <td class="text-left">
+              {{ d.create_at | moment("DD MMM YYYY")}} 
               <q-badge :color="getColor(d.status)" text-color="white" dense size="sm">{{ d.status }}</q-badge>
             </td>
+            <td class="text-left" style="width: 100px;">
+              {{ d.deadline | moment("DD MMM YYYY") }}
+            </td>
+            <td class="text-left">{{ d.item }}</td>
+            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">

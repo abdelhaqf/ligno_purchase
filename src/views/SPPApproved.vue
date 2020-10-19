@@ -1,12 +1,14 @@
 <template>
   <div class="row relative  q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
-      <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Buat PO" @click="openForm"/>
+      <!-- table control -->
+      <q-card-section class="q-pa-md q-gutter-md" >
+        <q-btn color="primary" label="Buat PO" @click="openForm" :disable="!selectCount" />
         <q-btn outline color="primary" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
         <q-btn outline color="primary" label="History" :disabled="selectCount != 1" @click="showHistory()" />
         <q-btn class="q-ml-xl" color="negative" label="Batalkan" :disabled="selectCount != 1" @click="confirmCancel  = true" v-if="$store.state.currentUser.is_purch_manager == 1" />
       </q-card-section>
+      <!-- table header  -->
       <q-markup-table  bordered flat square dense>
         <thead class="bg-green-4 text-white">
           <tr>

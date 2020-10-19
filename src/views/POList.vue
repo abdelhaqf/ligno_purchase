@@ -24,7 +24,7 @@
               {{ d.po_id }} 
               <q-chip :color="(d.is_received=='fully received'?'grey-7':'orange')" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
             </td>
-            <td class="text-left">{{ d.po_date }}</td>
+            <td class="text-left">{{ d.po_date | moment('DD MMM YYYY')}}</td>
             <td class="text-left">{{ d.handler_name }}</td>
             <td class="text-left">{{ d.vendor }}</td>
             <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>
