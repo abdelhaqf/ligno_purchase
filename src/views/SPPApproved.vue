@@ -132,7 +132,6 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-card-section>
-        <q-card-section class="">
           <q-list>
             <q-item>
               <q-item-section>
@@ -145,9 +144,7 @@
                 <q-item-label caption>Request Date</q-item-label>
                 <q-item-label>{{selected.create_at}}</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
+              <q-item-section side>
                 <q-item-label caption>Deadline</q-item-label>
                 <q-item-label>{{selected.deadline}}</q-item-label>
               </q-item-section>
@@ -157,9 +154,7 @@
                 <q-item-label caption>Item</q-item-label>
                 <q-item-label>{{selected.item}}</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
+              <q-item-section side>
                 <q-item-label caption>Quantity</q-item-label>
                 <q-item-label>{{selected.qty}} {{selected.unit}}</q-item-label>
               </q-item-section>
@@ -172,6 +167,7 @@
                 >
               </q-item-section>
             </q-item>
+            <q-separator spaced />
             <q-item v-if="selected.est_arrival">
               <q-item-section>
                 <q-item-label caption>Arrival Estimation</q-item-label>
@@ -189,7 +185,6 @@
               </q-item-section>
             </q-item>
           </q-list>
-        </q-card-section>
       </q-card>
     </q-dialog>
 

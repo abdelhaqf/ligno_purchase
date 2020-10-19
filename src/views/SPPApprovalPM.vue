@@ -58,7 +58,6 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-card-section>
-        <q-card-section class="">
           <q-list>
             <q-item>
               <q-item-section>
@@ -71,9 +70,7 @@
                 <q-item-label caption>Request Date</q-item-label>
                 <q-item-label>{{selected.create_at}}</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
+              <q-item-section side>
                 <q-item-label caption>Deadline</q-item-label>
                 <q-item-label>{{selected.deadline}}</q-item-label>
               </q-item-section>
@@ -83,9 +80,7 @@
                 <q-item-label caption>Item</q-item-label>
                 <q-item-label>{{selected.item}}</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
+              <q-item-section side>
                 <q-item-label caption>Quantity</q-item-label>
                 <q-item-label>{{selected.qty}} {{selected.unit}}</q-item-label>
               </q-item-section>
@@ -98,6 +93,7 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
+            <q-separator spaced />
             <q-item>
               <q-item-section>
                 <q-item-label caption>Status</q-item-label>
@@ -107,7 +103,7 @@
               </q-item-section>
             </q-item>
           </q-list>
-        </q-card-section>
+            <q-separator spaced />
         <q-card-actions align="between">
           <q-btn flat label="Tolak" color="negative" @click="promptReject=true" v-close-popup />
           <q-btn flat label="Setuju" color="positive" @click="promptApprove = true"  />

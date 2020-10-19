@@ -59,61 +59,56 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-card-section>
-        <q-card-section class="">
-          <q-list>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Yang Mengajukan</q-item-label>
-                <q-item-label>{{ selected.name }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Pada Tanggal</q-item-label>
-                <q-item-label>{{ selected.create_at | moment(' hh:mm, DD MMM YYYY ')}}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Deadline</q-item-label>
-                <q-item-label>{{ selected.deadline }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Nama Barang</q-item-label>
-                <q-item-label>{{ selected.item }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Jumlah</q-item-label>
-                <q-item-label>{{ selected.qty }} {{ selected.unit }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section v-if="show_detail">
-                <q-item-label caption>Keterangan</q-item-label>
-                <q-item-label v-if="selected.description.length">{{ selected.description }}</q-item-label>
-                <q-item-label v-else>-</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item v-if="selected.est_arrival">
-              <q-item-section>
-                <q-item-label caption>Perkiraan Barang Tiba</q-item-label>
-                <q-item-label>{{ selected.est_arrival }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Status Saat Ini</q-item-label>
-                <q-item-label>
-                  {{ status_note }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
+        <q-list>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Yang Mengajukan</q-item-label>
+              <q-item-label>{{ selected.name }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Pada Tanggal</q-item-label>
+              <q-item-label>{{ selected.create_at | moment(" hh:mm, DD MMM YYYY ") }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>Deadline</q-item-label>
+              <q-item-label>{{ selected.deadline }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Nama Barang</q-item-label>
+              <q-item-label>{{ selected.item }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>Jumlah</q-item-label>
+              <q-item-label>{{ selected.qty }} {{ selected.unit }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section v-if="show_detail">
+              <q-item-label caption>Keterangan</q-item-label>
+              <q-item-label v-if="selected.description.length">{{ selected.description }}</q-item-label>
+              <q-item-label v-else>-</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item v-if="selected.est_arrival">
+            <q-item-section>
+              <q-item-label caption>Perkiraan Barang Tiba</q-item-label>
+              <q-item-label>{{ selected.est_arrival }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Status Saat Ini</q-item-label>
+              <q-item-label>
+                {{ status_note }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
       </q-card>
     </q-dialog>
 
