@@ -39,7 +39,7 @@
       <q-separator />
       <q-card class="relative-position bg-grey-2" flat>
         <q-card-section class="q-pb-none">
-          <div class="text-h6">Currency</div>
+          <div class="text-h6">Info Kurs</div>
         </q-card-section>
         <!-- kurs -->
         <q-card-section>
