@@ -1,35 +1,38 @@
 <template>
   <div class="row  relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
+      <!-- toolbar  -->
       <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Setuju" @click="confirmApprove = true" :disable="!selectCount"  />
         <q-btn color="negative" label="Tolak" @click="confirmReject = true" :disable="!selectCount"  />
-        <q-btn outline class="q-ml-xl" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
-        <q-btn outline label="History" :disabled="selectCount != 1" @click="showHistory()" />
+        <q-btn color="positive" label="Setuju" @click="confirmApprove = true" :disable="!selectCount"  />
+        <q-btn flat class="q-ml-xl" color="secondary" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+        <q-btn flat label="History" color="secondary" :disabled="selectCount != 1" @click="showHistory()" />
       </q-card-section>
       <q-markup-table flat square dense>
-        <thead class="bg-green-4 text-white">
+      <!-- table head -->
+        <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th class="text-left">user</th>
-            <th class="text-left">date</th>
-            <th class="text-left">item</th>
-            <th class="text-right">qty</th>
-            <th class="text-left">deadline</th>
+            <th class="text-left">User</th>
+            <th class="text-left">Tanggal Pengajuan</th>
+            <th class="text-left">Deadline</th>
+            <th class="text-left">Barang</th>
+            <th class="text-right">Jumlah</th>
           </tr>
         </thead>
-        <tbody v-if="sppList.length" class="bg-green-1">
+        <!-- table body  -->
+        <tbody v-if="sppList.length" class="bg-blue-grey-1">
           <tr v-for="d in sppList" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
             <td class="text-left">
-              {{ d.name }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
+              {{ d.name }} <q-chip color="accent" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
-            <td class="text-left">{{formatDate(d.create_at)}}</td>
+            <td class="text-left">{{d.create_at |moment('DD MMM YYYY')}}</td>
+            <td class="text-left">{{ d.deadline |moment('DD MMM YYYY')}}</td>
             <td class="text-left">{{ d.item }}</td>
             <td class="text-right">{{ d.qty }} {{d.unit}}</td>
-            <td class="text-left">{{ d.deadline }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
@@ -42,18 +45,18 @@
         <q-card-section></q-card-section>
       </q-markup-table>
     </q-card>
-
-    <q-dialog v-model="show_detail" persistent transition-show="flip-down" transition-hide="flip-up">
+    <!-- detail  -->
+    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
-        <q-bar class="bg-primary text-white">
-          <div>NO SPP: {{selected.spp_id}}</div>
+        <q-card-section class="bg-primary text-white row">
+          <div>NO SPP: {{ selected.spp_id }}</div>
 
           <q-space />
 
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
           </q-btn>
-        </q-bar>
+        </q-card-section>
         <q-card-section class="">
           <q-list>
             <q-item>
@@ -104,22 +107,23 @@
             </q-item>
           </q-list>
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Tolak" color="primary" @click="confirmReject=true" v-close-popup />
-          <q-btn flat label="Setuju" color="primary" @click="confirmApprove = true"  />
+        <q-card-actions align="between">
+          <q-btn flat label="Tolak" color="negative" @click="confirmReject=true" v-close-popup />
+          <q-btn flat label="Setuju" color="positive" @click="confirmApprove = true"  />
         </q-card-actions>
       </q-card>
     </q-dialog>
     
+    <!-- history  -->
     <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
       <q-card style="min-width: 350px;">
-        <q-bar class="bg-primary text-white">
-          <div>NO SPP: {{history[0]?history[0].spp_id:''}}</div>
+        <q-card-section class="bg-secondary text-white row">
+          <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
           <q-space />
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
           </q-btn>
-        </q-bar>
+        </q-card-section>
         <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
           <q-timeline>
             <q-timeline-entry v-for="x in history" :key="x.id"
@@ -137,12 +141,11 @@
       </q-card>
     </q-dialog>
 
+    <!-- persetujuan -->
     <q-dialog v-model="confirmApprove" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section class="bg-primary text-white">
-          <!-- <div class="text-bold">Approve Confirmation</div> -->
+        <q-card-section class="bg-positive text-white">
           <q-item-label>Konfirmasi persetujuan</q-item-label>
-          <!-- <q-item-label caption>Anda yakin dengan pilihan ini?</q-item-label> -->
         </q-card-section>
 
         <q-card-section class="">
@@ -155,9 +158,10 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- penolakan  -->
     <q-dialog v-model="confirmReject" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section class="bg-primary text-white"> 
+        <q-card-section class="bg-negative text-white"> 
           <div >Penolakan SPP</div>
         </q-card-section>
 

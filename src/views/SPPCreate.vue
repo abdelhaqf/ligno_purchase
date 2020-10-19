@@ -1,10 +1,67 @@
 <template>
   <div class="row justify-center q-py-lg rounded-borders">
     <q-card class=" bg-white">
-      <q-card-section class="bg-green-4 text-white text-h6">SPP Baru</q-card-section>
       <!-- form  -->
-      <q-card-section horizontal>
-        <q-card-section>
+      <q-card-section horizontal class="q-pa-none">
+        <!-- petunjuk pengisian  -->
+        <q-card-section class="bg-blue-grey-1 q-pa-none">
+          <q-card-section class="text-h6 bg-blue-grey-5 text-white">
+            Petunjuk Pengisian
+          </q-card-section>
+          <q-list separator>
+            <q-item>
+              <q-item-section>
+                <q-item-label>1. Cari nama barang yang dibutuhkan</q-item-label>
+                <q-item-label caption>
+                  Bila tidak ditemukan, klik tombol plus disebelahnya untuk input barang baru
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>2. Input qty/jumlah barang yang diminta</q-item-label>
+                <q-item-label caption>isi dengan bilangan bulat tanpa titik atau koma, misal: 1000000</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>3. Input satuan/unit dari qty barang yang dicari</q-item-label>
+                <q-item-label caption>isi secara manual misal: kg, liter, ml, box, dus, buah, rim, dll</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>4. Input deadline dari permintaan ini</q-item-label>
+                <q-item-label caption>isi sesuai format tahun/bulan/tanggal misal: 2020/03/09</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>5. Input keterangan tentang permintaan ini</q-item-label>
+                <q-item-label caption
+                  >isi dengan data tambahan seperti nama vendor, spesifikasi barang, dll</q-item-label
+                >
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>6. Klik tombol ajukan</q-item-label>
+                <q-item-label caption>
+                  bila permintaan berhasil dikirim anda akan melihat pesan "SPP Berhasil dibuat"
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>7. Selesai</q-item-label>
+                <q-item-label caption>Cek perkembangan SPP di menu "SPP Anda"</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+        <q-card-section class="q-pa-none">
+          <!-- form SPP -->
+          <q-card-section class="bg-primary text-white text-h6">SPP Baru</q-card-section>
           <q-card-section class="q-gutter-md ">
             <div class="row">
               <q-input
@@ -16,9 +73,9 @@
                 v-if="showInput"
                 dense
               >
-              <template v-slot:label>
-                    1. Nama Barang <a class="q-px-sm bg-grey-6 text-white rounded-borders">input baru</a>
-                  </template>
+                <template v-slot:label>
+                  1. Nama Barang <a class="q-px-sm bg-info text-white rounded-borders">input baru</a>
+                </template>
               </q-input>
               <q-select
                 v-else
@@ -45,53 +102,20 @@
                     </q-item-section>
                   </q-item>
                 </template>
-                
               </q-select>
               <q-toggle v-model="showInput" color="green" icon="add" keep-color />
             </div>
-            <!-- <q-input outlined v-model="spp.item" label="Nama Barang" stack-label v-if="showInput" dense>
-          <template v-slot:append>
-            <q-btn round dense flat icon="arrow_drop_down" no-caps @click="showInput = !showInput" />
-          </template>
-        </q-input>
-        <q-select
-          class="col-4"
-          v-else
-          outlined
-          dense
-          stack-label
-          v-model="spp.item"
-          :options="option"
-          map-options
-          emit-value
-          label="Nama Barang"
-        >
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-              <q-item-section class="text-grey text-italic" v-if="scope.opt.value == ''" @click="test()">
-                {{ scope.opt.label }}
-              </q-item-section>
-              <q-item-section v-else>
-                {{ scope.opt.label }}
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select> -->
 
             <div>
               <div class="row q-col-gutter-sm">
                 <q-input type="number" class="col-7" outlined v-model="spp.qty" label="2. Qty" stack-label dense />
                 <q-input class="col-5" outlined v-model="spp.unit" label="" stack-label dense>
                   <template v-slot:label>
-                  3. Satuan <a class="q-px-sm bg-grey-6 text-white rounded-borders">kg / m / dus</a>
+                    3. Satuan <a class="q-px-sm bg-info text-white rounded-borders">kg / m / dus</a>
                   </template>
                 </q-input>
               </div>
             </div>
-            <!-- old qdate  -->
-            <!-- <q-input outlined v-model="spp.deadline" label="Deadline" stack-label dense readonly />
-        <q-date v-model="spp.deadline" minimal :options="limitDate" /> -->
-            <!-- new qdate  -->
             <q-input outlined v-model="spp.deadline" mask="date" :rules="['date']" label="">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
@@ -105,7 +129,7 @@
                 </q-icon>
               </template>
               <template v-slot:label>
-                4. Deadline <a class="q-px-sm bg-grey-6 text-white rounded-borders">tahun / bulan / tanggal</a>
+                4. Deadline <a class="q-px-sm bg-info text-white rounded-borders">tahun / bulan / tanggal</a>
               </template>
             </q-input>
 
@@ -119,62 +143,11 @@
               type="textarea"
             />
           </q-card-section>
-        </q-card-section>
-        <q-card-section class="bg-grey-1">
-          <div class="text-subtitle2">Petunjuk Pengisian</div>
-          
-
-          <q-list>
-            <q-item>
-              <q-item-section>
-                <q-item-label>1. Cari nama barang yang dibutuhkan</q-item-label>
-                <q-item-label caption
-                  >Bila tidak ditemukan, klik tombol plus disebelahnya untuk input barang baru</q-item-label
-                >
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label>2. Input qty/jumlah barang yang diminta</q-item-label>
-                <q-item-label caption>isi dengan bilangan bulat tanpa titik atau koma, misal: 1000000</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label>3. Input satuan/unit dari qty barang yang dicari</q-item-label>
-                <q-item-label caption>isi secara manual misal: kg, liter, ml, box, dus, buah, rim, dll</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label>4. Input deadline dari permintaan ini</q-item-label>
-                <q-item-label caption>isi sesuai format tahun/bulan/tanggal misal: 2020/03/09</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label>5. Input keterangan tentang permintaan ini</q-item-label>
-                <q-item-label caption>isi dengan data tambahan seperti nama vendor, spesifikasi barang, dll</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label>6. Klik tombol ajukan</q-item-label>
-                <q-item-label caption>bila permintaan berhasil dikirim anda akan melihat pesan "SPP Berhasil dibuat"</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label>7. Selesai</q-item-label>
-                <q-item-label caption>Cek perkembangan SPP di menu "SPP Anda"</q-item-label>
-              </q-item-section>
-            </q-item>
-            
-          </q-list>
+          <q-card-actions>
+            <q-btn flat class="full-width" color="primary" label="Ajukan" @click="createSPP()" />
+          </q-card-actions>
         </q-card-section>
       </q-card-section>
-
-      <q-btn class="full-width no-border-radius" color="primary" label="Ajukan" @click="createSPP()" />
     </q-card>
   </div>
 </template>
@@ -200,16 +173,9 @@ export default {
   mounted() {
     this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
-      // this.option.unshift({
-      // value: "",
-      // label: " input baru",
-      // });
     });
   },
   methods: {
-    // test() {
-    //   this.showInput = true;
-    // },
     limitDate(date) {
       return date >= moment().format("YYYY/MM/DD");
     },
@@ -231,7 +197,6 @@ export default {
         this.$http.post("/new_history", history, {}).then((result) => {});
 
         this.$q.notify("SPP Berhasil Dibuat!");
-        // this.$router.push('/spp/list')
       });
     },
     filterOP(val, update, abort) {
