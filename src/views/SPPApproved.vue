@@ -234,20 +234,21 @@
     
     <q-dialog v-model="confirmCancel" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section> 
+        <q-card-section class="bg-negative text-white"> 
           <div class="text-bold">Alasan Pembatalan SPP</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
+        <q-card-section class="">
           <q-input class="col-4"
           outlined dense
+          type="textarea"
           v-model="content"
           />
         </q-card-section>
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="OK" @click="cancelSPP()" v-close-popup />
+        <q-card-actions align="between" class="text-primary">
+          <q-btn flat color="negative" label="Cancel" v-close-popup />
+          <q-btn flat color="positive" label="OK" @click="cancelSPP()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>

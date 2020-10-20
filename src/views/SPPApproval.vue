@@ -112,7 +112,7 @@
     </q-dialog>
     
     <!-- history  -->
-    <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
+    <q-dialog v-model="show_history" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-secondary text-white row">
           <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
@@ -149,9 +149,9 @@
           Anda yakin memberi persetujuan untuk SPP ini?
         </q-card-section>
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="OK" @click="approveSelected()" v-close-popup />
+        <q-card-actions align="between" class="text-primary">
+          <q-btn flat color="negative" label="Cancel" v-close-popup />
+          <q-btn flat color="positive" label="OK" @click="approveSelected()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -172,9 +172,9 @@
           />
         </q-card-section>
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="OK" @click="rejectSelected()" v-close-popup />
+        <q-card-actions align="between" class="text-primary">
+          <q-btn flat color="negative" label="Cancel" v-close-popup />
+          <q-btn flat color="positive" label="OK" @click="rejectSelected()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
