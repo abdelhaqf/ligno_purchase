@@ -5,7 +5,7 @@
         <q-btn color="primary" label="Update" @click="openForm" />
       </q-card-section>
       <q-markup-table bordered flat square dense>
-        <thead class="bg-green-4 text-white">
+        <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;"></th>
             <th class="text-left">PO Number</th>
@@ -15,7 +15,7 @@
             <th class="text-right">value</th>
           </tr>
         </thead>
-        <tbody v-if="poList.length" class="bg-green-1">
+        <tbody v-if="poList.length" class="bg-blue-grey-1">
           <tr v-for="d in poList" :key="d.id">
             <td>
               <q-radio v-model="slcPO" :val="d.po_id" />
@@ -24,7 +24,7 @@
               {{ d.po_id }} 
               <q-chip :color="(d.is_received=='fully received'?'grey-7':'orange')" text-color="white" dense size="sm">{{ d.is_received }}</q-chip>
             </td>
-            <td class="text-left">{{ d.po_date }}</td>
+            <td class="text-left">{{ d.po_date | moment('DD MMM YYYY')}}</td>
             <td class="text-left">{{ d.handler_name }}</td>
             <td class="text-left">{{ d.vendor }}</td>
             <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>

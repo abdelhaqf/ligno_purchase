@@ -1,34 +1,39 @@
 <template>
   <div class="row relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
+      <!-- toolbar -->
       <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn label="Detail" color="primary" @click="showDetail()" />
-        <q-btn outline label="History" color="primary" @click="showHistory()" />
+        <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex" />
+        <q-btn flat label="History" color="secondary" @click="showHistory()" :disable="slcIndex" />
       </q-card-section>
-      <q-markup-table bordered flat square dense>
-        <thead class="bg-green-4 text-white">
+
+      <!-- table  -->
+      <q-markup-table bordered dense>
+        <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th class="text-left">user</th>
-            <th class="text-left">date</th>
-            <th class="text-left">item</th>
-            <th class="text-right">qty</th>
-            <th class="text-left">deadline</th>
+            <!-- <th class="text-left">user</th> -->
+            <th class="text-left">Dibuat</th>
+            <th class="text-left">Deadline</th>
+            <th class="text-left">Barang</th>
+            <th class="text-right">Jumlah</th>
           </tr>
         </thead>
-        <tbody v-if="sppList.length" class="bg-green-1">
+        <tbody v-if="sppList.length" class="bg-blue-grey-1">
           <tr v-for="(d, index) in sppList" :key="d.spp_id">
             <td>
               <q-radio v-model="slcIndex" :val="index" />
             </td>
-            <td class="text-left">{{ d.name }}</td>
-            <td class="text-left">{{ formatDate(d.create_at) }}</td>
-            <td class="text-left">{{ d.item }}</td>
-            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
-            <td class="text-left" style="width: 100px;">
-              {{ d.deadline }}
+            <!-- <td class="text-left">{{ d.name }}</td> -->
+            <td class="text-left">
+              {{ d.create_at | moment("DD MMM YYYY") }}
               <q-badge :color="getColor(d.status)" text-color="white" dense size="sm">{{ d.status }}</q-badge>
             </td>
+            <td class="text-left" style="width: 100px;">
+              {{ d.deadline | moment("DD MMM YYYY") }}
+            </td>
+            <td class="text-left">{{ d.item }}</td>
+            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
@@ -42,9 +47,10 @@
       <q-card-section></q-card-section>
     </q-card>
 
-    <q-dialog v-model="show_detail" persistent transition-show="flip-down" transition-hide="flip-up">
+    <!-- detail  -->
+    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
-        <q-bar class="bg-primary text-white">
+        <q-card-section class="bg-primary text-white row">
           <div>NO SPP: {{ selected.spp_id }}</div>
 
           <q-space />
@@ -52,73 +58,70 @@
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
           </q-btn>
-        </q-bar>
-        <q-card-section class="">
-          <q-list>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Requester</q-item-label>
-                <q-item-label>{{ selected.name }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Request Date</q-item-label>
-                <q-item-label>{{ selected.create_at }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Deadline</q-item-label>
-                <q-item-label>{{ selected.deadline }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Item</q-item-label>
-                <q-item-label>{{ selected.item }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Quantity</q-item-label>
-                <q-item-label>{{ selected.qty }} {{ selected.unit }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Description</q-item-label>
-                <q-item-label>{{ selected.description }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item v-if="selected.est_arrival">
-              <q-item-section>
-                <q-item-label caption>Arrival Estimation</q-item-label>
-                <q-item-label>{{ selected.est_arrival }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label caption>Status</q-item-label>
-                <q-item-label>
-                  {{ status_note }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
         </q-card-section>
+        <q-list>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Yang Mengajukan</q-item-label>
+              <q-item-label>{{ selected.name }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Pada Tanggal</q-item-label>
+              <q-item-label>{{ selected.create_at | moment(" hh:mm, DD MMM YYYY ") }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>Deadline</q-item-label>
+              <q-item-label>{{ selected.deadline }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Nama Barang</q-item-label>
+              <q-item-label>{{ selected.item }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>Jumlah</q-item-label>
+              <q-item-label>{{ selected.qty }} {{ selected.unit }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section v-if="show_detail">
+              <q-item-label caption>Keterangan</q-item-label>
+              <q-item-label v-if="selected.description.length">{{ selected.description }}</q-item-label>
+              <q-item-label v-else>-</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item v-if="selected.est_arrival">
+            <q-item-section>
+              <q-item-label caption>Perkiraan Barang Tiba</q-item-label>
+              <q-item-label>{{ selected.est_arrival }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Status Saat Ini</q-item-label>
+              <q-item-label>
+                {{ status_note }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
       </q-card>
     </q-dialog>
 
-    <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
+    <!-- history  -->
+    <q-dialog v-model="show_history" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
-        <q-bar class="bg-primary text-white">
+        <q-card-section class="bg-secondary text-white row">
           <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
           <q-space />
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
           </q-btn>
-        </q-bar>
+        </q-card-section>
         <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
           <q-timeline>
             <q-timeline-entry

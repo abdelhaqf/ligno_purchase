@@ -1,35 +1,38 @@
 <template>
   <div class="row  relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
+      <!-- toolbar  -->
       <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Setuju" @click="promptApprove = true" />
-        <q-btn  color="negative" label="Tolak" @click="promptReject=true" />
-        <q-btn  outline class="q-ml-xl" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
-        <q-btn outline  label="History" :disabled="selectCount != 1" @click="showHistory()" />
+        <q-btn  color="negative" label="Tolak" @click="promptReject=true" :disable="!selectCount"/>
+        <q-btn color="positive" label="Setuju" @click="promptApprove = true" :disable="!selectCount"/>
+        <q-btn flat color="secondary"   class="q-ml-xl" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+        <q-btn flat color="secondary"   label="History" :disabled="selectCount != 1" @click="showHistory()" />
       </q-card-section>
       <q-markup-table flat square dense>
-        <thead class="bg-green-4 text-white">
+        <!-- table head  -->
+        <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <th class="text-left">user</th>
-            <th class="text-left">date</th>
-            <th class="text-left">item</th>
-            <th class="text-right">qty</th>
-            <th class="text-left">deadline</th>
+            <th class="text-left">User</th>
+            <th class="text-left">Tanggal Pengajuan</th>
+            <th class="text-left">Deadline</th>
+            <th class="text-left">Barang</th>
+            <th class="text-right">Jumlah</th>
           </tr>
         </thead>
-        <tbody v-if="sppList.length" class="bg-green-4">
+        <!-- table body  -->
+        <tbody v-if="sppList.length" class="bg-blue-grey-1">
           <tr v-for="d in sppList" :key="d.id">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
             <td class="text-left">
-              {{ d.name }} <q-chip color="grey-7" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
+              {{ d.name }} <q-chip color="accent" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
-            <td class="text-left">{{ formatDate(d.create_at) }}</td>
+            <td class="text-left">{{ d.create_at |moment('DD MMM YYYY') }}</td>
+            <td class="text-left">{{ d.deadline |moment('DD MMM YYYY')}}</td>
             <td class="text-left">{{ d.item }}</td>
             <td class="text-right">{{ d.qty }} {{d.unit}}</td>
-            <td class="text-left">{{ d.deadline }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
@@ -43,18 +46,18 @@
       </q-markup-table>
     </q-card>
 
+    <!-- detail  -->
     <q-dialog v-model="show_detail" persistent transition-show="flip-down" transition-hide="flip-up">
       <q-card style="min-width: 350px;">
-        <q-bar class="bg-primary text-white">
-          <div>NO SPP: {{selected.spp_id}}</div>
+        <q-card-section class="bg-primary text-white row">
+          <div>NO SPP: {{ selected.spp_id }}</div>
 
           <q-space />
 
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
           </q-btn>
-        </q-bar>
-        <q-card-section class="">
+        </q-card-section>
           <q-list>
             <q-item>
               <q-item-section>
@@ -67,9 +70,7 @@
                 <q-item-label caption>Request Date</q-item-label>
                 <q-item-label>{{selected.create_at}}</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
+              <q-item-section side>
                 <q-item-label caption>Deadline</q-item-label>
                 <q-item-label>{{selected.deadline}}</q-item-label>
               </q-item-section>
@@ -79,9 +80,7 @@
                 <q-item-label caption>Item</q-item-label>
                 <q-item-label>{{selected.item}}</q-item-label>
               </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
+              <q-item-section side>
                 <q-item-label caption>Quantity</q-item-label>
                 <q-item-label>{{selected.qty}} {{selected.unit}}</q-item-label>
               </q-item-section>
@@ -94,6 +93,7 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
+            <q-separator spaced />
             <q-item>
               <q-item-section>
                 <q-item-label caption>Status</q-item-label>
@@ -103,23 +103,23 @@
               </q-item-section>
             </q-item>
           </q-list>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Tolak" color="primary" @click="promptReject=true" v-close-popup />
-          <q-btn flat label="Setuju" color="primary" @click="promptApprove = true"  />
+            <q-separator spaced />
+        <q-card-actions align="between">
+          <q-btn flat label="Tolak" color="negative" @click="promptReject=true" v-close-popup />
+          <q-btn flat label="Setuju" color="positive" @click="promptApprove = true"  />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    
+    <!-- history  -->
     <q-dialog v-model="show_history" persistent transition-show="flip-down" transition-hide="flip-up">
       <q-card style="min-width: 350px;">
-        <q-bar class="bg-primary text-white">
-          <div>NO SPP: {{history[0]?history[0].spp_id:''}}</div>
+        <q-card-section class="bg-secondary text-white row">
+          <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
           <q-space />
           <q-btn dense flat icon="close" v-close-popup>
             <q-tooltip>Close</q-tooltip>
           </q-btn>
-        </q-bar>
+        </q-card-section>
         <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
           <q-timeline>
             <q-timeline-entry v-for="x in history" :key="x.id"
@@ -138,15 +138,14 @@
     </q-dialog>
     <q-dialog v-model="promptApprove" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section>
-          <div class="text-h6">Handled By</div>
+        <q-card-section class="bg-primary text-white">
+          <q-item-label class="">Tugaskan Kepada</q-item-label>
         </q-card-section>
-{{handleBy}}
+        <q-separator></q-separator>
 
-        <q-card-section class="q-pt-none">
+        <q-card-section class="">
           <q-select class="col-4"
           outlined dense
-          hide-dropdown-icon
           v-model="handleBy" :options="option" 
           map-options
           />
@@ -160,14 +159,17 @@
     </q-dialog>
     <q-dialog v-model="promptReject" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section>
-          <div class="text-h6">Alasan Penolakan SPP</div>
+        <q-card-section class="bg-primary text-white">
+          <div >Penolakan SPP</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
+        <q-card-section>
           <q-input class="col-4"
-          outlined dense
+          outlined 
+          stack-label
           v-model="content"
+          type="textarea"
+          label="Alasan Penolakan"
           />
         </q-card-section>
 

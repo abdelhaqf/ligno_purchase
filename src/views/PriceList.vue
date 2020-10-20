@@ -27,17 +27,17 @@
         
       </q-card-section>
       <q-markup-table flat dense square>
-        <thead class="bg-green-4 text-white">
+        <thead class="bg-blue-grey-14 text-white">
           <th class="text-left">PO</th>
           <th class="text-left">PO Date</th>
           <th class="text-left">Vendor</th>
           <th class="text-right">Price</th>
           <th class="text-right">Qty</th>
         </thead>
-        <tbody v-if="priceList.length" class="bg-green-1">
+        <tbody v-if="priceList.length" class="bg-blue-grey-1">
           <tr v-for="p in priceList" :key="p.id">
             <td class="text-left">{{ p.po_id }}</td>
-            <td class="text-left">{{ p.po_date }}</td>
+            <td class="text-left">{{ p.po_date}}</td>
             <td class="text-left">{{ p.vendor }}</td>
             <td class="text-right">{{ setCurrency(parseFloat(p.price) / parseFloat(p.qty), p.currency) }} / {{ p.unit }}</td>
             <td class="text-right">{{ p.qty }}</td>

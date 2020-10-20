@@ -11,7 +11,7 @@ Vue.prototype.$http = axios.create({
   baseURL: "http://localhost/ligno_purchase/api",
 });
 
-
+Vue.use(require('vue-moment'));
 Vue.use(Vue2Filters)
 // Vue.use(money, {
 //   decimal: ',',
