@@ -28,11 +28,11 @@
       </q-card-section>
       <q-markup-table flat dense square>
         <thead class="bg-blue-grey-14 text-white">
-          <th class="text-left">PO</th>
-          <th class="text-left">PO Date</th>
-          <th class="text-left">Vendor</th>
-          <th class="text-right">Price</th>
-          <th class="text-right">Qty</th>
+          <th class="text-left">Nomer PO</th>
+          <th class="text-left">Tanggal PO</th>
+          <th class="text-left">Nama Vendor</th>
+          <th class="text-right">Harga Satuan</th>
+          <th class="text-right">Jumlah Pembelian</th>
         </thead>
         <tbody v-if="priceList.length" class="bg-blue-grey-1">
           <tr v-for="p in priceList" :key="p.id">
@@ -40,7 +40,7 @@
             <td class="text-left">{{ p.po_date}}</td>
             <td class="text-left">{{ p.vendor }}</td>
             <td class="text-right">{{ setCurrency(parseFloat(p.price) / parseFloat(p.qty), p.currency) }} / {{ p.unit }}</td>
-            <td class="text-right">{{ p.qty }}</td>
+            <td class="text-right">{{ p.qty }} {{p.unit}}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">

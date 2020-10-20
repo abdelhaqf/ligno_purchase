@@ -55,8 +55,6 @@
 
     <!-- detail PO  -->
     <q-card v-if="show_detail" class="col-12">
-      <!-- <div class="row">
-        <div class="col-12"> -->
       <q-card-section class="bg-primary text-white"> Detail PO : {{ selected[0].po_id }} </q-card-section>
 
       <q-card-section class="q-pa-md">
@@ -75,7 +73,6 @@
           </tr>
         </table>
       </q-card-section>
-      <!-- <div class="q-pa-md q-gutter-md "> -->
       <q-markup-table separator="cell" bordered flat dense>
         <thead class="bg-blue-grey-14 text-white">
           <tr>
@@ -117,9 +114,6 @@
         <q-btn flat color="secondary" label="Kembali" @click="closeForm" />
         <q-btn flat color="primary" label="Update" @click="updateSPP()" />
       </q-card-actions>
-      <!-- </div> -->
-      <!-- </div>
-      </div> -->
     </q-card>
   </div>
 </template>
