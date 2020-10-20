@@ -3,8 +3,8 @@
     <q-card class="col-12 bg-white rounded-borders">
       <!-- toolbar -->
       <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex" />
-        <q-btn flat label="History" color="secondary" @click="showHistory()" :disable="slcIndex" />
+        <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex < 0" />
+        <q-btn flat label="History" color="secondary" @click="showHistory()" :disable="slcIndex <0" />
       </q-card-section>
 
       <!-- table  -->
@@ -48,7 +48,7 @@
     </q-card>
 
     <!-- detail  -->
-    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
+    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale" v-if="show_detail">
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-primary text-white row">
           <div>NO SPP: {{ selected.spp_id }}</div>
@@ -128,7 +128,7 @@
               v-for="x in history"
               :key="x.id"
               :title="x.status"
-              :subtitle="dateHistory(x.create_at)"
+              :subtitle="x.create_at | moment('DD MMM YYYY')"
               :color="getColor(x.status)"
               :icon="getIcon(x.status)"
             >
@@ -145,13 +145,12 @@
 
 <script>
 // @ is an alias to /src
-import moment from "moment";
 
 export default {
   data() {
     return {
       sppList: [],
-      slcIndex: "",
+      slcIndex: -1,
       show_detail: false,
       history: [],
       show_history: false,
@@ -180,12 +179,6 @@ export default {
         this.history = result.data;
       });
       this.show_history = true;
-    },
-    formatDate(dt) {
-      return moment(dt).format("YYYY-MM-DD");
-    },
-    dateHistory(dt) {
-      return moment(dt).format("DD MMMM YYYY");
     },
     status(val) {
       if (val.purch_manager_cancel == 1) {

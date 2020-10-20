@@ -92,7 +92,6 @@
                 :options="filtered"
                 @filter="filterOP"
                 label="1. Nama Barang"
-                @input="select"
                 class="col-10"
               >
                 <template v-slot:no-option>

@@ -156,7 +156,6 @@ export default {
 
     fetchData(){
       this.menu = []
-      console.log('start fetch data');
       this.menu.push({
                   icon: 'create',
                   title: "Buat SPP",
