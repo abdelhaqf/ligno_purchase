@@ -113,16 +113,16 @@ function getLink()
             WHERE spp.po_id is null 
                 AND (spp.handle_by = $userid OR $ispurch = 1)
                 AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1
-                UNION ALL
+                UNION
             SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp` 
             INNER JOIN user ON user.user_id = spp.user_id
             WHERE manager_approve = 0 AND user.manager_id = $userid
-                UNION ALL
+                UNION
             SELECT 0 AS 'col1',0 AS 'col2',COUNT(spp_id) AS 'col3',0 AS 'col4' FROM `spp` 
             INNER JOIN user ON user.user_id = spp.user_id
             WHERE purch_manager_approve = 0 AND manager_approve = 1
             AND $userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) 
-                UNION ALL
+                UNION
             SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3',COUNT(DISTINCT po.po_id) AS 'col4' FROM `po` 
             INNER JOIN spp ON spp.po_id = po.po_id
             WHERE spp.is_received <> 2
@@ -130,6 +130,57 @@ function getLink()
               ) tb";
     runQuery2($q);
   });
+
+
+  Flight::route('GET /summary', function () {
+    $q = "SELECT SUM(col1) 'count_spp', SUM(col2) 'on_process', SUM(col3) 'value_idr', SUM(col4) 'value_usd' FROM (
+            SELECT COUNT(spp_id) AS 'col1',0 AS 'col2',0 AS 'col3',0 AS 'col4'  FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+            UNION
+            SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+            AND po_id IS NULL
+            UNION
+            SELECT 0 AS 'col1',0 AS 'col2', SUM(price) AS 'col3',0 AS 'col4' FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND currency LIKE 'IDR'
+            UNION
+            SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3', COUNT(price) AS 'col4' FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND currency LIKE 'USD') tb1
+            ";
+    runQuery2($q);
+  });
+  
+  Flight::route('GET /list_month', function () {
+    $q = "SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label' FROM spp
+          GROUP BY value, label
+            ";
+    runQuery($q);
+  });
+
+  Flight::route('GET /daily_summary/@from/@to', function ($dateFrom, $dateTo) {
+    $q = "SELECT * FROM spp
+          WHERE create_at BETWEEN '$dateFrom' AND '$dateTo'
+            ";
+    runQuery($q);
+  });
+  Flight::route('GET /monthly_summary/@from/@to', function ($dateFrom, $dateTo) {
+    $q = "SELECT 
+            COUNT(spp_id) AS 'total_spp',
+            CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'month_name', 
+            SUM(price) AS 'total_purchase'  FROM spp 
+          WHERE create_at BETWEEN '$dateFrom' AND '$dateTo'
+          AND currency = 'IDR'
+          AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+          GROUP BY month_name
+            ";
+    runQuery($q);
+  });
+
+
   
 //---------------------------------------------------------------------------------------------
   Flight::route('POST /new_spp', function () {
