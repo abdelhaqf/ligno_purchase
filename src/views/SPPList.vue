@@ -2,9 +2,19 @@
   <div class="row relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders">
       <!-- toolbar -->
-      <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex < 0" />
-        <q-btn flat label="History" color="secondary" @click="showHistory()" :disable="slcIndex <0" />
+      <q-card-section class="q-pa-md row justify-between">
+        <div class="q-gutter-md">
+          <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex < 0" />
+          <q-btn flat label="History" color="secondary" @click="showHistory()" :disable="slcIndex <0" />
+        </div>
+        <div>
+          <q-select 
+          outlined dense v-model="filter" 
+          :options="filterOption"
+          map-options emit-value
+          @input="fetchData"
+          />
+        </div>
       </q-card-section>
 
       <!-- table  -->
@@ -145,6 +155,7 @@
 
 <script>
 // @ is an alias to /src
+import moment from 'moment'
 
 export default {
   data() {
@@ -155,15 +166,23 @@ export default {
       history: [],
       show_history: false,
       selected: {},
+      filterOption:[], filter: ''
     };
   },
   mounted() {
+    this.filter = moment().format('YYYY-M')
+
+    this.$http.get("/list_month", {}).then((result) => {
+      this.filterOption = result.data
+      this.filterOption.unshift({value: '%25', label: 'all' })
+    })
+
     this.fetchData();
   },
   methods: {
     fetchData() {
       this.sppList = [];
-      this.$http.get("/spp_byuserid/" + this.$store.state.currentUser.user_id, {}).then((result) => {
+      this.$http.get("/spp_byuserid/" + this.$store.state.currentUser.user_id+'/'+this.filter, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
           result.data[i].status = this.status(result.data[i]);
           this.sppList.push(result.data[i]);

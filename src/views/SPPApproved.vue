@@ -2,18 +2,28 @@
   <div class="row justify-center  q-pa-lg">
     <q-card v-if="!formPO" class="col-12 bg-white rounded-borders">
       <!-- table control -->
-      <q-card-section class="q-pa-md q-gutter-md">
-        <q-btn color="primary" label="Buat PO" @click="openForm" :disable="!selectCount" />
-        <q-btn flat color="secondary" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
-        <q-btn flat color="secondary" label="History" :disabled="selectCount != 1" @click="showHistory()" />
-        <q-btn
-          class="q-ml-xl"
-          color="negative"
-          label="Batalkan"
-          :disabled="selectCount != 1"
-          @click="confirmCancel = true"
-          v-if="$store.state.currentUser.is_purch_manager == 1"
-        />
+      <q-card-section class="q-pa-md row justify-between">
+        <div class="q-gutter-md">
+          <q-btn color="primary" label="Buat PO" @click="openForm" :disable="!selectCount" />
+          <q-btn flat color="secondary" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
+          <q-btn flat color="secondary" label="History" :disabled="selectCount != 1" @click="showHistory()" />
+          <q-btn
+            class="q-ml-xl"
+            color="negative"
+            label="Batalkan"
+            :disabled="selectCount != 1"
+            @click="confirmCancel = true"
+            v-if="$store.state.currentUser.is_purch_manager == 1"
+          />
+        </div>
+        <div>
+          <q-select 
+            outlined dense v-model="filter" 
+            :options="filterOption"
+            map-options emit-value
+            @input="fetchData"
+            />
+        </div>
       </q-card-section>
       <!-- table header  -->
       <q-markup-table bordered flat square dense>
@@ -300,9 +310,17 @@ export default {
       },
       confirmCancel: false,
       content: "",
+      filterOption:[], filter: ''
     };
   },
   mounted() {
+    this.filter = moment().format('YYYY-M')
+
+    this.$http.get("/list_month", {}).then((result) => {
+      this.filterOption = result.data
+      this.filterOption.unshift({value: '%25', label: 'all' })
+    })
+
     this.fetchData();
   },
   methods: {
@@ -312,8 +330,8 @@ export default {
         .get(
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
-            "/" +
-            this.$store.state.currentUser.is_purch_manager,
+            "/" + this.$store.state.currentUser.is_purch_manager +
+            "/" + this.filter,
           {}
         )
         .then((result) => {
