@@ -5,7 +5,11 @@ module.exports = {
       rtlSupport: false
     }
   },
+
   transpileDependencies: [
     'quasar'
-  ]
+  ],
+
+  publicPath: '',
+  assetsDir: 'assets'
 }

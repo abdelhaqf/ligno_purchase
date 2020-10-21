@@ -6,7 +6,7 @@
       <q-item class="bg-blue-2">
         <q-item-section avatar>
           <q-avatar>
-            <img src="/avatar.png" />
+            <img :src="'./avatar.png'" />
           </q-avatar>
         </q-item-section>
         <q-item-section v-if="$store.state.currentUser">

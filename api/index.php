@@ -17,29 +17,33 @@ function getLink()
     runQuery2($q);
   });
 
-  Flight::route('GET /spp_byuserid/@id', function ($id) {
-    $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
+  Flight::route('GET /spp_byuserid/@id/@filter', function ($id, $filter) {
+    $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name'
+          FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
           WHERE spp.user_id = $id
+          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ORDER BY spp.spp_id DESC
     ";
     runQuery($q);
   });
-  Flight::route('GET /spp-approval', function () {
+  Flight::route('GET /spp-approval/@filter', function ($filter) {
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
     ";
     runQuery($q);
   });
-  Flight::route('GET /spp_approved/@id/@ispurch', function ($id, $ispurch) {
+  Flight::route('GET /spp_approved/@id/@ispurch/@filter', function ($id, $ispurch,$filter) {
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
           WHERE spp.po_id is null 
                 AND (spp.handle_by = $id OR $ispurch = 1)
                 AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1 
+          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ORDER BY spp.spp_id DESC
     ";
     runQuery($q);
@@ -49,13 +53,16 @@ function getLink()
     runQuery2($q);
   });
   
-  Flight::route('GET /po', function () {
-    $q = "SELECT po.po_id, po.user_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
+  Flight::route('GET /po/@filter', function ($filter) {
+    $q = " SELECT * FROM (
+    SELECT po.po_id, po.user_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
               CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
               WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
           FROM po INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = po.user_id
-          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency";
+          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
+          WHERE is_received LIKE '%$filter%'
+          ";
     runQuery($q);
   });
   Flight::route('GET /po_byid/@id', function ($id) {
