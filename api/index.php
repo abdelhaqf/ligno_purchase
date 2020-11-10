@@ -138,32 +138,22 @@ function getLink()
     runQuery2($q);
   });
 
-
-  Flight::route('GET /summary', function () {
-    $q = "SELECT SUM(col1) 'count_spp', SUM(col2) 'on_process', SUM(col3) 'value_idr', SUM(col4) 'value_usd' FROM (
-            SELECT COUNT(spp_id) AS 'col1',0 AS 'col2',0 AS 'col3',0 AS 'col4'  FROM `spp`
-            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
-            AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
-            UNION
-            SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp`
-            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
-            AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
-            AND po_id IS NULL
-            UNION
-            SELECT 0 AS 'col1',0 AS 'col2', SUM(price) AS 'col3',0 AS 'col4' FROM `spp`
-            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
-            AND currency LIKE 'IDR'
-            UNION
-            SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3', COUNT(price) AS 'col4' FROM `spp`
-            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
-            AND currency LIKE 'USD') tb1
-            ";
-    runQuery2($q);
-  });
   
   Flight::route('GET /list_month', function () {
-    $q = "SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label' FROM spp
-          GROUP BY value, label
+    $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
+          YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
+          FROM spp
+          GROUP BY value, label, 'year', 'month'
+          ORDER BY year, month DESC
+            ";
+    runQuery($q);
+  });
+  Flight::route('GET /list_year', function () {
+    $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
+          YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
+          FROM spp
+          GROUP BY value, label, 'year', 'month'
+          ORDER BY year, month DESC
             ";
     runQuery($q);
   });
@@ -185,6 +175,88 @@ function getLink()
           GROUP BY month_name
             ";
     runQuery($q);
+  });
+
+
+
+
+  Flight::route('GET /yearly_summary', function () {
+      $q = "SELECT SUM(col1) 'count_spp', SUM(col2) 'on_process', SUM(col3) 'value_idr', SUM(col4) 'value_usd' FROM (
+              SELECT COUNT(spp_id) AS 'col1',0 AS 'col2',0 AS 'col3',0 AS 'col4'  FROM `spp`
+              WHERE YEAR(create_at) = YEAR(CURRENT_DATE)
+              AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+              UNION
+              SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp`
+              WHERE YEAR(create_at) = YEAR(CURRENT_DATE)
+              AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+              AND po_id IS NULL
+              UNION
+              SELECT 0 AS 'col1',0 AS 'col2', IFNULL(SUM(price),0) AS 'col3',0 AS 'col4' FROM `spp`
+              WHERE YEAR(create_at) = YEAR(CURRENT_DATE)
+              AND currency LIKE 'IDR'
+              UNION
+              SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3', COUNT(price) AS 'col4' FROM `spp`
+              WHERE YEAR(create_at) = YEAR(CURRENT_DATE)
+              AND currency LIKE 'USD') tb1
+              ";
+      runQuery2($q);
+    });
+  Flight::route('GET /monthly_summary', function () {
+    $q = "SELECT SUM(col1) 'count_spp', SUM(col2) 'on_process', SUM(col3) 'value_idr', SUM(col4) 'value_usd' FROM (
+            SELECT COUNT(spp_id) AS 'col1',0 AS 'col2',0 AS 'col3',0 AS 'col4'  FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+            UNION
+            SELECT 0 AS 'col1',COUNT(spp_id) AS 'col2',0 AS 'col3',0 AS 'col4' FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND manager_approve <> -1 AND purch_manager_approve <> -1 AND purch_manager_cancel <> -1
+            AND po_id IS NULL
+            UNION
+            SELECT 0 AS 'col1',0 AS 'col2', IFNULL(SUM(price),0) AS 'col3',0 AS 'col4' FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND currency LIKE 'IDR'
+            UNION
+            SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3', COUNT(price) AS 'col4' FROM `spp`
+            WHERE MONTH(create_at) = MONTH(CURRENT_DATE)
+            AND currency LIKE 'USD') tb1
+            ";
+    runQuery2($q);
+  });
+  Flight::route('GET /yearly_data_report', function () {
+    $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, po.vendor FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+           GROUP BY currency, po.vendor
+           ORDER BY price DESC
+            ";
+    runQuery($q);
+  });
+  Flight::route('GET /yearly_total_price', function () {
+    $q = " SELECT IFNULL(SUM(price),0) AS 'total' FROM `spp` 
+           WHERE po_id IS NOT NULL
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+            ";
+    runQuery2($q);
+  });
+  Flight::route('GET /MONTHLY_data_report', function () {
+    $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, po.vendor FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND MONTH(spp.create_at) = MONTH(CURRENT_DATE)
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+           GROUP BY currency, po.vendor
+           ORDER BY price DESC
+            ";
+    runQuery($q);
+  });
+  Flight::route('GET /MONTHLY_total_price', function () {
+    $q = " SELECT IFNULL(SUM(price),0) AS 'total' FROM `spp` 
+           WHERE po_id IS NOT NULL
+           AND MONTH(spp.create_at) = MONTH(CURRENT_DATE)
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+            ";
+    runQuery2($q);
   });
 
 

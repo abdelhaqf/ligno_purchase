@@ -114,7 +114,7 @@
         <tbody class="bg-blue-grey-1">
           <tr v-for="(x, i) in sppSelect" :key="i">
             <td>{{ i + 1 }}</td>
-            <td style="width: 250px;">{{ x.item }}</td>
+            <td style="width: 250px;">{{ x.item }} ({{x.qty}} {{x.unit}})</td>
             <td style="padding: 0px;">
               <money v-model="x.price" v-bind="money"></money>
             </td>
@@ -347,6 +347,8 @@ export default {
           let data = {
             spp_id: this.sppList[i].spp_id,
             item: this.sppList[i].item,
+            qty: this.sppList[i].qty,
+            unit: this.sppList[i].unit,
             price: 0,
             currency: "IDR",
             est_arrival: moment()
@@ -391,8 +393,8 @@ export default {
         };
         this.fetchData();
       });
-      await this.fetchData();
       await this.$root.$emit("refresh");
+      this.sppSelect = []
       this.$q.notify("Berhasil membuat PO!");
     },
     changeType() {
