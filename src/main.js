@@ -8,8 +8,8 @@ import Vue2Filters from 'vue2-filters'
 // import money from 'v-money'
 
 Vue.prototype.$http = axios.create({
-  baseURL: "http://localhost/ligno_purchase/api",
-  // baseURL: "http://192.168.100.209/ligno_purchase/api",
+  // baseURL: "http://localhost/ligno_purchase/api",
+  baseURL: "http://192.168.100.209/ligno_purchase/api",
 });
 
 Vue.use(require('vue-moment'));

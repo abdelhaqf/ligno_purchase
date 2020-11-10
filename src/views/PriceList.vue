@@ -75,7 +75,7 @@ export default {
       });
     },
     change(val) {
-      this.$http.get("/pricelist/" + this.selectOption, {}).then((result) => {
+      this.$http.get("/pricelist/" + encodeURIComponent(this.selectOption), {}).then((result) => {
         this.priceList = result.data;
       });
     },

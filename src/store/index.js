@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import axios from "axios";
 
 Vue.prototype.$http = axios.create({
-  baseURL: "http://localhost/ligno_purchase/api",
+  baseURL: "http://192.168.100.209/ligno_purchase/api",
 });
 Vue.use(Vuex);
 
@@ -33,6 +33,9 @@ export default new Vuex.Store({
           context.commit("getCurrentUser", result.data);
         })
         .catch(error => {
+          // console.log('error');
+          localStorage.removeItem("token");
+          this.$router.push("/login");
          })
     },
   },

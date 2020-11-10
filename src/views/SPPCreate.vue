@@ -172,6 +172,8 @@ export default {
   mounted() {
     this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
+      if(this.option.length == 0) 
+        this.showInput = true
     });
   },
   methods: {

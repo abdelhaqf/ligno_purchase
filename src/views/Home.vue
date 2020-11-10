@@ -1,35 +1,71 @@
 <template>
   <div class="q-pa-md">
-    <div class="text-h6">
-      {{date | moment('MMMM YYYY')}}
+    <div class="row q-pa-md justify-between">
+      <div class="text-h6 text-grey">
+        DASHBOARD LIGNO PURCHASING
+      </div>
+      <div>
+        <!-- <div>
+          <q-select
+            dense outlined
+            label="Tampilan Data"
+            v-model="selectedShow"
+            :options="showOption"
+            map-options emit-value
+            style="width: 200px;" class="bg-white"
+            @input="fetchData"
+            />
+          <q-select
+            dense outlined
+            label="Tampilan Data"
+            v-model="selectedShow"
+            :options="showOption"
+            map-options emit-value
+            style="width: 200px;" class="bg-white"
+            @input="fetchData"
+            />
+
+        </div> -->
+
+      <q-select
+        dense outlined
+        label="Tampilan Data"
+        v-model="selectedShow"
+        :options="showOption"
+        map-options emit-value
+        style="width: 200px;" class="bg-white"
+        @input="fetchData"
+        />
+      </div>
     </div>
-    <div class="row q-gutter-xl">
-      <q-card>
-        <q-card-section>
+    
+    <div class="row q-pa-md q-gutter-md justify-between">
+      <q-card class="summary-card">
+        <q-card-section class="text-h6 text-center text-blue-5">
           {{summary.count_spp}}
         </q-card-section>
         <q-card-section>
           SPP Diproses
         </q-card-section>
       </q-card>
-      <q-card>
-        <q-card-section>
+      <q-card class="summary-card">
+        <q-card-section class="text-h6 text-center text-blue-5">
           {{summary.on_process}}
         </q-card-section>
         <q-card-section>
           SPP Dalam Persetujuan
         </q-card-section>
       </q-card>
-      <q-card>
-        <q-card-section>
+      <q-card class="summary-card">
+        <q-card-section class="text-h6 text-center text-blue-5">
           {{setCurrency(summary.value_idr, 'IDR')}}
         </q-card-section>
         <q-card-section>
           Pembelian (IDR)
         </q-card-section>
       </q-card>
-      <q-card>
-        <q-card-section>
+      <q-card class="summary-card">
+        <q-card-section class="text-h6 text-center text-blue-5">
           {{setCurrency(summary.value_usd, 'USD')}}
         </q-card-section>
         <q-card-section>
@@ -37,135 +73,234 @@
         </q-card-section>
       </q-card>
     </div>
-    <div class="q-pa-md">
-      <div>
-        Filter
-        <div class="row q-gutter-sm">
-          <div class="col-8">
-            <q-select 
-              outlined dense
-              label="Summary Type"
-              v-model="summaryType"
-              :options="['per hari', 'per bulan']"
-              @input="changeType"
-            />
-          </div>
-          <div class="col-8">
-            <div v-if="!showListMonth" class="row">
-              <q-input outlined dense class="col-5" v-model="dateFrom" label="Tanggal Dari">
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                      <q-date minimal v-model="dateFrom" mask="YYYY-MM-DD">
-                        <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-              <q-input outlined dense class="col-5" v-model="dateTo" label="Tanggal Sampai">
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                      <q-date minimal v-model="dateTo" mask="YYYY-MM-DD">
-                        <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-              <q-btn 
-                dense outline class="col-2"
-                @click="showDaily" 
-                label="OK" />
-            </div>
-            <div v-else class="row">
-              <q-select 
-                outlined dense class="col-5"
-                label="Bulan Dari"
-                v-model="monthFrom"
-                :options="listMonth"
-                emit-value map-options
-              />
-              <q-select 
-                outlined dense class="col-5"
-                label="Bulan Sampai"
-                v-model="monthTo"
-                :options="listMonth"
-                emit-value map-options
-              />
-              <q-btn 
-                dense outline
-                style="width: 100px;"
-                @click="showMonthly" 
-                label="OK" />
-            </div>
-          </div>
 
-        </div>
-      </div>
-      <div>
-        {{listSummary}}
-      </div>
+    <div class="row q-pa-md q-gutter-md">
+      <q-card class="col">
+        <q-card-section>
+          <v-chart :options="option50" theme="default" :autoresize="true"/>
+        </q-card-section>
+      </q-card>
+    </div>
+    
+    <div class="row q-pa-md q-gutter-md">
+      <q-card class="col">
+        <q-card-section>
+          <v-chart :options="option80" theme="default" :autoresize="true"/>
+        </q-card-section>
+      </q-card>
     </div>
   </div>
 </template>
 
 <script>
+import ECharts from "vue-echarts";
+import "echarts/lib/chart/pie";
+import "echarts/lib/component/tooltip";
+import "echarts/lib/component/title";
+import "echarts/lib/component/legend";
 // @ is an alias to /src
 import moment from "moment";
 
+const colorPalette = ['#1976D2', '#21BA45', '#26A69A', '#9C27B0', '#C10015', '#31CCEC', '#F2C037']
+
 export default {
+  components: {
+    "v-chart": ECharts,
+  },
   data(){
     return{
+      showOption:[
+        {value: (new Date).getFullYear(), label: 'Tahun Ini'},
+        {value: (new Date).getMonth() + 1, label: 'Bulan Ini'},
+      ],
+      selectedShow: (new Date).getFullYear(),
       summary: {},
       listSummary: [],
       date: new Date,
-      summaryType: '',
-      listMonth: [], showListMonth: false, monthFrom: '', monthTo: '',
-      dateFrom: '', dateTo: '',
+
+      totalPrice: 0,
+      report: [],
+      report_80: [], report_50: [],
+      total_80: 0, total_50: 0,
+      option50: 
+      {
+        title: {
+          text: "DATA 50 % PENGELUARAN BELANJA",
+          left: "center",
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: "{b}<br/>Rp {c} ({d}%)",
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "20",
+            fontWeight: "bold",
+          },
+        },
+        legend: {
+            orient: 'horizontal',
+            bottom: 10,
+            data: []
+        },
+        series: [
+          {
+            type: "pie",
+            radius: ["45%", "70%"],
+            center: ["50%", "50%"],
+            selectedMode: "single",
+            data: [],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+        color: colorPalette,
+      },
+      option80: 
+      {
+        title: {
+          text: "DATA 80 % PENGELUARAN BELANJA",
+          left: "center",
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: "{b}<br/>Rp {c} ({d}%)",
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "20",
+            fontWeight: "bold",
+          },
+        },
+        series: [
+          {
+            type: "pie",
+            radius: ["45%", "70%"],
+            center: ["50%", "50%"],
+            selectedMode: "single",
+            data: [],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+        color: colorPalette,
+      },
     }
   },
   mounted(){
+    this.$http.get("/list_month", {}).then((result) => {
+      this.listMonth = result.data;
+    });
+
     this.fetchData()
   },
   methods:{
+
     fetchData(){
-      this.$http.get("/summary", {}).then((result) => {
+      this.report_50 = []
+      this.option50.series[0].data = []
+      this.report_80 = []
+      this.option80.series[0].data = []
+
+      var dt = (new Date).getFullYear()
+      if(dt == this.selectedShow){
+        this.showByYear(this.selectedShow)
+      }
+      else{
+        this.showByMonth(this.selectedShow)
+      }
+    },
+    showByYear(val){
+      
+      this.$http.get("/yearly_summary", {}).then((result) => {
         this.summary = result.data;
       });
+
+      this.$http.get("/yearly_total_price", {}).then((result) => {
+        this.totalPrice = parseInt(result.data.total);
+        var margin_80 = this.totalPrice * 0.8
+        var margin_50 = this.totalPrice * 0.5
+
+        this.$http.get("/yearly_data_report", {}).then((result) => {
+          this.report = result.data
+          this.total_80 = 0
+          this.total_50 = 0
+          for(var i = 0; i < result.data.length; i++){
+            if(this.total_80 < margin_80){
+              this.total_80 += parseInt(result.data[i].price)
+              this.report_80.push(result.data[i])
+              this.option80.series[0].data.push(
+                {value: result.data[i].price, name: result.data[i].vendor}
+              )
+            }
+            
+            if(this.total_50 < margin_50){
+              this.total_50 += parseInt(result.data[i].price)
+              this.report_50.push(result.data[i])
+              this.option50.series[0].data.push(
+                {value: result.data[i].price, name: result.data[i].vendor}
+              )
+              this.option50.legend.data.push(result.data[i].vendor)
+            }
+          }
+          this.option50.title.text = '50% Pengeluaran (Rp' + this.total_50 + ' dari Rp' + this.totalPrice + ' )' 
+          this.option80.title.text = '80% Pengeluaran (Rp' + this.total_80 + ' dari Rp' + this.totalPrice + ' )' 
+
+        });
+
+      });
+
+    },
+    showByMonth(val){
       
-      this.$http.get("/list_month", {}).then((result) => {
-        this.listMonth = result.data;
+      this.$http.get("/monthly_summary", {}).then((result) => {
+        this.summary = result.data;
       });
-    },
-    showDaily(){
-      var from = this.dateFrom + ' 00:00'
-      var to = this.dateTo+ ' 23:59'
-      this.$http.get("/daily_summary/" + from+'/'+ to, {}).then((result) => {
-        this.listSummary = result.data;
+
+      this.$http.get("/monthly_total_price", {}).then((result) => {
         console.log(result.data);
-      });
-    },
-    showMonthly(){
+        this.totalPrice = parseInt(result.data.total);
+        var margin_80 = this.totalPrice * 0.8
+        var margin_50 = this.totalPrice * 0.5
 
-      var from = this.monthFrom.substring(0, 4)+'-'+this.monthFrom.split('-')[1]+'-01 00:00'
-      var to = this.monthTo.substring(0, 4)+'-'+this.monthTo.split('-')[1]+'-31 23:59'
-
-      console.log(from + ' and ' + to);
-      this.$http.get("/monthly_summary/" + from +'/'+ to, {}).then((result) => {
-        this.listSummary = result.data;
+        this.$http.get("/monthly_data_report", {}).then((result) => {
+          this.report = result.data
+          this.total_80 = 0
+          this.total_50 = 0
+          for(var i = 0; i < result.data.length; i++){
+            if(this.total_80 < margin_80){
+              this.total_80 += parseInt(result.data[i].price)
+              this.report_80.push(result.data[i])
+              this.option80.series[0].data.push(
+                {value: result.data[i].price, name: result.data[i].vendor}
+              )
+            }
+            
+            if(this.total_50 < margin_50){
+              this.total_50 += parseInt(result.data[i].price)
+              this.report_50.push(result.data[i])
+              this.option50.series[0].data.push(
+                {value: result.data[i].price, name: result.data[i].vendor}
+              )
+              this.option50.legend.data.push(result.data[i].vendor)
+            }
+          }
+          this.option50.title.text = '50% Pengeluaran (Rp' + this.total_50 + ' dari Rp' + this.totalPrice + ' )' 
+          this.option80.title.text = '80% Pengeluaran (Rp' + this.total_80 + ' dari Rp' + this.totalPrice + ' )' 
+        });
       });
-    },
-    changeType(){
-      if(this.summaryType == 'per hari')
-        this.showListMonth = false
-      else 
-        this.showListMonth = true
     },
     setCurrency(price, cur) {
       if (cur == "IDR") {
@@ -191,5 +326,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  
+.summary-card{
+  min-width: 150px;
+  text-align: center;
+  color: grey;
+}
 </style>

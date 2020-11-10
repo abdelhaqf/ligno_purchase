@@ -8,6 +8,7 @@
           :options="filterOption"
           map-options emit-value
           @input="fetchData"
+          
         >
           <template v-slot:option="scope">
             <q-item
@@ -27,7 +28,6 @@
                 "
                 text-color="white"
                 dense
-                size="md"
                 >{{ scope.opt.label }}
               </q-badge>
               </q-item-section>
@@ -165,7 +165,7 @@ export default {
       ], 
       isReceived: '%25',
       filterOption:[
-        { label: "all", value: "%25" },
+        { label: "show all", value: "%25" },
         { label: "fully received", value: "fully" },
         { label: "half received", value: "half" },
         { label: "not received", value: "not" },
