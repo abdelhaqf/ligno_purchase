@@ -185,12 +185,15 @@ export default {
       this.poList = [];
       this.$http.get("/po/" + this.isReceived, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
-          if (
-            this.$store.state.currentUser.is_purch_manager == "1" ||
-            result.data[i].user_id == this.$store.state.currentUser.user_id
-          ) {
+          // if (
+          //   this.$store.state.currentUser.is_purch_manager == "1" ||
+          //   result.data[i].user_id == this.$store.state.currentUser.user_id
+          //   ) {
+          //   this.poList.push(result.data[i]);
+          // }
+
             this.poList.push(result.data[i]);
-          }
+
         }
       });
     },

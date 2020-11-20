@@ -61,14 +61,14 @@ const router = new VueRouter({
 });
 router.beforeEach((to, from, next) => {
   if (to.name != "Login") {
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("token-purchase")) {
       next({ name: "Login" });
     } else {
       next();
     }
   }
   if (to.name == "Login") {
-    if (localStorage.getItem("token")) {
+    if (localStorage.getItem("token-purchase")) {
       next({ name: "Home" });
     } else {
       next();
