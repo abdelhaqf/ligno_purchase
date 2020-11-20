@@ -224,7 +224,7 @@ export default {
       });
     },
     logout() {
-      localStorage.removeItem("token");
+      localStorage.removeItem("token-purchase");
       this.$router.push("/login");
     },
   },

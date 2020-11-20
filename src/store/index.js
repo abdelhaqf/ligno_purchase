@@ -19,14 +19,14 @@ export default new Vuex.Store({
   },
   actions: {
     async getCurrentUser(context) {
-      if (!localStorage.getItem("token")) {
+      if (!localStorage.getItem("token-purchase")) {
         context.commit("getCurrentUser", null);
         return null;
       }
       await Vue.prototype.$http
         .get("/user/info/", {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization: "Bearer " + localStorage.getItem("token-purchase"),
           },
         })
         .then((result) => {
@@ -34,7 +34,7 @@ export default new Vuex.Store({
         })
         .catch(error => {
           // console.log('error');
-          localStorage.removeItem("token");
+          localStorage.removeItem("token-purchase");
           this.$router.push("/login");
          })
     },
