@@ -53,15 +53,16 @@ function getLink()
     runQuery2($q);
   });
   
-  Flight::route('GET /po/@filter', function ($filter) {
+  Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
     $q = " SELECT * FROM (
-    SELECT po.po_id, po.user_id, po.vendor, po.po_date, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
+    SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
               CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
               WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
           FROM po INNER JOIN spp on po.po_id = spp.po_id 
           INNER JOIN `user` usr on usr.user_id = po.user_id
           GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-          WHERE is_received LIKE '%$filter%'
+          WHERE is_received LIKE '%$is_rcv%' 
+          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ";
     runQuery($q);
   });
@@ -142,8 +143,17 @@ function getLink()
   Flight::route('GET /list_month', function () {
     $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
           YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
-          FROM spp
-          GROUP BY value, label, 'year', 'month'
+          FROM spp 
+          GROUP BY 'value', 'label', 'year', 'month'
+          ORDER BY year, month DESC
+            ";
+    runQuery($q);
+  });
+  Flight::route('GET /list_month_po', function () {
+    $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
+          YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
+          FROM po
+          GROUP BY 'value', 'label', 'year', 'month'
           ORDER BY year, month DESC
             ";
     runQuery($q);

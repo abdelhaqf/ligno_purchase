@@ -118,6 +118,19 @@
               </q-item-label>
             </q-item-section>
           </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Konfirmasi Penerimaan</q-item-label>
+              <q-item-label>
+                <q-select 
+                  outlined dense v-model="isReceived" 
+                  :options="receivedOption"
+                  map-options emit-value
+                  @input="updateStatus"
+                  />
+              </q-item-label>
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-card>
     </q-dialog>
@@ -166,18 +179,24 @@ export default {
       history: [],
       show_history: false,
       selected: {},
-      filterOption:[], filter: ''
+      filterOption:[], filter: '',
+      isReceived: 0,
+      receivedOption:[
+        { label: "fully received", value: '2' },
+        { label: "half received", value: '1' },
+        { label: "not received", value: '0' },
+      ],
     };
   },
   mounted() {
-    this.filter = moment().format('YYYY-M')
 
     this.$http.get("/list_month", {}).then((result) => {
       this.filterOption = result.data
+      this.filter = result.data[0].value
       this.filterOption.unshift({value: '%25', label: 'all' })
-    })
 
-    this.fetchData();
+      this.fetchData();
+    })
   },
   methods: {
     fetchData() {
@@ -191,7 +210,34 @@ export default {
     },
     showDetail() {
       this.selected = this.sppList[this.slcIndex];
+      this.isReceived = this.selected.is_received
       this.show_detail = true;
+    },
+    updateStatus(){
+      var data = { spp_id:  this.selected.spp_id, is_received: this.isReceived}
+      this.selected.is_received = this.isReceived
+
+      this.$http.put("/update_spp/" + this.selected.spp_id, data, {})
+      .then((result) => {
+        let history = {
+          spp_id: this.selected.spp_id,
+          status: "process",
+          content: "update oleh pembuat SPP (" + this.$store.state.currentUser.username + ")",
+        };
+        if (this.isReceived == 2) {
+          history.status = "done";
+        }
+        this.$http.post("/new_history", history, {}).then((result) => {});
+        
+        this.$q.notify({
+          icon: "done",
+          color: "positive",
+          message: "Status penerimaan sudah diubah",
+        });
+
+        this.fetchData()
+      });
+
     },
     showHistory() {
       this.$http.get("/spp_history/" + this.sppList[this.slcIndex].spp_id, {}).then((result) => {
