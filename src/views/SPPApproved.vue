@@ -13,7 +13,6 @@
             label="Batalkan"
             :disabled="selectCount != 1"
             @click="confirmCancel = true"
-            v-if="$store.state.currentUser.is_purch_manager == 1"
           />
         </div>
         <div>
