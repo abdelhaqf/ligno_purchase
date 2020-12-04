@@ -54,7 +54,21 @@ Flight::route('GET /spp_byid/@id', function ($id) {
 });
 
 Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
+  $is_purch_manager = checkJWT()->data->is_purch_manager;
+  $user_id = checkJWT()->data->user_id;
+
   $q = " SELECT * FROM (
+    SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
+            CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
+            WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
+            FROM po INNER JOIN spp on po.po_id = spp.po_id 
+            INNER JOIN `user` usr on usr.user_id = po.user_id
+            GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
+          WHERE is_received LIKE '%$is_rcv%' AND user_id = $user_id
+          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
+          ";
+  if ($is_purch_manager)
+    $q = " SELECT * FROM (
     SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
               CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
               WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
@@ -64,6 +78,7 @@ Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
           WHERE is_received LIKE '%$is_rcv%' 
           HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ";
+
   runQuery($q);
 });
 Flight::route('GET /po_byid/@id', function ($id) {
@@ -142,7 +157,7 @@ Flight::route('GET /count_data/@userid/@ispurch', function ($userid, $ispurch) {
 
 Flight::route('GET /list_month_user', function () {
 
-  $id=checkJWT()->data->user_id;
+  $id = checkJWT()->data->user_id;
   $q = "SELECT DISTINCT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
   YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
   FROM spp 
@@ -152,7 +167,16 @@ Flight::route('GET /list_month_user', function () {
 });
 
 Flight::route('GET /list_month_po', function () {
-  $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
+  $is_purch_manager = checkJWT()->data->is_purch_manager;
+  $user_id = checkJWT()->data->user_id;
+  $q = " SELECT DISTINCT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
+          YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
+          FROM po
+          WHERE po.user_id=$user_id
+          ORDER BY year, month DESC
+            ";
+  if ($is_purch_manager)
+    $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
           YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
           FROM po
           GROUP BY 'value', 'label', 'year', 'month'

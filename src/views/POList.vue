@@ -215,7 +215,9 @@ export default {
   },
   mounted() {
     
-    this.$http.get("/list_month_po", {}).then((result) => {
+    this.$http.get("/list_month_po", {
+      headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
+    }).then((result) => {
       this.filterOption = result.data
       this.filter = result.data[0].value
       this.filterOption.unshift({value: '%25', label: 'all' })
@@ -226,7 +228,9 @@ export default {
   methods: {
     fetchData() {
       this.poList = [];
-      this.$http.get("/po/" + this.isReceived + "/" + this.filter, {}).then((result) => {
+      this.$http.get("/po/" + this.isReceived + "/" + this.filter, {
+        headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
+      }).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
             this.poList.push(result.data[i]);
         }

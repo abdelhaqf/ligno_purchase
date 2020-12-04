@@ -14,8 +14,8 @@
             outlined dense v-model="filter" 
             :options="filterOption"
             map-options emit-value
-            @input="fetchData" -->
-            />
+            @input="fetchData" 
+            /> -->
         </div>
       </q-card-section>
       <q-markup-table flat square dense>
