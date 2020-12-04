@@ -119,7 +119,7 @@
             </q-item-section>
           </q-item>
           <q-item>
-            <q-item-section>
+            <q-item-section v-show="selected.po_id">
               <q-item-label caption>Konfirmasi Penerimaan</q-item-label>
               <q-item-label>
                 <q-select 
@@ -190,7 +190,9 @@ export default {
   },
   mounted() {
 
-    this.$http.get("/list_month", {}).then((result) => {
+    this.$http.get("/list_month_user", {
+      headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
+    }).then((result) => {
       this.filterOption = result.data
       this.filter = result.data[0].value
       this.filterOption.unshift({value: '%25', label: 'all' })
@@ -200,6 +202,7 @@ export default {
   },
   methods: {
     fetchData() {
+      console.log(this.filter)
       this.sppList = [];
       this.$http.get("/spp_byuserid/" + this.$store.state.currentUser.user_id+'/'+this.filter, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {

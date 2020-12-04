@@ -10,12 +10,12 @@
           <q-btn flat label="History" color="secondary" :disabled="selectCount != 1" @click="showHistory()" />
         </div>
         <div>
-          <q-select 
+          <!-- <q-select 
           outlined dense v-model="filter" 
           :options="filterOption"
           map-options emit-value
           @input="fetchData"
-          />
+          /> -->
         </div>
       </q-card-section>
       <q-markup-table flat square dense>
@@ -204,23 +204,23 @@ export default {
       sppList: [],
       selected: {},
       option:[],
-      filterOption:[], filter: ''
+      // filterOption:[], filter: ''
     };
   },
   mounted() {
 
-    this.$http.get("/list_month", {}).then((result) => {
-      this.filterOption = result.data
-      this.filter = result.data[0].value
-      this.filterOption.unshift({value: '%25', label: 'all' })
+    // this.$http.get("/list_month", {}).then((result) => {
+    //   this.filterOption = result.data
+    //   this.filter = result.data[0].value
+    //   this.filterOption.unshift({value: '%25', label: 'all' })
 
-      this.fetchData()
-    })
+    //   this.fetchData()
+    // })
   },
   methods: {
     fetchData(){
       this.sppList = []
-      this.$http.get('/spp-approval/' + this.filter, {})
+      this.$http.get('/spp-approval', {})
       .then (result => {
         for(var i = 0; i < result.data.length;i++){
           if(result.data[i].manager_approve == 0 && result.data[i].manager_id == this.$store.state.currentUser.user_id){

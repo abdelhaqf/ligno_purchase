@@ -200,9 +200,9 @@ export default {
     }
   },
   mounted(){
-    this.$http.get("/list_month", {}).then((result) => {
-      this.listMonth = result.data;
-    });
+    // this.$http.get("/list_month", {}).then((result) => {
+    //   this.listMonth = result.data;
+    // });
 
     this.fetchData()
   },

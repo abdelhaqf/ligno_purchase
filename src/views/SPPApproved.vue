@@ -16,12 +16,12 @@
           />
         </div>
         <div>
-          <q-select 
+          <!-- <q-select 
             outlined dense v-model="filter" 
             :options="filterOption"
             map-options emit-value
             @input="fetchData"
-            />
+            /> -->
         </div>
       </q-card-section>
       <!-- table header  -->
@@ -309,18 +309,20 @@ export default {
       },
       confirmCancel: false,
       content: "",
-      filterOption:[], filter: ''
+      // filterOption:[], filter: ''
     };
   },
   mounted() {
 
-    this.$http.get("/list_month", {}).then((result) => {
-      this.filterOption = result.data
-      this.filter = result.data[0].value
-      this.filterOption.unshift({value: '%25', label: 'all' })
+    // this.$http.get("/list_month_purch", {
+    //   headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
+    // }).then((result) => {
+    //   this.filterOption = result.data
+    //   this.filter = result.data[0].value
+    //   this.filterOption.unshift({value: '%25', label: 'all' })
 
-      this.fetchData();
-    })
+    //   this.fetchData();
+    // })
   },
   methods: {
     fetchData() {
@@ -330,7 +332,7 @@ export default {
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
             "/" + this.$store.state.currentUser.is_purch_manager +
-            "/" + this.filter,
+            
           {}
         )
         .then((result) => {
