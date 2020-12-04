@@ -215,7 +215,7 @@ export default {
     //   this.filter = result.data[0].value
     //   this.filterOption.unshift({value: '%25', label: 'all' })
 
-    //   this.fetchData()
+      this.fetchData()
     // })
   },
   methods: {

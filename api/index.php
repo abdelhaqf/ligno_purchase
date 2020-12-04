@@ -176,11 +176,10 @@ Flight::route('GET /list_month_po', function () {
           ORDER BY year, month DESC
             ";
   if ($is_purch_manager)
-    $q = " SELECT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
-          YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
-          FROM po
-          GROUP BY 'value', 'label', 'year', 'month'
-          ORDER BY year, month DESC
+    $q = " SELECT DISTINCT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
+    YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
+    FROM po
+    ORDER BY year, month DESC
             ";
   runQuery($q);
 });

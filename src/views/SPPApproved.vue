@@ -321,19 +321,20 @@ export default {
     //   this.filter = result.data[0].value
     //   this.filterOption.unshift({value: '%25', label: 'all' })
 
-    //   this.fetchData();
+      this.fetchData();
     // })
   },
   methods: {
     fetchData() {
       this.sppList = [];
+      // console.log(this.$store.state.currentUser.is_purch_manager)
       this.$http
         .get(
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
-            "/" + this.$store.state.currentUser.is_purch_manager +
+            "/" + this.$store.state.currentUser.is_purch_manager
             
-          {}
+          ,{}
         )
         .then((result) => {
           for (var i = 0; i < result.data.length; i++) {

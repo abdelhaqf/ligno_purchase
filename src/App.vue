@@ -11,7 +11,7 @@
         </q-item-section>
         <q-item-section v-if="$store.state.currentUser">
           <q-item-label class="text-subtitle2">
-            {{ $store.state.currentUser.username | capitalize}}
+            {{ $store.state.currentUser.username | capitalize }}
           </q-item-label>
           <q-item-label caption>
             {{ $store.state.currentUser.dept }}
@@ -23,15 +23,15 @@
       </q-item>
       <q-separator />
       <!-- menus -->
-      <q-item clickable v-ripple v-for="m in menu" :key="m.title"  :to="m.link">
-          <q-item-section avatar>
-                <q-icon :name="m.icon" color="indigo-2" />
-              </q-item-section>
+      <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link" @click="reloadData">
+        <q-item-section avatar>
+          <q-icon :name="m.icon" color="indigo-2" />
+        </q-item-section>
         <q-item-section>
           <q-item-label class="row items-center">
             <div>{{ m.title }}</div>
             <div style="height: 30px; padding: 0 5px;">
-              <q-badge color="orange-4"  v-if="m.count> 0">{{m.count}}</q-badge>
+              <q-badge color="orange-4" v-if="m.count > 0">{{ m.count }}</q-badge>
             </div>
           </q-item-label>
         </q-item-section>
@@ -96,7 +96,6 @@
 import axios from "axios";
 import { mapState, mapActions } from "vuex";
 
-
 export default {
   data() {
     return {
@@ -106,8 +105,7 @@ export default {
       showKurs: false,
       kurs: [],
       count: {},
-      menu: [
-      ],
+      menu: [],
       thumbStyle: {
         right: "4px",
         borderRadius: "5px",
@@ -126,94 +124,111 @@ export default {
     };
   },
   mounted() {
-    this.$root.$on('refresh', async ()=>{
+    this.$root.$on("refresh", async () => {
       // this.menu = []
-      await this.fetchData()
-    })
+      await this.fetchData();
+    });
 
-    this.preRun()
-    
+    this.preRun();
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
+    reloadData() {
+      console.log("reload");
+      this.$http
+        .get(
+          "/count_data/" + this.$store.state.currentUser.user_id + "/" + this.$store.state.currentUser.is_purch_manager,
+          {}
+        )
+        .then((result) => {
+          this.menu.forEach((x) => {
+            if (x.link == "/spp/approval") this.$set(x, "count", result.data.count_approve);
+            if (x.link == "/spp/approval-pm") this.$set(x, "count", result.data.count_approvePM);
+            if (x.link == "/spp/approved") this.$set(x, "count", result.data.count_spp);
+            if (x.link == "/po/list") this.$set(x, "count", result.data.count_po);
+          });
 
-    async preRun(){
+          this.count = result.data;
+          // this.$set(this.count, result.data)
+          // this.$forceUpdate();
+          // console.log(result.data);
+        });
+    },
+    async preRun() {
       await this.getCurrentUser();
-      this.fetchData()
+      this.fetchData();
 
       if (!this.$store.state.currentUser) {
-        this.logout()
+        this.logout();
         this.$router.push("/login").catch(() => {});
         this.isLogin = true;
-      } 
-      else {
-        
+      } else {
         this.isLogin = false;
         this.isLoading = true;
         this.updateKurs();
       }
     },
 
-    fetchData(){
-      this.menu = []
+    fetchData() {
+      this.menu = [];
       this.menu.push({
-                  icon: 'create',
-                  title: "Buat SPP",
-                  link: "/spp/create",
-                })
+        icon: "create",
+        title: "Buat SPP",
+        link: "/spp/create",
+      });
 
-      this.$http.get('/count_data/' 
-                      + this.$store.state.currentUser.user_id+'/'
-                      + this.$store.state.currentUser.is_purch_manager, {})
-        .then (result => {
-          this.count = result.data
+      this.$http
+        .get(
+          "/count_data/" + this.$store.state.currentUser.user_id + "/" + this.$store.state.currentUser.is_purch_manager,
+          {}
+        )
+        .then((result) => {
+          this.count = result.data;
           this.menu.push({
-            icon: 'inbox',
+            icon: "inbox",
             title: "SPP Anda",
             link: "/spp/list",
-          })
-          if(this.$store.state.currentUser.is_manager=='1'){
+          });
+          if (this.$store.state.currentUser.is_manager == "1") {
             this.menu.push({
-              icon: 'group',
+              icon: "group",
               title: "Persetujuan Manager",
               link: "/spp/approval",
-              count: result.data.count_approve
-            })
+              count: result.data.count_approve,
+            });
           }
-          if(this.$store.state.currentUser.is_purch_manager=='1'){
+          if (this.$store.state.currentUser.is_purch_manager == "1") {
             this.menu.push({
-              icon: 'how_to_reg',
+              icon: "how_to_reg",
               title: "Persetujuan Man.Purchasing",
               link: "/spp/approval-pm",
-              count: result.data.count_approvePM
-            })
+              count: result.data.count_approvePM,
+            });
           }
-          if(this.$store.state.currentUser.is_purchasing=='1'){
+          if (this.$store.state.currentUser.is_purchasing == "1") {
             this.menu.push({
-              icon: 'beenhere',
+              icon: "beenhere",
               title: "SPP Disetujui",
               link: "/spp/approved",
-              count: result.data.count_spp
-            })
+              count: result.data.count_spp,
+            });
             this.menu.push({
-              icon: 'ballot',
+              icon: "ballot",
               title: "PO",
               link: "/po/list",
-              count: result.data.count_po
-            })
+              count: result.data.count_po,
+            });
             this.menu.push({
-              icon: 'bar_chart',
+              icon: "bar_chart",
               title: "List Harga",
               link: "/price/list",
-            })
+            });
           }
-
-        })
+        });
     },
     toggleLogin(val) {
-      this.isLogin = val
-      if(this.isLogin == false)
-      this.preRun()
+      this.isLogin = val;
+      if (this.isLogin == false) this.preRun();
     },
     updateKurs() {
       this.isLoading = true;
@@ -229,6 +244,5 @@ export default {
     },
   },
   computed: mapState(["currentUser"]),
-
 };
 </script>
