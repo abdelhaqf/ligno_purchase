@@ -64,7 +64,7 @@ Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
             FROM po INNER JOIN spp on po.po_id = spp.po_id 
             INNER JOIN `user` usr on usr.user_id = po.user_id
             GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-          WHERE is_received LIKE '%$is_rcv%' AND user_id = $user_id
+          WHERE is_received LIKE '%$is_rcv%' 
           HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ";
   if ($is_purch_manager)
@@ -172,14 +172,7 @@ Flight::route('GET /list_month_po', function () {
   $q = " SELECT DISTINCT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
           YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
           FROM po
-          WHERE po.user_id=$user_id
           ORDER BY year, month DESC
-            ";
-  if ($is_purch_manager)
-    $q = " SELECT DISTINCT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
-    YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
-    FROM po
-    ORDER BY year, month DESC
             ";
   runQuery($q);
 });
