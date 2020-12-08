@@ -3,7 +3,8 @@ import Vuex from "vuex";
 import axios from "axios";
 
 Vue.prototype.$http = axios.create({
-  baseURL: "http://192.168.100.209/ligno_purchase/api",
+  // baseURL: "http://192.168.100.209/ligno_purchase/api",
+  baseURL: process.env.VUE_APP_BASE_URL,
 });
 Vue.use(Vuex);
 
