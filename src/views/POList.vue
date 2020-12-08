@@ -47,6 +47,7 @@
             <th class="text-left">PO Date</th>
             <th class="text-left">Handle By</th>
             <th class="text-left">Vendor</th>
+            <th class="text-left">Items</th>
             <th class="text-right">value</th>
           </tr>
         </thead>
@@ -55,8 +56,8 @@
             <td style="padding: 0px;">
               <q-btn color="primary" size="md" icon="launch" class="full-width q-py-sm" flat @click="openForm(d.po_id)" />
             </td>
-            <td class="text-left">
-              {{ d.po_id }}
+            <td class="text-left col">
+              <div>{{ d.po_id }}</div>
               <q-chip
                 :color="
                   d.is_received == 'fully received'
@@ -72,8 +73,9 @@
               </q-chip>
             </td>
             <td class="text-left">{{ d.po_date | moment("DD MMM YYYY") }}</td>
-            <td class="text-left">{{ d.handler_name }}</td>
-            <td class="text-left">{{ d.vendor }}</td>
+            <td class="text-left">{{ d.handler_name | truncate(8) }}</td>
+            <td class="text-left">{{ d.vendor | truncate(11) }}</td>
+            <td class="text-left col"><div>{{ d.item}}{{d.spp_count>1?', more items... ' : ''}}</div></td>
             <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>
           </tr>
         </tbody>

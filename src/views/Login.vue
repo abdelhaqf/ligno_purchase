@@ -38,7 +38,19 @@ export default {
         this.$emit("isLogin", false);
         this.$emit("updateKurs");
         // await this.$router.push("/");
-        this.$router.push("/");
+
+        this.$http.get("/user/info/", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token-purchase"),
+          },
+        })
+        .then(resp => {
+          if(resp.data.is_purchasing == 1 || resp.data.username == 'ceo')
+            this.$router.push("/");
+          else
+            this.$router.push("/spp/create");
+        })
+
       });
     },
   },

@@ -60,21 +60,12 @@ Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
   $q = " SELECT * FROM (
     SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
             CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
-            WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
+            WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received',
+    		    COUNT(spp.spp_id) AS 'spp_count', spp.item
+             
             FROM po INNER JOIN spp on po.po_id = spp.po_id 
             INNER JOIN `user` usr on usr.user_id = po.user_id
             GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-          WHERE is_received LIKE '%$is_rcv%' 
-          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
-          ";
-  if ($is_purch_manager)
-    $q = " SELECT * FROM (
-    SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
-              CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
-              WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received'  
-          FROM po INNER JOIN spp on po.po_id = spp.po_id 
-          INNER JOIN `user` usr on usr.user_id = po.user_id
-          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
           WHERE is_received LIKE '%$is_rcv%' 
           HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ";

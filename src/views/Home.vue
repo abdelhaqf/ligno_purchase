@@ -203,8 +203,13 @@ export default {
     // this.$http.get("/list_month", {}).then((result) => {
     //   this.listMonth = result.data;
     // });
-
-    this.fetchData()
+    if(this.$store.state.currentUser.is_purchasing == 1 || this.$store.state.currentUser.username == 'ceo')
+    {
+      this.fetchData()
+    }
+    else{
+      this.$router.push('/spp/create')
+    }
   },
   methods:{
 

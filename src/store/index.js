@@ -33,7 +33,6 @@ export default new Vuex.Store({
           context.commit("getCurrentUser", result.data);
         })
         .catch(error => {
-          // console.log('error');
           localStorage.removeItem("token-purchase");
           this.$router.push("/login");
          })
