@@ -254,6 +254,22 @@ export default {
       await this.$http.post('/new_history', history, {})
       .then (result => {
       })
+      var notifikasi ={
+        from_id: this.$store.state.currentUser.user_id,
+        to_id: val.user_id,
+        notif: 'SPP Anda sudah disetujui manager purchasing',
+        note: 'Dalam proses pencarian vendor',
+        spp_id: val.spp_id ,
+        reference_page: '/spp/list'
+      }
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+
+      notifikasi.to_id = this.handleBy.value
+      notifikasi.notif = 'SPP Baru perlu di proses'
+      notifikasi.reference_page = '/spp/approved'
+      notifikasi.note = ''
+
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
     async reject(val){
       var data = {
@@ -273,6 +289,15 @@ export default {
       await this.$http.post('/new_history', history, {})
       .then (result => {
       })
+      var notifikasi ={
+        from_id: this.$store.state.currentUser.user_id,
+        to_id: val.user_id,
+        notif: 'SPP Anda ditolak manager purchasing',
+        note: val.note,
+        spp_id: val.spp_id ,
+        reference_page: '/spp/list'
+      }
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
     async approveSelected(){
       this.show_detail = false

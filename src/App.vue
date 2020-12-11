@@ -17,6 +17,10 @@
             {{ $store.state.currentUser.dept }}
           </q-item-label>
         </q-item-section>
+        <q-item-section class="relative-position">
+          <q-btn flat dense color="indigo-4" icon="notifications" @click="$router.push('/notification')"  />
+          <q-chip v-show="count_notif> 0" dense size="sm" style="top:5px;" class="absolute-center text-white" color="orange-4">{{count_notif}}</q-chip>
+        </q-item-section>
         <q-item-section side>
           <q-item-label caption><q-btn flat label="logout" size="sm" color="negative" @click="logout"/></q-item-label>
         </q-item-section>
@@ -37,51 +41,56 @@
         </q-item-section>
       </q-item>
       <q-separator />
-      <q-card class="relative-position bg-grey-2" flat>
-        <q-card-section class="q-pb-none">
-          <div class="text-h6">Info Kurs</div>
-        </q-card-section>
-        <!-- kurs -->
-        <q-card-section>
-          <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-            <div v-if="showKurs">
-              <q-list bordered separator class="bg-white rounded-borders">
-                <q-item>
-                  <q-item-section>
-                    <q-item-label class="text-subtitle2">BCA</q-item-label>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Rp {{ kurs.Jsondata.bcarate | number("0,0") }}</q-item-label>
-                    <q-item-label caption>{{ kurs.Jsondata.date3 }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label class="text-subtitle2">BI</q-item-label>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Rp {{ kurs.Jsondata.birate | number("0,0") }}</q-item-label>
-                    <q-item-label caption>{{ kurs.Jsondata.date2 }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label class="text-subtitle2">MenKeu</q-item-label>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Rp {{ kurs.Jsondata.menkeurate | number("0,0") }}</q-item-label>
-                    <q-item-label caption>{{ kurs.Jsondata.date1 }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </div>
-          </transition>
-        </q-card-section>
+      <q-expansion-item
+        label="Info Kurs"
+        header-class="text-h6"
+      >
+        <q-card class="relative-position bg-grey-2" flat>
+          <!-- <q-card-section class="q-pb-none">
+            <div class="text-h6">Info Kurs</div>
+          </q-card-section> -->
+          <!-- kurs -->
+          <q-card-section>
+            <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+              <div v-if="showKurs">
+                <q-list bordered separator class="bg-white rounded-borders">
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label class="text-subtitle2">BCA</q-item-label>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Rp {{ kurs.Jsondata.bcarate | number("0,0") }}</q-item-label>
+                      <q-item-label caption>{{ kurs.Jsondata.date3 }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label class="text-subtitle2">BI</q-item-label>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Rp {{ kurs.Jsondata.birate | number("0,0") }}</q-item-label>
+                      <q-item-label caption>{{ kurs.Jsondata.date2 }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label class="text-subtitle2">MenKeu</q-item-label>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Rp {{ kurs.Jsondata.menkeurate | number("0,0") }}</q-item-label>
+                      <q-item-label caption>{{ kurs.Jsondata.date1 }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </div>
+            </transition>
+          </q-card-section>
 
-        <q-inner-loading :showing="isLoading">
-          <q-spinner-gears size="50px" color="primary" />
-        </q-inner-loading>
-      </q-card>
+          <q-inner-loading :showing="isLoading">
+            <q-spinner-gears size="50px" color="primary" />
+          </q-inner-loading>
+        </q-card>
+      </q-expansion-item>
     </q-drawer>
 
     <q-page-container>
@@ -106,6 +115,7 @@ export default {
       kurs: [],
       count: {},
       menu: [],
+      count_notif: 0,
       thumbStyle: {
         right: "4px",
         borderRadius: "5px",
@@ -128,6 +138,13 @@ export default {
       // this.menu = []
       await this.fetchData();
     });
+    
+    this.$root.$on('notifikasi', async () => { 
+      this.$http.get("/count_notif/" + this.$store.state.currentUser.user_id, {})
+      .then(result => {
+        this.count_notif = result.data.count
+      })
+    })   
 
     this.preRun();
   },
@@ -171,6 +188,13 @@ export default {
 
     fetchData() {
       this.menu = [];
+      if(this.$store.state.currentUser.is_purchasing == 1){
+        this.menu.push({
+          icon: "dashboard",
+          title: "Home",
+          link: "/dashboard",
+        });
+      }
       this.menu.push({
         icon: "create",
         title: "Buat SPP",
@@ -225,18 +249,25 @@ export default {
             });
           }
         });
+
+
+      this.$http.get("/count_notif/" + this.$store.state.currentUser.user_id, {})
+        .then(result => {
+          this.count_notif = result.data.count
+        })
+
     },
     toggleLogin(val) {
       this.isLogin = val;
       if (this.isLogin == false) this.preRun();
     },
     updateKurs() {
-      this.isLoading = true;
-      axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
-        this.kurs = result.data;
-        this.isLoading = false;
-        this.showKurs = true;
-      });
+      // this.isLoading = true;
+      // axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
+      //   this.kurs = result.data;
+      //   this.isLoading = false;
+      //   this.showKurs = true;
+      // });
     },
     logout() {
       localStorage.removeItem("token-purchase");

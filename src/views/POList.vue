@@ -295,6 +295,28 @@ export default {
           history.status = "done";
         }
         this.$http.post("/new_history", history, {}).then((result) => {});
+        var info = ''
+        if(this.selected[i].is_received == 2)
+          info = 'barang sudah diterima penuh'
+        if(this.selected[i].is_received == 1)
+          info = 'barang sudah diterima sebagian'
+
+        var notifikasi ={
+            from_id: this.$store.state.currentUser.user_id,
+            to_id: this.selected[i].user_id,
+            notif: 'Konfirmasi Penerimaan barang',
+            note: info,
+            spp_id: this.selected[i].spp_id ,
+            reference_page: '/spp/list'
+          }
+        if(info != 0){
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+          
+          notifikasi.to_id = 1 // Notif ke Manager purchasing
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+        }
+
+
       }
       this.show_detail = false;
       await this.fetchData();

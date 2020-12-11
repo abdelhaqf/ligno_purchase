@@ -386,7 +386,19 @@ export default {
             content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
           };
           this.$http.post("/new_history", history, {}).then((result) => {});
+          
+          var notifikasi ={
+            from_id: this.$store.state.currentUser.user_id,
+            to_id: this.sppSelect[i].user_id,
+            notif: 'PO telah dibuat',
+            note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+            spp_id: this.sppSelect[i].spp_id ,
+            reference_page: '/spp/list'
+          }
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
         }
+
+
         this.formPO = false;
         this.po = {
           po_date: moment()

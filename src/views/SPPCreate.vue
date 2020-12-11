@@ -198,6 +198,17 @@ export default {
         this.$http.post("/new_history", history, {}).then((result) => {});
 
         this.$q.notify("SPP Berhasil Dibuat!");
+
+        var notifikasi ={
+          from_id: this.$store.state.currentUser.user_id,
+          to_id: this.$store.state.currentUser.manager_id,
+          notif: this.$store.state.currentUser.username + ' membuat SPP baru',
+          note: val.note,
+          spp_id: result.data,
+          reference_page: '/spp/approval'
+        }
+        this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+
       });
     },
     filterOP(val, update, abort) {

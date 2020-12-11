@@ -5,7 +5,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/dashboard",
     name: "Home",
     component: () => import("../views/Home.vue"),
   },
@@ -53,6 +53,11 @@ const routes = [
     path: "/report",
     name: "Report",
     component: () => import("../views/Report.vue"),
+  },
+  {
+    path: "/notification",
+    name: "notification",
+    component: () => import("../views/Notification.vue"),
   },
 ];
 

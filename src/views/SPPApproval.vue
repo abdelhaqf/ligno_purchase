@@ -235,6 +235,7 @@ export default {
         this.option = result.data
       })      
     },
+
     async approve(val){
       var data = {
         manager_approve: 1,
@@ -253,7 +254,18 @@ export default {
       await this.$http.post('/new_history', history, {})
       .then (result => {
       })
+
+      var notifikasi ={
+        from_id: this.$store.state.currentUser.user_id,
+        to_id: 1, //Diisi dengan user_id menager purchasing
+        notif: 'SPP dari ' + val.name + ' menunggu persetujuan',
+        note: val.note,
+        spp_id: val.spp_id ,
+        reference_page: '/spp/approval-pm'
+      }
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
+
     async reject(val){
       var data = {
         manager_approve: -1,
@@ -272,7 +284,17 @@ export default {
       await this.$http.post('/new_history', history, {})
       .then (result => {
       })
+      var notifikasi ={
+        from_id: this.$store.state.currentUser.user_id,
+        to_id: val.user_id,
+        notif: 'SPP Anda ditolak manager',
+        note: this.content,
+        spp_id: val.spp_id ,
+        reference_page: '/spp/list'
+      }
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
+
     async approveSelected(){
       this.show_detail = false
       var data = this.sppList.filter(e => e.select === true)
@@ -283,6 +305,7 @@ export default {
       await this.$root.$emit('refresh')
       this.$q.notify('SPP berhasil disetujui!')
     },
+
     async rejectSelected(){
       var data = this.sppList.filter(e => e.select === true)
       for(var i = 0; i<data.length; i++){
@@ -292,6 +315,7 @@ export default {
       await this.$root.$emit('refresh')
       this.$q.notify('SPP ditolak!')
     },
+
     showHistory(){
       this.$http.get('/spp_history/' + this.selected.spp_id, {})
       .then (result => {

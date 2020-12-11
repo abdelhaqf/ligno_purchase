@@ -32,7 +32,6 @@ Flight::route('GET /spp-approval', function () {
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          
     ";
   runQuery($q);
 });
@@ -278,6 +277,29 @@ Flight::route('GET /MONTHLY_total_price', function () {
   runQuery2($q);
 });
 
+Flight::route('GET /count_notif/@id', function ($id) {
+  $q = " SELECT COUNT(*) AS count FROM notifikasi WHERE to_id = $id 
+         AND `is_read` = 'N' AND to_id <> from_id ";
+  runQuery2($q);
+});
+Flight::route('GET /notifikasi/@id', function ($id) {
+  $q = " SELECT n.* , user.name
+         FROM notifikasi n
+         INNER JOIN user ON user.user_id = n.from_id
+         WHERE to_id = $id AND to_id <> from_id
+         ORDER BY notif_id DESC
+         LIMIT 20
+         ";
+  runQuery($q);
+});
+
+Flight::route('PUT /notifikasi/@notif_id', function ($notif_id) {
+  $data = Flight::request()->getBody();
+  $data = (array) json_decode($data);
+
+  runQuery3('PUT', 'notifikasi', $data, 'notif_id', $notif_id);
+});
+
 
 
 //---------------------------------------------------------------------------------------------
@@ -306,7 +328,12 @@ Flight::route('PUT /update_spp/@spp_id', function ($spp_id) {
 
   runQuery3('PUT', 'spp', $data, 'spp_id', $spp_id);
 });
+Flight::route('POST /notifikasi', function () {
+  $data = Flight::request()->getBody();
+  $data = (array) json_decode($data);
 
+  runQuery3('POST', 'notifikasi', $data, '');
+});
 
 /// Run Query
 //Get Array
@@ -380,7 +407,7 @@ Flight::route('POST /login', function () {
   $password = $user->password;
 
   $link = getLink();
-  $q = "select user_id, name, username, is_manager, is_purchasing, is_purch_manager, dept from user where username = '$username' and password = '$password'";
+  $q = "select user_id, name, username, is_manager, manager_id, is_purchasing, is_purch_manager, dept from user where username = '$username' and password = '$password'";
 
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
 
@@ -401,6 +428,7 @@ Flight::route('POST /login', function () {
       "data" => array(
         "user_id" => $arr[0]['user_id'],
         "username" => $username,
+        "manager_id" => $arr[0]['manager_id'],
         "is_manager" => $arr[0]['is_manager'],
         "is_purchasing" => $arr[0]['is_purchasing'],
         "is_purch_manager" => $arr[0]['is_purch_manager'],

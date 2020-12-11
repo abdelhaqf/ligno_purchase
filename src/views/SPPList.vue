@@ -58,7 +58,7 @@
     </q-card>
 
     <!-- detail  -->
-    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale" v-if="show_detail">
+    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale" >
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-primary text-white row">
           <div>NO SPP: {{ selected.spp_id }}</div>
@@ -231,6 +231,25 @@ export default {
           history.status = "done";
         }
         this.$http.post("/new_history", history, {}).then((result) => {});
+
+        var info = ''
+        if(this.isReceived == 2)
+          info = 'barang sudah diterima penuh'
+        if(this.isReceived == 1)
+          info = 'barang sudah diterima sebagian'
+
+        var notifikasi ={
+          from_id: this.$store.state.currentUser.user_id,
+          to_id: this.selected.handle_by,
+          notif: 'Konfimrasi penerimaan oleh pemohon',
+          note: info,
+          spp_id: this.selected.spp_id ,
+          reference_page: '/po/list'
+        }
+        this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+        
+        notifikasi.to_id = 1 // Notif ke Manager purchasing
+        this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
         
         this.$q.notify({
           icon: "done",
