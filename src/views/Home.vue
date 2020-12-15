@@ -1,8 +1,8 @@
 <template>
   <div class="q-pa-md">
     <div class="row q-pa-md justify-between">
-      <div class="text-h6 text-grey">
-        DASHBOARD LIGNO PURCHASING
+      <div class="text-h6 text-grey-5">
+        DASHBOARD LIGNO PURCHASE
       </div>
       <div>
 
@@ -20,34 +20,34 @@
     
     <div class="row q-pa-md q-gutter-md justify-between">
       <q-card class="summary-card">
-        <q-card-section class="text-h6 text-center text-blue-5">
+        <q-card-section :class="classSummary">
           {{summary.count_spp}}
         </q-card-section>
-        <q-card-section>
+        <q-card-section class="q-pt-none">
           SPP Diproses
         </q-card-section>
       </q-card>
-      <q-card class="summary-card">
-        <q-card-section class="text-h6 text-center text-blue-5">
+      <q-card class="summary-card" >
+        <q-card-section :class="classSummary">
           {{summary.on_process}}
         </q-card-section>
-        <q-card-section>
+        <q-card-section class="q-pt-none">
           SPP Dalam Persetujuan
         </q-card-section>
       </q-card>
-      <q-card class="summary-card">
-        <q-card-section class="text-h6 text-center text-blue-5">
+      <q-card  class="summary-card">
+        <q-card-section :class="classSummary">
           {{setCurrency(summary.value_idr, 'IDR')}}
         </q-card-section>
-        <q-card-section>
+        <q-card-section class="q-pt-none">
           Pembelian (IDR)
         </q-card-section>
       </q-card>
       <q-card class="summary-card">
-        <q-card-section class="text-h6 text-center text-blue-5">
+        <q-card-section :class="classSummary">
           {{setCurrency(summary.value_usd, 'USD')}}
         </q-card-section>
-        <q-card-section>
+        <q-card-section class="q-pt-none">
           Pembelian (USD)
         </q-card-section>
       </q-card>
@@ -87,6 +87,7 @@ export default {
   },
   data(){
     return{
+      classSummary: 'text-h4 text-center text-blue-5 text-weight-bold',
       showOption:[
         {value: (new Date).getFullYear(), label: 'Tahun Ini'},
         {value: (new Date).getMonth() + 1, label: 'Bulan Ini'},
@@ -108,7 +109,10 @@ export default {
         },
         tooltip: {
           trigger: "item",
-          formatter: "{b}<br/>Rp {c} ({d}%)",
+          // formatter: "{b}<br/>Rp {c} ({d}%)",
+          formatter: (param,ticket) =>{
+            return param.name + '<br>'+this.setCurrency(param.value,'IDR')+' ('+param.percent+'%)'
+          }
         },
         emphasis: {
           label: {
@@ -148,7 +152,10 @@ export default {
         },
         tooltip: {
           trigger: "item",
-          formatter: "{b}<br/>Rp {c} ({d}%)",
+          // formatter: "{b}<br/>Rp {c} ({d}%)",
+          formatter: (param,ticket) =>{
+            return param.name + '<br>'+this.setCurrency(param.value,'IDR')+' ('+param.percent+'%)'
+          }
         },
         emphasis: {
           label: {
@@ -235,8 +242,8 @@ export default {
               this.option50.legend.data.push(result.data[i].vendor)
             }
           }
-          this.option50.title.text = '50% Pengeluaran (Rp' + this.total_50 + ' dari Rp' + this.totalPrice + ' )' 
-          this.option80.title.text = '80% Pengeluaran (Rp' + this.total_80 + ' dari Rp' + this.totalPrice + ' )' 
+          this.option80.title.text = '80% Pengeluaran (' + this.setCurrency(this.total_80, 'IDR')+ ' dari ' + this.setCurrency(this.totalPrice, 'IDR') + ' )' 
+          this.option50.title.text = '50% Pengeluaran (' + this.setCurrency(this.total_50, 'IDR') + ' dari ' + this.setCurrency(this.totalPrice, 'IDR') + ' )' 
 
         });
 
@@ -276,8 +283,8 @@ export default {
               this.option50.legend.data.push(result.data[i].vendor)
             }
           }
-          this.option50.title.text = '50% Pengeluaran (Rp' + this.total_50 + ' dari Rp' + this.totalPrice + ' )' 
-          this.option80.title.text = '80% Pengeluaran (Rp' + this.total_80 + ' dari Rp' + this.totalPrice + ' )' 
+          this.option50.title.text = '80% Pengeluaran (' + this.setCurrency(this.total_80, 'IDR')+ ' dari ' + this.setCurrency(this.totalPrice, 'IDR') + ' )' 
+          this.option80.title.text = '50% Pengeluaran (' + this.setCurrency(this.total_50, 'IDR') + ' dari ' + this.setCurrency(this.totalPrice, 'IDR') + ' )' 
         });
       });
     },
