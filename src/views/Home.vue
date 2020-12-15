@@ -5,27 +5,6 @@
         DASHBOARD LIGNO PURCHASING
       </div>
       <div>
-        <!-- <div>
-          <q-select
-            dense outlined
-            label="Tampilan Data"
-            v-model="selectedShow"
-            :options="showOption"
-            map-options emit-value
-            style="width: 200px;" class="bg-white"
-            @input="fetchData"
-            />
-          <q-select
-            dense outlined
-            label="Tampilan Data"
-            v-model="selectedShow"
-            :options="showOption"
-            map-options emit-value
-            style="width: 200px;" class="bg-white"
-            @input="fetchData"
-            />
-
-        </div> -->
 
       <q-select
         dense outlined

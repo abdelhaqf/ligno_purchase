@@ -10,12 +10,6 @@
           <q-btn flat label="History" color="secondary" :disabled="selectCount != 1" @click="showHistory()" />
         </div>
         <div>
-          <!-- <q-select 
-          outlined dense v-model="filter" 
-          :options="filterOption"
-          map-options emit-value
-          @input="fetchData"
-          /> -->
         </div>
       </q-card-section>
       <q-markup-table flat square dense>

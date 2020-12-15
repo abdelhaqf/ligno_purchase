@@ -22,7 +22,6 @@
         <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;"></th>
-            <!-- <th class="text-left">user</th> -->
             <th class="text-left">Dibuat</th>
             <th class="text-left">Deadline</th>
             <th class="text-left">Barang</th>
@@ -34,7 +33,6 @@
             <td>
               <q-radio v-model="slcIndex" :val="index" />
             </td>
-            <!-- <td class="text-left">{{ d.name }}</td> -->
             <td class="text-left">
               {{ d.create_at | moment("DD MMM YYYY") }}
               <q-badge :color="getColor(d.status)" text-color="white" dense size="sm">{{ d.status }}</q-badge>

@@ -16,12 +16,6 @@
           />
         </div>
         <div>
-          <!-- <q-select 
-            outlined dense v-model="filter" 
-            :options="filterOption"
-            map-options emit-value
-            @input="fetchData"
-            /> -->
         </div>
       </q-card-section>
       <!-- table header  -->
@@ -66,9 +60,6 @@
 
     <!-- form PO baru -->
     <q-card v-if="formPO">
-      <!-- <div class="formPO">
-        <div class="row">
-          <div class="col-8"> -->
       <q-card-section class="bg-primary text-white text-h6">PO Baru</q-card-section>
       <div class="q-pa-md q-gutter-md ">
         <div class="row">
@@ -136,15 +127,11 @@
         </tbody>
       </q-markup-table>
 
-      <!-- </div> -->
 
       <q-card-actions class="q-gutter-md row justify-end">
         <q-btn flat color="secondary" label="Kembali" @click="closeForm" />
         <q-btn flat color="primary" label="Submit" @click="createPO()" />
       </q-card-actions>
-      <!-- </div>
-        </div>
-      </div> -->
     </q-card>
 
     <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">

@@ -46,10 +46,6 @@
         header-class="text-h6"
       >
         <q-card class="relative-position bg-grey-2" flat>
-          <!-- <q-card-section class="q-pb-none">
-            <div class="text-h6">Info Kurs</div>
-          </q-card-section> -->
-          <!-- kurs -->
           <q-card-section>
             <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
               <div v-if="showKurs">
