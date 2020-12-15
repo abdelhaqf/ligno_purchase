@@ -171,7 +171,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from "moment";
 import { Money } from "v-money";
 
@@ -345,7 +344,6 @@ export default {
     },
     chgCurrency(i) {
       
-      console.log(this.curr);
       if (this.curr == "IDR") {
         this.money.precision = 0;
         this.money.prefix = "Rp ";

@@ -116,7 +116,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from "moment";
 
 export default {
@@ -148,7 +147,6 @@ export default {
       var to = this.dateTo+ ' 23:59'
       this.$http.get("/daily_summary/" + from+'/'+ to, {}).then((result) => {
         this.listSummary = result.data;
-        console.log(result.data);
       });
     },
     showMonthly(){
@@ -156,7 +154,6 @@ export default {
       var from = this.monthFrom.substring(0, 4)+'-'+this.monthFrom.split('-')[1]+'-01 00:00'
       var to = this.monthTo.substring(0, 4)+'-'+this.monthTo.split('-')[1]+'-31 23:59'
 
-      console.log(from + ' and ' + to);
       this.$http.get("/monthly_summary/" + from +'/'+ to, {}).then((result) => {
         this.listSummary = result.data;
       });

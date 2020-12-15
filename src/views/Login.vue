@@ -34,10 +34,8 @@ export default {
       usr.password = md5(this.user.password);
       await this.$http.post("/login", usr, {}).then(async (result) => {
         await localStorage.setItem("token-purchase", result.data);
-        // await this.$store.dispatch("getCurrentUser");
         this.$emit("isLogin", false);
         this.$emit("updateKurs");
-        // await this.$router.push("/");
 
         this.$http.get("/user/info/", {
           headers: {

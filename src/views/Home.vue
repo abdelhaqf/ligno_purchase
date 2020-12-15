@@ -98,7 +98,6 @@ import "echarts/lib/chart/pie";
 import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
-// @ is an alias to /src
 import moment from "moment";
 
 const colorPalette = ['#1976D2', '#21BA45', '#26A69A', '#9C27B0', '#C10015', '#31CCEC', '#F2C037']
@@ -200,9 +199,6 @@ export default {
     }
   },
   mounted(){
-    // this.$http.get("/list_month", {}).then((result) => {
-    //   this.listMonth = result.data;
-    // });
     if(this.$store.state.currentUser.is_purchasing == 1 || this.$store.state.currentUser.username == 'ceo')
     {
       this.fetchData()
@@ -275,7 +271,6 @@ export default {
       });
 
       this.$http.get("/monthly_total_price", {}).then((result) => {
-        console.log(result.data);
         this.totalPrice = parseInt(result.data.total);
         var margin_80 = this.totalPrice * 0.8
         var margin_50 = this.totalPrice * 0.5

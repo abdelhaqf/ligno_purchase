@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 04, 2020 at 05:14 AM
+-- Generation Time: Dec 15, 2020 at 04:31 AM
 -- Server version: 10.3.16-MariaDB
 -- PHP Version: 7.3.6
 
@@ -21,6 +21,51 @@ SET time_zone = "+00:00";
 --
 -- Database: `ligno_purchase`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifikasi`
+--
+
+CREATE TABLE `notifikasi` (
+  `notif_id` int(11) NOT NULL,
+  `from_id` int(11) NOT NULL,
+  `to_id` int(11) NOT NULL,
+  `notif` text NOT NULL,
+  `note` text NOT NULL,
+  `is_read` enum('Y','N') NOT NULL DEFAULT 'N',
+  `spp_id` int(11) NOT NULL,
+  `reference_page` varchar(100) NOT NULL,
+  `create_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `notifikasi`
+--
+
+INSERT INTO `notifikasi` (`notif_id`, `from_id`, `to_id`, `notif`, `note`, `is_read`, `spp_id`, `reference_page`, `create_at`) VALUES
+(1, 1, 1, 'SPP baru perlu diproses', '', 'N', 66, '/po/list', '2020-12-11 10:56:33'),
+(2, 1, 4, 'SPP baru perlu diproses', '', 'Y', 13, '/po/list', '2020-12-11 10:56:33'),
+(3, 1, 4, 'SPP baru perlu diproses', '', 'Y', 65, '/po/list', '2020-12-11 10:56:33'),
+(4, 6, 1, 'SPP dari Ferry Novriandi menunggu persetujuan', '', 'N', 74, '/spp/approval-pm', '2020-12-14 15:41:47'),
+(5, 6, 1, 'SPP dari Ferry Novriandi menunggu persetujuan', '', 'N', 75, '/spp/approval-pm', '2020-12-14 15:41:47'),
+(6, 6, 1, 'SPP dari Ferry Novriandi menunggu persetujuan', '', 'N', 76, '/spp/approval-pm', '2020-12-14 15:41:47'),
+(7, 6, 1, 'SPP dari Ferry Novriandi menunggu persetujuan', '', 'N', 77, '/spp/approval-pm', '2020-12-14 15:41:48'),
+(8, 6, 1, 'SPP dari Ferry Novriandi menunggu persetujuan', '', 'N', 78, '/spp/approval-pm', '2020-12-14 15:41:48'),
+(9, 6, 1, 'SPP dari Ferry Novriandi menunggu persetujuan', '', 'N', 79, '/spp/approval-pm', '2020-12-14 15:41:48'),
+(10, 1, 6, 'SPP Anda sudah disetujui manager purchasing', 'Dalam proses pencarian vendor', 'Y', 74, '/spp/list', '2020-12-14 15:45:31'),
+(11, 1, 4, 'SPP Baru perlu di proses', '', 'Y', 74, '/spp/approved', '2020-12-14 15:45:31'),
+(12, 1, 6, 'SPP Anda sudah disetujui manager purchasing', 'Dalam proses pencarian vendor', 'N', 75, '/spp/list', '2020-12-14 15:45:31'),
+(13, 1, 4, 'SPP Baru perlu di proses', '', 'Y', 75, '/spp/approved', '2020-12-14 15:45:31'),
+(14, 1, 6, 'SPP Anda sudah disetujui manager purchasing', 'Dalam proses pencarian vendor', 'N', 76, '/spp/list', '2020-12-14 15:45:31'),
+(15, 1, 4, 'SPP Baru perlu di proses', '', 'Y', 76, '/spp/approved', '2020-12-14 15:45:31'),
+(16, 1, 4, 'SPP Baru perlu di proses', '', 'Y', 77, '/spp/approved', '2020-12-14 15:45:31'),
+(17, 1, 6, 'SPP Anda sudah disetujui manager purchasing', 'Dalam proses pencarian vendor', 'N', 77, '/spp/list', '2020-12-14 15:45:31'),
+(18, 1, 6, 'SPP Anda sudah disetujui manager purchasing', 'Dalam proses pencarian vendor', 'N', 78, '/spp/list', '2020-12-14 15:45:31'),
+(19, 1, 4, 'SPP Baru perlu di proses', '', 'Y', 78, '/spp/approved', '2020-12-14 15:45:31'),
+(20, 1, 6, 'SPP Anda sudah disetujui manager purchasing', 'Dalam proses pencarian vendor', 'N', 79, '/spp/list', '2020-12-14 15:45:31'),
+(21, 1, 4, 'SPP Baru perlu di proses', '', 'Y', 79, '/spp/approved', '2020-12-14 15:45:31');
 
 -- --------------------------------------------------------
 
@@ -64,6 +109,7 @@ INSERT INTO `po` (`po_id`, `user_id`, `vendor`, `po_date`, `create_at`) VALUES
 ('NON-PO/47', 4, 'BANYUKU FILTER-Tokopedia', '2020-12-01', '2020-11-30 08:55:35'),
 ('NON-PO/59', 4, 'HANOnlineShop-Tokopedia', '2020-11-27', '2020-11-30 09:10:24'),
 ('NON-PO/67', 4, 'centralfurniture-Tokopedia', '2020-12-03', '2020-12-03 15:23:33'),
+('NON-PO/70', 4, 'Angkasacom-Tokopedia', '2020-12-08', '2020-12-08 10:48:16'),
 ('NON-PO/8', 4, 'Indo phoenix & Tuton\'s Store - Tokopedia', '2020-11-11', '2020-11-11 10:39:35'),
 ('NON-PO/9', 4, 'Milkyku-Tokopedia', '2020-11-11', '2020-11-11 10:41:39'),
 ('OP/CM/20/XI/234', 4, 'PT. Estrong Nusantara Mandiri', '2020-11-16', '2020-11-18 12:02:22'),
@@ -79,7 +125,12 @@ INSERT INTO `po` (`po_id`, `user_id`, `vendor`, `po_date`, `create_at`) VALUES
 ('OP/CM/20/XI/247', 4, 'PT. Bisindo Kencana', '2021-11-26', '2020-11-30 09:02:55'),
 ('OP/CM/20/XI/248', 4, 'PT. Kirana Mitra Abadi', '2020-11-26', '2020-11-30 09:04:03'),
 ('OP/CM/20/XII/252', 4, 'PT. Karya Muda Indochem', '2020-12-01', '2020-12-01 15:09:05'),
-('OP/CM/20/XII/253', 4, 'PT. Interchem Plasagro Jaya', '2020-12-01', '2020-12-01 16:09:09');
+('OP/CM/20/XII/253', 4, 'PT. Interchem Plasagro Jaya', '2020-12-01', '2020-12-01 16:09:09'),
+('OP/CM/20/XII/255', 5, 'PT. Mahkota Indonesia', '2020-12-04', '2020-12-07 10:03:03'),
+('OP/CM/20/XII/256', 1, 'PT. BAHTERA ADI JAYA', '2020-12-07', '2020-12-07 11:54:54'),
+('OP/CM/20/XII/258', 1, 'PT. BAHTERA ADI JAYA', '2020-12-07', '2020-12-07 14:51:16'),
+('OP/CM/20/XII/260', 4, 'Acuksae Label', '2020-12-10', '2020-12-10 13:45:43'),
+('OP/CM/20/XII/263', 4, 'PT. Artha Christa', '2020-12-11', '2020-12-11 16:51:44');
 
 -- --------------------------------------------------------
 
@@ -159,19 +210,31 @@ INSERT INTO `spp` (`spp_id`, `user_id`, `create_at`, `item`, `qty`, `unit`, `dea
 (52, 20, '2020-11-26 15:00:49', 'Domsyo Lignin DS10', 48000, 'kg', '2021-04-12', '', 1, 1, 0, 4, 'OP/CM/20/XI/245', 26496, 'USD', '2021-04-01', 0, 0, '', ''),
 (53, 20, '2020-11-26 15:01:37', 'Domsyo Lignin DS10', 48000, 'kg', '2021-05-17', '', 1, 1, 0, 4, 'OP/CM/20/XI/246', 26496, 'USD', '2021-05-03', 0, 0, '', ''),
 (54, 20, '2020-11-26 15:02:16', 'Domsyo Lignin DS10', 48000, 'kg', '2021-06-14', '', 1, 1, 0, 4, 'OP/CM/20/XI/247', 26496, 'USD', '2021-06-01', 0, 0, '', ''),
-(55, 20, '2020-11-26 15:04:19', 'Slack Wax SPO', 1020, 'kg', '2020-12-03', 'by confirmation', 1, 1, 0, 4, 'OP/CM/20/XI/248', 10761000, 'IDR', '2020-12-01', 0, 0, '', ''),
-(56, 20, '2020-11-26 15:05:39', 'Borresperse NA 890 P', 24000, 'kg', '2021-01-18', '', 1, 1, 0, 4, 'LSC016-IM-20', 9120, 'USD', NULL, 0, 0, 'Hold by borregard, harga sudah berubah dari 0.38 menjadi 0.45', ''),
-(57, 20, '2020-11-26 15:08:32', 'ARE - 580 FX', 21000, 'kg', '2020-12-14', '', 1, 1, 0, 4, 'LSC015-IM-20', 15540, 'USD', '2020-12-07', 0, 0, 'Book no. KR02848642, ETA 7 Des 2020', ''),
-(58, 20, '2020-11-26 15:10:36', 'Slack Wax SPO', 19000, 'kg', '2020-12-02', '', 1, 1, 0, 4, 'OP/CM/20/XI/241', 155800000, 'IDR', '2020-12-01', 0, 0, '', ''),
+(55, 20, '2020-11-26 15:04:19', 'Slack Wax SPO', 1020, 'kg', '2020-12-03', 'by confirmation', 1, 1, 0, 4, 'OP/CM/20/XI/248', 10761000, 'IDR', '2020-12-01', 0, 0, 'cancel PO di tgl 4 des 20', ''),
+(56, 20, '2020-11-26 15:05:39', 'Borresperse NA 890 P', 24000, 'kg', '2021-01-18', '', 1, 1, 0, 4, 'LSC016-IM-20', 10800, 'USD', NULL, 0, 0, 'Hold by borregard, harga sudah berubah dari 0.38 menjadi 0.45.\nsudah revisi PO dan sudah email PO, menunggu konfirmasi.\nPO Sudah di konfirmasi ETD Jan 2021', 'wildan'),
+(57, 20, '2020-11-26 15:08:32', 'ARE - 580 FX', 21000, 'kg', '2020-12-14', '', 1, 1, 0, 4, 'LSC015-IM-20', 15540, 'USD', '2020-12-07', 0, 0, 'Book no. KR02848642, ETA 13 Des 2020, DOkumen original sudah diterima\n', ''),
+(58, 20, '2020-11-26 15:10:36', 'Slack Wax SPO', 19000, 'kg', '2020-12-02', '', 1, 1, 0, 4, 'OP/CM/20/XI/241', 155800000, 'IDR', '2020-12-01', 0, 2, 'Diterima produksi', ''),
 (59, 20, '2020-11-27 10:11:19', 'corong stainles 30 cm', 3, '', '2020-11-28', 'diameter atas 30 cm\ndiameter bawah kalau bisa 1,5 inci, kalau tdk ya seadanya.\ntebal bahan minimal 1 mm', 1, 1, 0, 4, 'NON-PO/59', 399000, 'IDR', '2020-11-27', 0, 2, 'Sudah diterima mas hendra', ''),
 (60, 16, '2020-11-30 09:19:12', 'KAPUR TOHOR', 20000, 'KG', '2020-12-04', 'Stock dilapangan habis', 0, 0, 0, NULL, NULL, 0, '', NULL, 0, 0, '', ''),
-(61, 15, '2020-12-01 10:46:03', 'TEXAPON N 70', 14100, 'KG', '2020-12-02', '', 1, 1, 0, 1, NULL, 0, '', NULL, 0, 0, '', ''),
-(62, 15, '2020-12-01 10:46:28', 'DHYTON ', 20600, 'KG', '2020-12-02', '', 1, 1, 0, 1, NULL, 0, '', NULL, 0, 0, '', ''),
-(63, 15, '2020-12-01 10:46:55', 'SODIUM SULFAT', 8500, 'KG', '2020-12-02', '', 1, 1, 0, 4, 'OP/CM/20/XII/253', 19550000, 'IDR', '2020-12-02', 0, 0, '', ''),
+(61, 15, '2020-12-01 10:46:03', 'TEXAPON N 70', 960, 'KG', '2020-12-02', '', 1, 1, 0, 1, 'OP/CM/20/XII/258', 14592000, 'IDR', '2020-12-14', 0, 2, 'Minta dipercepat datang sudah diterima gudang', 'MANSYUR'),
+(62, 15, '2020-12-01 10:46:28', 'DEHYTON ', 1400, 'KG', '2020-12-02', '', 1, 1, 0, 1, 'OP/CM/20/XII/256', 18900000, 'IDR', '2020-12-08', 0, 2, 'diterima gudang 8 Des 2020', 'wildan'),
+(63, 15, '2020-12-01 10:46:55', 'SODIUM SULFAT', 8500, 'KG', '2020-12-02', '', 1, 1, 0, 4, 'OP/CM/20/XII/253', 19550000, 'IDR', '2020-12-02', 0, 2, 'Diterima gudang 3 Des 2020', ''),
 (64, 15, '2020-12-01 10:47:54', 'METANOL', 3000, 'KG', '2020-12-02', '', 1, 1, 0, 4, 'OP/CM/20/XII/252', 20625000, 'IDR', '2020-12-02', 0, 2, 'Sudah diterima gudang', ''),
-(65, 15, '2020-12-01 10:52:25', 'calcium nitrat', 1000, 'KG', '2020-12-02', '', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', ''),
+(65, 15, '2020-12-01 10:52:25', 'calcium nitrat', 500, 'KG', '2020-12-02', '', 1, 1, 0, 4, 'OP/CM/20/XII/263', 6000000, 'IDR', '2020-12-14', 0, 0, 'ambil senin pagi ke marunda', 'wildan'),
 (66, 15, '2020-12-01 10:55:29', 'D FOAM IND 001', 165, 'KG', '2020-12-02', '', 1, 1, 0, 1, NULL, 0, '', NULL, 0, 0, '', ''),
-(67, 19, '2020-12-03 11:52:30', 'Meja 1/2 biro', 1, 'unit', '2020-12-08', 'Meja untuk personil baru IT, akan mulai kerja hari Selasa', 1, 1, 0, 4, 'NON-PO/67', 793200, 'IDR', '2020-12-07', 0, 0, 'Sudah dipesan estimasi datang senin', '');
+(67, 19, '2020-12-03 11:52:30', 'Meja 1/2 biro', 1, 'unit', '2020-12-08', 'Meja untuk personil baru IT, akan mulai kerja hari Selasa', 1, 1, 0, 4, 'NON-PO/67', 793200, 'IDR', '2020-12-07', 0, 2, 'Sudah di office', ''),
+(68, 15, '2020-12-04 13:42:20', 'WATER GLASS 58 Be', 1980, 'KG', '2020-12-07', '', 1, 1, 0, 5, 'OP/CM/20/XII/255', 9405000, 'IDR', '2020-12-07', 0, 2, 'Diterima gudang 7 Des 2020 \n', 'nanang'),
+(69, 1, '2020-12-07 14:49:35', 'DEHYTON ', 1200, 'Kg', '2020-12-14', '', 1, 1, 0, 1, 'OP/CM/20/XII/258', 16200000, 'IDR', '2020-12-14', 0, 2, 'Minta dipercepat datang sudah diterima gudang', 'MANSYUR'),
+(70, 19, '2020-12-08 09:32:41', 'Toner HP LaserJet 119A', 1, 'unit', '2020-12-11', 'varian original, warna kuning\n\nlink toko\nhttps://tokopedia.link/czgHa16p2bb\n\nPengisi tinta HP 115NW office yang sudah lama kosong, sudah dicoba tinta KW tapi belum cocok', 1, 1, 0, 4, 'NON-PO/70', 653700, 'IDR', '2020-12-10', 0, 2, 'diterima abdel 10 des 20', ''),
+(71, 19, '2020-12-08 10:47:30', 'kaos promosi', 420, 'pcs', '2020-12-09', 'kaos promosi dengan sablon logo Ligno untuk kebutuhan marketing. 20 lusin ukuran L, 15 lusin ukuran XL', 1, 1, 0, 4, 'OP/CM/20/XII/260', 14700000, 'IDR', '2021-01-04', 0, 0, '', 'wildan'),
+(72, 16, '2020-12-10 15:36:29', 'TANKI IBC', 16, 'PCS', '2020-12-11', 'Untuk wadah kedatangan ARE 580 FX', 0, 0, 0, NULL, NULL, 0, '', NULL, 0, 0, '', ''),
+(73, 16, '2020-12-14 08:06:20', 'TINTA PRINTER ZEBRA', 4, 'PCS', '2020-12-14', ' ', 0, 0, 0, NULL, NULL, 0, '', NULL, 0, 0, '', ''),
+(74, 6, '2020-12-14 15:39:38', 'Zinc Sulfate', 25, 'kg', '2020-12-21', 'Kegunaan untuk produksi 1 karung asumsi 25 kg', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', ''),
+(75, 6, '2020-12-14 15:40:23', 'Ferrous Sulfate', 25, 'kg', '2020-12-21', 'Kegunaan untuk produksi, asumsi 1 karung 25 kg', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', ''),
+(76, 6, '2020-12-14 15:40:39', 'Cupper Sulfate', 25, 'kg', '2020-12-21', 'Kegunaan untuk produksi, asumsi 1 karung 25 kg', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', ''),
+(77, 6, '2020-12-14 15:40:58', 'Sodium Tetra Borax', 25, 'kg', '2020-12-21', 'Kegunaan untuk produksi, asumsi 1 karung 25 kg', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', ''),
+(78, 6, '2020-12-14 15:41:12', 'Manganese Sulfate', 25, 'kg', '2020-12-21', 'Kegunaan untuk produksi, asumsi 1 karung 25 kg', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', ''),
+(79, 6, '2020-12-14 15:41:31', 'Sodium Molybdate', 1, 'kg', '2020-12-21', 'Kegunaan untuk produksi, ', 1, 1, 0, 4, NULL, 0, '', NULL, 0, 0, '', '');
 
 -- --------------------------------------------------------
 
@@ -448,7 +511,74 @@ INSERT INTO `spp_history` (`history_id`, `spp_id`, `status`, `content`, `create_
 (306, 67, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-03 14:06:20'),
 (307, 67, 'process', 'Sudah dibuat PO dengan nomor: NON-PO/67', '2020-12-03 15:23:34'),
 (308, 64, 'done', 'Sudah diterima gudang', '2020-12-03 16:38:15'),
-(309, 67, 'process', 'Sudah dipesan estimasi datang senin', '2020-12-03 16:38:46');
+(309, 67, 'process', 'Sudah dipesan estimasi datang senin', '2020-12-03 16:38:46'),
+(310, 68, 'created', 'Dibuat oleh opik', '2020-12-04 13:42:20'),
+(311, 68, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-04 13:42:33'),
+(312, 68, 'process', 'Sudah disetujui manager purchasing, diproses oleh: M Aristu Prananca', '2020-12-04 15:40:07'),
+(313, 57, 'process', 'Book no. KR02848642, ETA 7 Des 2020, DOkumen original sudah diterima\n', '2020-12-07 08:37:47'),
+(314, 57, 'process', 'Book no. KR02848642, ETA 13 Des 2020, DOkumen original sudah diterima\n', '2020-12-07 08:46:40'),
+(315, 67, 'done', 'Sudah di office', '2020-12-07 08:47:00'),
+(316, 63, 'done', 'Diterima gudang 3 Des 2020', '2020-12-07 08:48:37'),
+(317, 68, 'process', 'Sudah dibuat PO dengan nomor: OP/CM/20/XII/255', '2020-12-07 10:03:04'),
+(318, 68, 'process', 'Sedang diambil oleh Muchsin \n', '2020-12-07 10:03:55'),
+(319, 68, 'process', 'Sedang diambil oleh Muchsin \n, nama item: WATER GLASS => WATER GLASS 58 Be, qty: 2000 => 1980', '2020-12-07 10:06:49'),
+(320, 68, 'process', 'Sedang diambil oleh Muchsin \n', '2020-12-07 10:10:14'),
+(321, 57, 'process', 'Book no. KR02848642, ETA 13 Des 2020, DOkumen original sudah diterima\n', '2020-12-07 11:49:17'),
+(322, 62, 'process', 'Sudah dibuat PO dengan nomor: OP/CM/20/XII/256', '2020-12-07 11:54:54'),
+(323, 62, 'process', ', nama item: DHYTON  => DEHYTON , qty: 20600 => 1400', '2020-12-07 11:55:50'),
+(324, 62, 'process', 'sudah po untuk 1400kg, kirim 7 des 2020, 1200 kg sisa jadwal kirim tgl 14, qty: 1400 => 2600', '2020-12-07 14:43:03'),
+(325, 62, 'process', 'sudah po untuk 1400kg, kirim 7 des 2020, 1200 kg sisa jadwal kirim tgl 14', '2020-12-07 14:46:09'),
+(326, 62, 'process', 'sudah po untuk 1400kg, kirim 7 des 2020, qty: 2600 => 1400', '2020-12-07 14:46:39'),
+(327, 69, 'created', 'Dibuat oleh MANSYUR', '2020-12-07 14:49:35'),
+(328, 69, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-07 14:49:57'),
+(329, 69, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Mansyur Ola', '2020-12-07 14:50:06'),
+(330, 69, 'process', 'Sudah dibuat PO dengan nomor: OP/CM/20/XII/258', '2020-12-07 14:51:16'),
+(331, 61, 'process', 'Sudah dibuat PO dengan nomor: OP/CM/20/XII/258', '2020-12-07 14:51:16'),
+(332, 61, 'process', ', qty: 14100 => 960, harga: 15200 => 14592000', '2020-12-07 14:52:18'),
+(333, 69, 'process', ', harga: 13500 => 16200000', '2020-12-07 14:52:18'),
+(334, 58, 'done', 'Diterima produksi', '2020-12-07 15:15:17'),
+(335, 55, 'process', 'cancel PO di tgl 4 des 20', '2020-12-07 15:15:41'),
+(336, 56, 'process', 'Hold by borregard, harga sudah berubah dari 0.38 menjadi 0.45.\nsudah revisi PO dan sudah email PO, menunggu konfirmasi', '2020-12-07 16:18:19'),
+(337, 68, 'done', 'Diterima gudang 7 Des 2020 \n', '2020-12-08 08:07:06'),
+(338, 56, 'process', 'Hold by borregard, harga sudah berubah dari 0.38 menjadi 0.45.\nsudah revisi PO dan sudah email PO, menunggu konfirmasi, harga: 9120 => 10800', '2020-12-08 09:30:39'),
+(339, 70, 'created', 'Dibuat oleh abdelhaq', '2020-12-08 09:32:41'),
+(340, 70, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-08 09:32:49'),
+(341, 70, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-08 09:35:31'),
+(342, 71, 'created', 'Dibuat oleh abdelhaq', '2020-12-08 10:47:30'),
+(343, 71, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-08 10:47:41'),
+(344, 70, 'process', 'Sudah dibuat PO dengan nomor: NON-PO/70', '2020-12-08 10:48:16'),
+(345, 71, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-08 12:01:04'),
+(346, 71, 'process', 'Sudah dibuat PO dengan nomor: OP/CM/20/XII/260', '2020-12-10 13:45:44'),
+(347, 70, 'done', 'diterima abdel 10 des 20', '2020-12-10 13:46:16'),
+(348, 62, 'done', 'diterima gudang 8 Des 2020', '2020-12-10 13:46:49'),
+(349, 71, 'process', ', qty: 55 => 420, unit: lusin => pcs', '2020-12-10 13:47:14'),
+(350, 71, 'process', '', '2020-12-10 14:02:33'),
+(351, 72, 'created', 'Dibuat oleh agungtri', '2020-12-10 15:36:29'),
+(352, 65, 'process', 'Sudah dibuat PO dengan nomor: OP/CM/20/XII/263', '2020-12-11 16:51:44'),
+(353, 65, 'process', ', qty: 1000 => 500', '2020-12-11 16:51:58'),
+(354, 65, 'process', 'ambil senin pagi ke marunda', '2020-12-11 17:03:06'),
+(355, 61, 'done', 'Minta dipercepat datang sudah diterima gudang', '2020-12-11 17:03:33'),
+(356, 69, 'done', 'Minta dipercepat datang sudah diterima gudang', '2020-12-11 17:03:33'),
+(357, 73, 'created', 'Dibuat oleh agungtri', '2020-12-14 08:06:20'),
+(358, 56, 'process', 'Hold by borregard, harga sudah berubah dari 0.38 menjadi 0.45.\nsudah revisi PO dan sudah email PO, menunggu konfirmasi.\nPO Sudah di konfirmasi ETD Jan 2021', '2020-12-14 09:43:28'),
+(359, 74, 'created', 'Dibuat oleh ferry', '2020-12-14 15:39:38'),
+(360, 75, 'created', 'Dibuat oleh ferry', '2020-12-14 15:40:23'),
+(361, 76, 'created', 'Dibuat oleh ferry', '2020-12-14 15:40:39'),
+(362, 77, 'created', 'Dibuat oleh ferry', '2020-12-14 15:40:58'),
+(363, 78, 'created', 'Dibuat oleh ferry', '2020-12-14 15:41:12'),
+(364, 79, 'created', 'Dibuat oleh ferry', '2020-12-14 15:41:31'),
+(365, 74, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-14 15:41:47'),
+(366, 75, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-14 15:41:47'),
+(367, 76, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-14 15:41:47'),
+(368, 77, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-14 15:41:47'),
+(369, 78, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-14 15:41:48'),
+(370, 79, 'waiting', 'Disetujui manager, menunggu persetujuan manager purchasing', '2020-12-14 15:41:48'),
+(371, 74, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-14 15:45:30'),
+(372, 75, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-14 15:45:31'),
+(373, 76, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-14 15:45:31'),
+(374, 77, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-14 15:45:31'),
+(375, 78, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-14 15:45:31'),
+(376, 79, 'process', 'Sudah disetujui manager purchasing, diproses oleh: Wildan Abror Firdausy', '2020-12-14 15:45:31');
 
 -- --------------------------------------------------------
 
@@ -498,6 +628,12 @@ INSERT INTO `user` (`user_id`, `name`, `dept`, `username`, `password`, `manager_
 --
 
 --
+-- Indexes for table `notifikasi`
+--
+ALTER TABLE `notifikasi`
+  ADD PRIMARY KEY (`notif_id`);
+
+--
 -- Indexes for table `po`
 --
 ALTER TABLE `po`
@@ -526,16 +662,22 @@ ALTER TABLE `user`
 --
 
 --
+-- AUTO_INCREMENT for table `notifikasi`
+--
+ALTER TABLE `notifikasi`
+  MODIFY `notif_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
 -- AUTO_INCREMENT for table `spp`
 --
 ALTER TABLE `spp`
-  MODIFY `spp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `spp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `spp_history`
 --
 ALTER TABLE `spp_history`
-  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=310;
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=377;
 
 --
 -- AUTO_INCREMENT for table `user`

@@ -152,7 +152,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from "moment";
 
 export default {

@@ -167,7 +167,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from 'moment'
 
 export default {
@@ -202,7 +201,6 @@ export default {
   },
   methods: {
     fetchData() {
-      console.log(this.filter)
       this.sppList = [];
       this.$http.get("/spp_byuserid/" + this.$store.state.currentUser.user_id+'/'+this.filter, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {

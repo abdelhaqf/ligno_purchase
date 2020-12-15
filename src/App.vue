@@ -151,7 +151,6 @@ export default {
   methods: {
     ...mapActions(["getCurrentUser"]),
     reloadData() {
-      console.log("reload");
       this.$http
         .get(
           "/count_data/" + this.$store.state.currentUser.user_id + "/" + this.$store.state.currentUser.is_purch_manager,
@@ -166,9 +165,6 @@ export default {
           });
 
           this.count = result.data;
-          // this.$set(this.count, result.data)
-          // this.$forceUpdate();
-          // console.log(result.data);
         });
     },
     async preRun() {
@@ -262,12 +258,12 @@ export default {
       if (this.isLogin == false) this.preRun();
     },
     updateKurs() {
-      // this.isLoading = true;
-      // axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
-      //   this.kurs = result.data;
-      //   this.isLoading = false;
-      //   this.showKurs = true;
-      // });
+      this.isLoading = true;
+      axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
+        this.kurs = result.data;
+        this.isLoading = false;
+        this.showKurs = true;
+      });
     },
     logout() {
       localStorage.removeItem("token-purchase");

@@ -80,7 +80,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from "moment";
 
 export default {
@@ -126,7 +125,6 @@ export default {
         })
     },
     async markAll(){
-      console.log('tandai');
       for(var i = 0; i < this.notifikasi.length; i++){
         let data = {
           is_read: 'Y'

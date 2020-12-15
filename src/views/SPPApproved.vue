@@ -274,7 +274,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from "moment";
 import { Money } from "v-money";
 
@@ -309,25 +308,15 @@ export default {
       },
       confirmCancel: false,
       content: "",
-      // filterOption:[], filter: ''
     };
   },
   mounted() {
 
-    // this.$http.get("/list_month_purch", {
-    //   headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
-    // }).then((result) => {
-    //   this.filterOption = result.data
-    //   this.filter = result.data[0].value
-    //   this.filterOption.unshift({value: '%25', label: 'all' })
-
       this.fetchData();
-    // })
   },
   methods: {
     fetchData() {
       this.sppList = [];
-      // console.log(this.$store.state.currentUser.is_purch_manager)
       this.$http
         .get(
           "/spp_approved/" +

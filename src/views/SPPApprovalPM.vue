@@ -193,7 +193,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import moment from "moment";
 export default {
   data() {
@@ -205,18 +204,11 @@ export default {
       sppList: [],
       selected: {},
       option:[],
-      // filterOption:[], filter: ''
     };
   },
   mounted() {
 
-    // this.$http.get("/list_month", {}).then((result) => {
-    //   this.filterOption = result.data
-    //   this.filter = result.data[0].value
-    //   this.filterOption.unshift({value: '%25', label: 'all' })
-
       this.fetchData()
-    // })
   },
   methods: {
     fetchData(){
