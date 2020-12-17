@@ -68,6 +68,14 @@
         </q-card-section>
       </q-card>
     </div>
+    
+    <div class="row q-pa-md q-gutter-md">
+      <q-card class="col">
+        <q-card-section>
+          <v-chart :options="optionBydept" theme="default" :autoresize="true"/>
+        </q-card-section>
+      </q-card>
+    </div>
   </div>
 </template>
 
@@ -99,8 +107,8 @@ export default {
 
       totalPrice: 0,
       report: [],
-      report_80: [], report_50: [],
-      total_80: 0, total_50: 0,
+      report_80: [], report_50: [], report_bydept: [],
+      total_80: 0, total_50: 0, total_bydept: 0,
       option50: 
       {
         title: {
@@ -182,6 +190,44 @@ export default {
         ],
         color: colorPalette,
       },
+      optionBydept: 
+      {
+        title: {
+          text: "Data Belanja Per Departemen",
+          left: "center",
+        },
+        tooltip: {
+          trigger: "item",
+          // formatter: "{b}<br/>Rp {c} ({d}%)",
+          formatter: (param,ticket) =>{
+            return param.name + '<br>'+this.setCurrency(param.value,'IDR')+' ('+param.percent+'%)'
+          }
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "20",
+            fontWeight: "bold",
+          },
+        },
+        series: [
+          {
+            type: "pie",
+            radius: ["45%", "70%"],
+            center: ["50%", "50%"],
+            selectedMode: "single",
+            data: [],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+        color: colorPalette,
+      },
     }
   },
   mounted(){
@@ -200,6 +246,8 @@ export default {
       this.option50.series[0].data = []
       this.report_80 = []
       this.option80.series[0].data = []
+      this.report_bydept = []
+      this.optionBydept.series[0].data = []
 
       var dt = (new Date).getFullYear()
       if(dt == this.selectedShow){
@@ -247,7 +295,21 @@ export default {
 
         });
 
+        this.$http.get("/yearly_dept_report", {}).then((resp) => {
+          for(var i = 0; i < resp.data.length; i++){
+              this.report_bydept.push(resp.data[i])
+              this.optionBydept.series[0].data.push(
+                {value: resp.data[i].price, name: resp.data[i].cost_category.toUpperCase() }
+              )
+
+          }
+
+        })
+
+
       });
+
+
 
     },
     showByMonth(val){

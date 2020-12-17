@@ -108,6 +108,12 @@
             <td class="text-caption ">Vendor</td>
             <td>: {{ selected[0].vendor }}</td>
           </tr>
+          <tr>
+            <td class="text-caption ">Kategori Biaya</td>
+            <td><q-select outlined dense  v-model="selected[0].cost_category"
+                :options="['rnd', 'produksi', 'marketing', 'purchasing', 'lab beton', 'lainnya']"
+                 /></td>
+          </tr>
         </table>
       </q-card-section>
       <q-markup-table separator="cell" bordered flat dense>
@@ -262,6 +268,7 @@ export default {
           is_received: this.selected[i].is_received,
           coa: this.selected[i].coa,
           note: this.selected[i].note,
+          cost_category: this.selected[0].cost_category,
           
           item: this.edited[i].item,
           qty: this.edited[i].qty,
