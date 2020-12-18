@@ -111,7 +111,7 @@
           <tr>
             <td class="text-caption ">Kategori Biaya</td>
             <td><q-select outlined dense  v-model="selected[0].cost_category"
-                :options="['rnd', 'produksi', 'marketing', 'purchasing', 'lab beton', 'lainnya']"
+                :options="cost_ctg"
                  /></td>
           </tr>
         </table>
@@ -217,6 +217,7 @@ export default {
         masked: false,
       },
       curr: "IDR",
+      cost_ctg: ['Marketing/Sales', 'RnD', 'Produksi/Gudang', 'Purchasing/Accounting', 'Lab Pusat', 'Lab Beton', 'IT', 'Umum/HRD']
 
     };
   },

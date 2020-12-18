@@ -19,7 +19,7 @@
         </q-item-section>
         <q-item-section class="relative-position">
           <q-btn flat dense color="indigo-4" icon="notifications" @click="$router.push('/notification')"  />
-          <q-chip v-show="count_notif> 0" dense size="sm" style="top:5px;" class="absolute-center text-white" color="orange-4">{{count_notif}}</q-chip>
+          <q-chip v-show="count_notif > 0" dense size="sm" style="top:5px;" class="absolute-center text-white" color="orange-4">{{count_notif>20?'20+':count_notif}}</q-chip>
         </q-item-section>
         <q-item-section side>
           <q-item-label caption><q-btn flat label="logout" size="sm" color="negative" @click="logout"/></q-item-label>
