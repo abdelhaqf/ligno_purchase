@@ -192,7 +192,7 @@ export default {
         { label: "partial", value: "1" },
         { label: "full", value: "2" },
       ], 
-      isReceived: '%25',
+      isReceived: 'not',
       receivedOption:[
         { label: "show all", value: "%25" },
         { label: "fully received", value: "fully" },
@@ -226,7 +226,7 @@ export default {
       headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
     }).then((result) => {
       this.filterOption = result.data
-      this.filter = result.data[0].value
+      this.filter = '%25'
       this.filterOption.unshift({value: '%25', label: 'all' })
     
       this.fetchData();
