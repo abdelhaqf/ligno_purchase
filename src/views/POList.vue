@@ -86,7 +86,7 @@
             <td class="text-left">{{ d.vendor | truncate(11) }}</td>
             <td
               class="text-left col"
-            >{{ d.item | truncate(20)}}{{d.spp_count>1?'[+'+d.spp_count+']' : ''}}</td>
+            >{{ d.item | truncate(20)}}{{d.spp_count>1?' [+'+(d.spp_count - 1)+']' : ''}}</td>
             <td class="text-left col">{{d.est_arrival | moment('DD MMM YYYY')}}</td>
             <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>
           </tr>
@@ -129,7 +129,7 @@
       <q-markup-table separator="cell" bordered flat dense>
         <thead class="bg-blue-grey-14 text-white">
           <tr>
-            <th class="text-left">SPP Number</th>
+            <th class="text-left">SPP</th>
             <th class="text-left">Request By</th>
             <th class="text-left">Item</th>
             <th class="text-right">Qty</th>
@@ -166,7 +166,12 @@
                 <money v-else v-model="edited[i].price" v-bind="money"></money>
               </div>
             </td>
-            <td class="text-left">{{ d.est_arrival | moment("DD MMM YYYY") }}</td>
+            <td class="text-left">
+              <div v-if="!onEdit">{{ d.est_arrival | moment("DD MMM YYYY") }}</div>
+              <div v-else class="row" style="width: 100px;">
+                <q-input outlined dense class="bg-white" v-model="edited[i].est_arrival"></q-input>
+              </div>
+            </td>
             <td class="text-left bg-white" style="padding:0px;">
               <q-option-group v-model="d.is_received" :options="isReceivedOption" />
             </td>
@@ -277,7 +282,8 @@ export default {
             qty: this.selected[i].qty,
             unit: this.selected[i].unit,
             price: this.selected[i].price,
-            currency: this.selected[i].currency
+            currency: this.selected[i].currency,
+            est_arrival: this.selected[i].est_arrival,
           })
         }
       });
@@ -298,6 +304,7 @@ export default {
           qty: this.edited[i].qty,
           unit: this.edited[i].unit,
           price: this.edited[i].price,
+          est_arrival: this.edited[i].est_arrival
         };
         var note_add= ''
         if(this.selected[i].item != this.edited[i].item){
