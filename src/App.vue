@@ -1,7 +1,14 @@
 <template>
   <q-layout view="hHh LpR fFf" class="bg-grey-1">
     <!-- left drawer  -->
-    <q-drawer v-if="!isLogin" content-class="bg-grey-2" show-if-above v-model="left" side="left" bordered>
+    <q-drawer
+      v-if="!isLogin"
+      content-class="bg-grey-2"
+      show-if-above
+      v-model="left"
+      side="left"
+      bordered
+    >
       <!-- current user  -->
       <q-item class="bg-blue-2">
         <q-item-section avatar>
@@ -10,19 +17,30 @@
           </q-avatar>
         </q-item-section>
         <q-item-section v-if="$store.state.currentUser">
-          <q-item-label class="text-subtitle2">
-            {{ $store.state.currentUser.username | capitalize }}
-          </q-item-label>
-          <q-item-label caption>
-            {{ $store.state.currentUser.dept }}
-          </q-item-label>
+          <q-item-label class="text-subtitle2">{{ $store.state.currentUser.username | capitalize }}</q-item-label>
+          <q-item-label caption>{{ $store.state.currentUser.dept }}</q-item-label>
         </q-item-section>
         <q-item-section class="relative-position">
-          <q-btn flat dense color="indigo-4" icon="notifications" @click="$router.push('/notification')"  />
-          <q-chip v-show="count_notif > 0" dense size="sm" style="top:5px;" class="absolute-center text-white" color="orange-4">{{count_notif>20?'20+':count_notif}}</q-chip>
+          <q-btn
+            flat
+            dense
+            color="indigo-4"
+            icon="notifications"
+            @click="$router.push('/notification')"
+          />
+          <q-chip
+            v-show="count_notif > 0"
+            dense
+            size="sm"
+            style="top:5px;"
+            class="absolute-center text-white"
+            color="orange-4"
+          >{{count_notif>20?'20+':count_notif}}</q-chip>
         </q-item-section>
         <q-item-section side>
-          <q-item-label caption><q-btn flat label="logout" size="sm" color="negative" @click="logout"/></q-item-label>
+          <q-item-label caption>
+            <q-btn flat label="logout" size="sm" color="negative" @click="logout" />
+          </q-item-label>
         </q-item-section>
       </q-item>
       <q-separator />
@@ -41,13 +59,14 @@
         </q-item-section>
       </q-item>
       <q-separator />
-      <q-expansion-item
-        label="Info Kurs"
-        header-class="text-h6"
-      >
+      <q-expansion-item label="Info Kurs" header-class="text-h6">
         <q-card class="relative-position bg-grey-2" flat>
           <q-card-section>
-            <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+            <transition
+              appear
+              enter-active-class="animated fadeIn"
+              leave-active-class="animated fadeOut"
+            >
               <div v-if="showKurs">
                 <q-list bordered separator class="bg-white rounded-borders">
                   <q-item>
@@ -90,7 +109,12 @@
     </q-drawer>
 
     <q-page-container>
-      <q-scroll-area :visible="false" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 100vh;">
+      <q-scroll-area
+        :visible="false"
+        :thumb-style="thumbStyle"
+        :bar-style="barStyle"
+        style="height: 100vh;"
+      >
         <router-view @isLogin="toggleLogin" @updateKurs="updateKurs" />
       </q-scroll-area>
     </q-page-container>
@@ -255,7 +279,7 @@ export default {
     },
     updateKurs() {
       this.isLoading = true;
-      axios.get("http://192.168.100.209/lignoapp/kurs_api").then((result) => {
+      axios.get(process.env.VUE_APP_BASE_URL+"/../kurs_api").then((result) => {
         this.kurs = result.data;
         this.isLoading = false;
         this.showKurs = true;
