@@ -1,21 +1,21 @@
 <template>
-  <div class="row  relative q-px-lg q-pt-lg">
+  <div class="row relative q-px-lg q-pt-lg">
     <q-card class="col-12 bg-white rounded-borders" v-if="!show_detail">
       <q-card-section class="q-pa-md q-gutter-md row justify-between">
-        <q-select 
-          outlined dense v-model="isReceived" 
+        <q-select
+          outlined
+          dense
+          v-model="isReceived"
           :options="receivedOption"
-          map-options emit-value
+          map-options
+          emit-value
           @input="fetchData"
         >
           <template v-slot:option="scope">
-            <q-item
-              v-bind="scope.itemProps"
-              v-on="scope.itemEvents"
-            >
+            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
               <q-item-section>
                 <q-badge
-                :color="
+                  :color="
                   scope.opt.label== 'fully received'
                     ? 'positive'
                     : scope.opt.label == 'half received'
@@ -24,20 +24,22 @@
                     ? 'negative'
                     : 'primary'
                 "
-                text-color="white"
-                dense
-                >{{ scope.opt.label }}
-              </q-badge>
+                  text-color="white"
+                  dense
+                >{{ scope.opt.label }}</q-badge>
               </q-item-section>
             </q-item>
           </template>
         </q-select>
-        <q-select 
-          outlined dense v-model="filter" 
+        <q-select
+          outlined
+          dense
+          v-model="filter"
           :options="filterOption"
-          map-options emit-value
+          map-options
+          emit-value
           @input="fetchData"
-          />
+        />
       </q-card-section>
       <q-markup-table bordered flat square dense>
         <thead class="bg-blue-grey-14 text-white">
@@ -48,13 +50,21 @@
             <th class="text-left">Handle By</th>
             <th class="text-left">Vendor</th>
             <th class="text-left">Items</th>
+            <th class="text-left">Est. Arrival</th>
             <th class="text-right">value</th>
           </tr>
         </thead>
         <tbody v-if="poList.length" class="bg-blue-grey-1">
           <tr v-for="d in poList" :key="d.id">
             <td style="padding: 0px;">
-              <q-btn color="primary" size="md" icon="launch" class="full-width q-py-sm" flat @click="openForm(d.po_id)" />
+              <q-btn
+                color="primary"
+                size="md"
+                icon="launch"
+                class="full-width q-py-sm"
+                flat
+                @click="openForm(d.po_id)"
+              />
             </td>
             <td class="text-left col">
               <div>{{ d.po_id }}</div>
@@ -69,21 +79,21 @@
                 text-color="white"
                 dense
                 size="sm"
-                >{{ d.is_received }}
-              </q-chip>
+              >{{ d.is_received }}</q-chip>
             </td>
             <td class="text-left">{{ d.po_date | moment("DD MMM YYYY") }}</td>
             <td class="text-left">{{ d.handler_name | truncate(8) }}</td>
             <td class="text-left">{{ d.vendor | truncate(11) }}</td>
-            <td class="text-left col"><div>{{ d.item}}{{d.spp_count>1?', more items... ' : ''}}</div></td>
+            <td
+              class="text-left col"
+            >{{ d.item | truncate(20)}}{{d.spp_count>1?'[+'+d.spp_count+']' : ''}}</td>
+            <td class="text-left col">{{d.est_arrival | moment('DD MMM YYYY')}}</td>
             <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
           <tr>
-            <td class="text-center text-grey" colspan="99">
-              tidak ada data
-            </td>
+            <td class="text-center text-grey" colspan="99">tidak ada data</td>
           </tr>
         </tbody>
       </q-markup-table>
@@ -92,27 +102,27 @@
 
     <!-- detail PO  -->
     <q-card v-if="show_detail" class="col-12">
-      <q-card-section class="bg-primary text-white"> Detail PO : {{ selected[0].po_id }} </q-card-section>
+      <q-card-section class="bg-primary text-white">Detail PO : {{ selected[0].po_id }}</q-card-section>
 
       <q-card-section class="q-pa-md">
         <table>
           <tr>
-            <td class="text-caption ">PO Date</td>
+            <td class="text-caption">PO Date</td>
             <td>: {{ selected[0].po_date | moment("DD MMM YYYY") }}</td>
           </tr>
           <tr>
-            <td class="text-caption ">Handle By</td>
+            <td class="text-caption">Handle By</td>
             <td>: {{ selected[0].handler_name }}</td>
           </tr>
           <tr>
-            <td class="text-caption ">Vendor</td>
+            <td class="text-caption">Vendor</td>
             <td>: {{ selected[0].vendor }}</td>
           </tr>
           <tr>
-            <td class="text-caption ">Kategori Biaya</td>
-            <td><q-select outlined dense  v-model="selected[0].cost_category"
-                :options="cost_ctg"
-                 /></td>
+            <td class="text-caption">Kategori Biaya</td>
+            <td>
+              <q-select outlined dense v-model="selected[0].cost_category" :options="cost_ctg" />
+            </td>
           </tr>
         </table>
       </q-card-section>
@@ -132,9 +142,7 @@
         </thead>
         <tbody class="bg-blue-grey-1">
           <tr v-for="(d, i) in selected" :key="i">
-            <td class="text-left">
-              {{ d.spp_id }}
-            </td>
+            <td class="text-left">{{ d.spp_id }}</td>
             <td class="text-left">{{ d.name }}</td>
             <td class="text-left">
               <div v-if="!onEdit">{{ d.item }}</div>
@@ -142,7 +150,7 @@
             </td>
             <td class="text-right">
               <div v-if="!onEdit">{{ d.qty }} {{ d.unit }}</div>
-              <div v-else class="" style="width: 60px;">
+              <div v-else class style="width: 60px;">
                 <q-input outlined dense class="bg-white" v-model="edited[i].qty" />
                 <q-input outlined dense class="bg-white" v-model="edited[i].unit" />
               </div>
@@ -150,17 +158,22 @@
             <td class="text-right">
               <div v-if="!onEdit">{{ setCurrency(d.price, d.currency) }}</div>
               <div v-else class="row" style="width: 100px;">
-                <money v-model="edited[i].price" v-bind="money"></money>
+                <money
+                  v-if="edited[i].currency == 'USD'"
+                  v-model="edited[i].price"
+                  v-bind="moneyUSD"
+                ></money>
+                <money v-else v-model="edited[i].price" v-bind="money"></money>
               </div>
             </td>
             <td class="text-left">{{ d.est_arrival | moment("DD MMM YYYY") }}</td>
             <td class="text-left bg-white" style="padding:0px;">
-              <q-option-group v-model="d.is_received" :options="isReceivedOption"/>
+              <q-option-group v-model="d.is_received" :options="isReceivedOption" />
             </td>
             <td class="text-left bg-white" style="padding:0px;">
-              <q-option-group class="" v-model="d.coa" :options="is_COA"  />
+              <q-option-group class v-model="d.coa" :options="is_COA" />
             </td>
-            <td class="text-left" style="padding: 0px;" >
+            <td class="text-left" style="padding: 0px;">
               <q-input square filled type="textarea" bg-color="white" v-model="d.note" dense />
             </td>
           </tr>
@@ -216,6 +229,15 @@ export default {
         precision: 0,
         masked: false,
       },
+      moneyUSD: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "$ ",
+        suffix: "",
+        precision: 0,
+        masked: false,
+        
+      },
       curr: "IDR",
       cost_ctg: ['Marketing/Sales', 'RnD', 'Produksi/Gudang', 'Purchasing/Accounting', 'Lab Pusat', 'Lab Beton', 'IT', 'Umum/HRD']
 
@@ -255,6 +277,7 @@ export default {
             qty: this.selected[i].qty,
             unit: this.selected[i].unit,
             price: this.selected[i].price,
+            currency: this.selected[i].currency
           })
         }
       });
@@ -350,7 +373,7 @@ export default {
         return formatter.format(price);
       }
     },
-    chgCurrency(i) {
+    chgCurrency() {
       
       if (this.curr == "IDR") {
         this.money.precision = 0;

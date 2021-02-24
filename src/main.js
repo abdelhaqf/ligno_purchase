@@ -11,6 +11,7 @@ Vue.prototype.$http = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
 });
 
+Vue.use(require('vue-moment'));
 
 Vue.use(require('vue-moment'));
 Vue.use(Vue2Filters)

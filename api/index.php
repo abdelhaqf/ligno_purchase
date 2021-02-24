@@ -57,7 +57,7 @@ Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
   $user_id = checkJWT()->data->user_id;
 
   $q = " SELECT * FROM (
-    SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, usr.name AS 'handler_name', 
+    SELECT po.po_id, po.user_id, po.vendor, po.po_date, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, spp.est_arrival, usr.name AS 'handler_name', 
             CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
             WHEN SUM(spp.is_received) = 0 THEN 'not received' ELSE 'half received' END as 'is_received',
     		    COUNT(spp.spp_id) AS 'spp_count', spp.item
