@@ -57,7 +57,7 @@
             <th class="text-left">Items</th>
             <th class="text-left">
               Est. Arrival
-              <q-btn flat dense icon="keyboard_arrow_down" size="xs" @click="sortBy='est_arrival'"></q-btn>
+              <q-btn flat dense icon="keyboard_arrow_up" size="xs" @click="sortBy='est_arrival'"></q-btn>
             </th>
             <th class="text-right">value</th>
           </tr>
@@ -407,7 +407,7 @@ export default {
         return temp.sort((a,b) => {
           let x = new Date(a.est_arrival)
           let y = new Date(b.est_arrival)
-          return y - x
+          return (y - x) * -1
         })
       
       }
