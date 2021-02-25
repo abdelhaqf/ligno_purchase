@@ -44,18 +44,26 @@
       <q-markup-table bordered flat square dense>
         <thead class="bg-blue-grey-14 text-white">
           <tr>
-            <th style="width:10px;"></th>
+            <th style="width:10px;">
+              <q-btn flat dense icon="keyboard_arrow_down" size="xs" @click="sortBy=''"></q-btn>
+            </th>
             <th class="text-left">PO Number</th>
-            <th class="text-left">PO Date</th>
+            <th class="text-left">
+              PO Date
+              <q-btn flat dense icon="keyboard_arrow_down" size="xs" @click="sortBy='po_date'"></q-btn>
+            </th>
             <th class="text-left">Handle By</th>
             <th class="text-left">Vendor</th>
             <th class="text-left">Items</th>
-            <th class="text-left">Est. Arrival</th>
+            <th class="text-left">
+              Est. Arrival
+              <q-btn flat dense icon="keyboard_arrow_down" size="xs" @click="sortBy='est_arrival'"></q-btn>
+            </th>
             <th class="text-right">value</th>
           </tr>
         </thead>
         <tbody v-if="poList.length" class="bg-blue-grey-1">
-          <tr v-for="d in poList" :key="d.id">
+          <tr v-for="d in sortedListPO" :key="d.id">
             <td style="padding: 0px;">
               <q-btn
                 color="primary"
@@ -202,6 +210,7 @@ export default {
   components: { Money },
   data() {
     return {
+      sortBy: '',
       poList: [],
       slcPO: null,
       selected: [],
@@ -391,7 +400,31 @@ export default {
       }
     },
   },
-  computed: {},
+  computed: {
+    sortedListPO() {
+      let temp = this.poList.slice(0)
+      if(this.sortBy == 'est_arrival') {
+        return temp.sort((a,b) => {
+          let x = new Date(a.est_arrival)
+          let y = new Date(b.est_arrival)
+          return y - x
+        })
+      
+      }
+      else if(this.sortBy == 'po_date') {
+        return temp.sort((a,b) => {
+          let x = new Date(a.po_date)
+          let y = new Date(b.po_date)
+          return y - x
+        })
+      
+      }
+      else {
+        console.log('else')
+        return this.poList
+      }
+    }
+  },
 };
 </script>
 
