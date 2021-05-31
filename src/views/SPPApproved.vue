@@ -1,12 +1,24 @@
 <template>
-  <div class="row justify-center  q-pa-lg">
+  <div class="row justify-center q-pa-lg">
     <q-card v-if="!formPO" class="col-12 bg-white rounded-borders">
       <!-- table control -->
       <q-card-section class="q-pa-md row justify-between">
         <div class="q-gutter-md">
           <q-btn color="primary" label="Buat PO" @click="openForm" :disable="!selectCount" />
-          <q-btn flat color="secondary" label="Detail" :disabled="selectCount != 1" @click="show_detail = true" />
-          <q-btn flat color="secondary" label="History" :disabled="selectCount != 1" @click="showHistory()" />
+          <q-btn
+            flat
+            color="secondary"
+            label="Detail"
+            :disabled="selectCount != 1"
+            @click="show_detail = true"
+          />
+          <q-btn
+            flat
+            color="secondary"
+            label="History"
+            :disabled="selectCount != 1"
+            @click="showHistory()"
+          />
           <q-btn
             class="q-ml-xl"
             color="negative"
@@ -15,8 +27,7 @@
             @click="confirmCancel = true"
           />
         </div>
-        <div>
-        </div>
+        <div></div>
       </q-card-section>
       <!-- table header  -->
       <q-markup-table bordered flat square dense>
@@ -40,18 +51,14 @@
               <q-chip color="accent" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
             <td class="text-left">{{ d.create_at | moment("DD MMM YYYY") }}</td>
-            <td class="text-left" style="width: 100px;">
-              {{ d.deadline | moment("DD MMM YYYY") }}
-            </td>
+            <td class="text-left" style="width: 100px;">{{ d.deadline | moment("DD MMM YYYY") }}</td>
             <td class="text-left">{{ d.item }}</td>
             <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
           <tr>
-            <td class="text-center text-grey" colspan="99">
-              tidak ada data
-            </td>
+            <td class="text-center text-grey" colspan="99">tidak ada data</td>
           </tr>
         </tbody>
       </q-markup-table>
@@ -61,21 +68,59 @@
     <!-- form PO baru -->
     <q-card v-if="formPO">
       <q-card-section class="bg-primary text-white text-h6">PO Baru</q-card-section>
-      <div class="q-pa-md q-gutter-md ">
+      <div class="q-pa-md q-gutter-md">
         <div class="row">
-          <q-input class="col-10" outlined v-model="po.po_id" label="Nomor PO" stack-label dense v-if="type == 'PO'" />
-          <q-input class="col-10" outlined v-model="po.po_id" label="Nomor non-PO" readonly stack-label dense v-else />
+          <q-input
+            class="col-10"
+            outlined
+            v-model="po.po_id"
+            label="Nomor PO"
+            stack-label
+            dense
+            v-if="type == 'PO'"
+          />
+          <q-input
+            class="col-10"
+            outlined
+            v-model="po.po_id"
+            label="Nomor non-PO"
+            readonly
+            stack-label
+            dense
+            v-else
+          />
           <div class="col-2">
-            <q-select class="q-ml-sm" outlined dense v-model="type" :options="['PO', 'Non-PO']" @input="changeType()" />
+            <q-select
+              class="q-ml-sm"
+              outlined
+              dense
+              v-model="type"
+              :options="['PO', 'Non-PO']"
+              @input="changeType()"
+            />
           </div>
         </div>
         <div class="row">
-          <q-input class="col-10" outlined v-model="po.vendor" label="Nama Vendor" stack-label dense />
+          <q-input
+            class="col-10"
+            outlined
+            v-model="po.vendor"
+            label="Nama Vendor"
+            stack-label
+            dense
+          />
           <div class="col-2">
-            <q-select class="q-ml-sm" outlined dense v-model="curr" :options="['IDR', 'USD']" @input="chgCurrency" />
+            <q-select
+              class="q-ml-sm"
+              outlined
+              dense
+              v-model="curr"
+              :options="['IDR', 'USD']"
+              @input="chgCurrency"
+            />
           </div>
         </div>
-        <q-input outlined v-model="po.po_date" mask="date" :rules="['date']" label="">
+        <q-input outlined v-model="po.po_date" mask="date" :rules="['date']" label>
           <template v-slot:append>
             <q-icon name="event" class="cursor-pointer">
               <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
@@ -88,11 +133,12 @@
             </q-icon>
           </template>
           <template v-slot:label>
-            Tanggal PO <a class="q-px-sm bg-info text-white rounded-borders">tahun / bulan / tanggal</a>
+            Tanggal PO
+            <a class="q-px-sm bg-info text-white rounded-borders">tahun / bulan / tanggal</a>
           </template>
         </q-input>
       </div>
-      <q-markup-table separator="cell" bordered flat square  dense>
+      <q-markup-table separator="cell" bordered flat square dense>
         <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th class="text-left">No</th>
@@ -126,7 +172,6 @@
           </tr>
         </tbody>
       </q-markup-table>
-
 
       <q-card-actions class="q-gutter-md row justify-end">
         <q-btn flat color="secondary" label="Kembali" @click="closeForm" />
@@ -188,9 +233,7 @@
           <q-item>
             <q-item-section>
               <q-item-label caption>Status</q-item-label>
-              <q-item-label>
-                {{ status_note }}
-              </q-item-label>
+              <q-item-label>{{ status_note }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -216,9 +259,7 @@
               :color="getColor(x.status)"
               :icon="getIcon(x.status)"
             >
-              <div>
-                {{ x.content }}
-              </div>
+              <div>{{ x.content }}</div>
             </q-timeline-entry>
           </q-timeline>
         </q-card-section>
@@ -231,9 +272,7 @@
           <div class="text-h6">PO Kosong</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          Anda belum memilih SPP yang akan dijadikan PO.
-        </q-card-section>
+        <q-card-section class="q-pt-none">Anda belum memilih SPP yang akan dijadikan PO.</q-card-section>
 
         <q-card-actions align="right">
           <q-btn flat label="OK" color="primary" v-close-popup />
@@ -247,7 +286,7 @@
           <div class="text-bold">Alasan Pembatalan SPP</div>
         </q-card-section>
 
-        <q-card-section class="">
+        <q-card-section class>
           <q-input class="col-4" outlined dense type="textarea" v-model="content" />
         </q-card-section>
 
@@ -274,7 +313,7 @@ export default {
         po_date: moment()
           .add(1, "days")
           .format("YYYY/MM/DD"),
-        po_id: "",
+        po_id: ""
       },
       formPO: false,
       alert: false,
@@ -291,15 +330,14 @@ export default {
         prefix: "Rp ",
         suffix: "",
         precision: 0,
-        masked: false,
+        masked: false
       },
       confirmCancel: false,
-      content: "",
+      content: ""
     };
   },
   mounted() {
-
-      this.fetchData();
+    this.fetchData();
   },
   methods: {
     fetchData() {
@@ -308,11 +346,12 @@ export default {
         .get(
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
-            "/" + this.$store.state.currentUser.is_purch_manager
-            
-          ,{}
+            "/" +
+            this.$store.state.currentUser.is_purch_manager,
+
+          {}
         )
-        .then((result) => {
+        .then(result => {
           for (var i = 0; i < result.data.length; i++) {
             result.data[i].select = false;
             this.sppList.push(result.data[i]);
@@ -331,12 +370,16 @@ export default {
             currency: "IDR",
             est_arrival: moment()
               .add(1, "days")
-              .format("YYYY/MM/DD"),
+              .format("YYYY/MM/DD")
           };
           this.sppSelect.push(data);
         }
       }
+
       if (this.sppSelect.length > 0) {
+        // this.po.po_id = this.sppSelect[0].spp_id;
+        this.changeType();
+
         this.formPO = true;
         this.curr = "IDR";
         this.chgCurrency();
@@ -350,41 +393,46 @@ export default {
     },
     async createPO() {
       this.po.user_id = this.$store.state.currentUser.user_id;
-      await this.$http.post("/new_po", this.po, {}).then(async (result) => {
+      await this.$http.post("/new_po", this.po, {}).then(async result => {
         for (var i = 0; i < this.sppSelect.length; i++) {
           this.sppSelect[i].po_id = this.po.po_id;
 
-          await this.$http.put("/update_spp/" + this.sppSelect[i].spp_id, this.sppSelect[i], {}).then((result) => {});
+          await this.$http
+            .put(
+              "/update_spp/" + this.sppSelect[i].spp_id,
+              this.sppSelect[i],
+              {}
+            )
+            .then(result => {});
 
           var history = {
             spp_id: this.sppSelect[i].spp_id,
             status: "process",
-            content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+            content: "Sudah dibuat PO dengan nomor: " + this.po.po_id
           };
-          this.$http.post("/new_history", history, {}).then((result) => {});
-          
-          var notifikasi ={
+          this.$http.post("/new_history", history, {}).then(result => {});
+
+          var notifikasi = {
             from_id: this.$store.state.currentUser.user_id,
             to_id: this.sppSelect[i].user_id,
-            notif: 'PO telah dibuat',
+            notif: "PO telah dibuat",
             note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
-            spp_id: this.sppSelect[i].spp_id ,
-            reference_page: '/spp/list'
-          }
-          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+            spp_id: this.sppSelect[i].spp_id,
+            reference_page: "/spp/list"
+          };
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
         }
-
 
         this.formPO = false;
         this.po = {
           po_date: moment()
             .add(1, "days")
-            .format("YYYY/MM/DD"),
+            .format("YYYY/MM/DD")
         };
         this.fetchData();
       });
       await this.$root.$emit("refresh");
-      this.sppSelect = []
+      this.sppSelect = [];
       this.$q.notify("Berhasil membuat PO!");
     },
     changeType() {
@@ -394,25 +442,29 @@ export default {
     cancelSPP() {
       var data = {
         purch_manager_cancel: 1,
-        note: this.content,
+        note: this.content
       };
-      this.$http.put("/update_spp/" + this.selected.spp_id, data, {}).then((result) => {
-        this.$root.$emit("refresh");
-        this.fetchData();
-      });
+      this.$http
+        .put("/update_spp/" + this.selected.spp_id, data, {})
+        .then(result => {
+          this.$root.$emit("refresh");
+          this.fetchData();
+        });
 
       var history = {
         spp_id: this.selected.spp_id,
         status: "canceled",
-        content: this.content,
+        content: this.content
       };
-      this.$http.post("/new_history", history, {}).then((result) => {});
+      this.$http.post("/new_history", history, {}).then(result => {});
       this.$q.notify("SPP berhasil dibatalkan!");
     },
     showHistory() {
-      this.$http.get("/spp_history/" + this.selected.spp_id, {}).then((result) => {
-        this.history = result.data;
-      });
+      this.$http
+        .get("/spp_history/" + this.selected.spp_id, {})
+        .then(result => {
+          this.history = result.data;
+        });
       this.show_history = true;
     },
     chgCurrency() {
@@ -450,11 +502,11 @@ export default {
       else if (val == "created") return "library_add";
       else if (val == "canceled") return "close";
       else return "pending_actions";
-    },
+    }
   },
   computed: {
     selectCount() {
-      var data = this.sppList.filter((e) => e.select === true);
+      var data = this.sppList.filter(e => e.select === true);
       var count = data.length;
 
       if (data[0]) this.selected = data[0];
@@ -477,8 +529,8 @@ export default {
       } else if (this.selected.is_received == 2) {
         return "Barang sudah diterima";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -5,14 +5,23 @@
       <q-card-section class="q-pa-md row justify-between">
         <div class="q-gutter-md">
           <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex < 0" />
-          <q-btn flat label="History" color="secondary" @click="showHistory()" :disable="slcIndex <0" />
+          <q-btn
+            flat
+            label="History"
+            color="secondary"
+            @click="showHistory()"
+            :disable="slcIndex <0"
+          />
         </div>
         <div>
-          <q-select 
-          outlined dense v-model="filter" 
-          :options="filterOption"
-          map-options emit-value
-          @input="fetchData"
+          <q-select
+            outlined
+            dense
+            v-model="filter"
+            :options="filterOption"
+            map-options
+            emit-value
+            @input="fetchData"
           />
         </div>
       </q-card-section>
@@ -37,18 +46,14 @@
               {{ d.create_at | moment("DD MMM YYYY") }}
               <q-badge :color="getColor(d.status)" text-color="white" dense size="sm">{{ d.status }}</q-badge>
             </td>
-            <td class="text-left" style="width: 100px;">
-              {{ d.deadline | moment("DD MMM YYYY") }}
-            </td>
+            <td class="text-left" style="width: 100px;">{{ d.deadline | moment("DD MMM YYYY") }}</td>
             <td class="text-left">{{ d.item }}</td>
             <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
           <tr>
-            <td class="text-center text-grey" colspan="99">
-              tidak ada data
-            </td>
+            <td class="text-center text-grey" colspan="99">tidak ada data</td>
           </tr>
         </tbody>
       </q-markup-table>
@@ -56,7 +61,7 @@
     </q-card>
 
     <!-- detail  -->
-    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale" >
+    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-primary text-white row">
           <div>NO SPP: {{ selected.spp_id }}</div>
@@ -111,21 +116,22 @@
           <q-item>
             <q-item-section>
               <q-item-label caption>Status Saat Ini</q-item-label>
-              <q-item-label>
-                {{ status_note }}
-              </q-item-label>
+              <q-item-label>{{ status_note }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section v-show="selected.po_id">
               <q-item-label caption>Konfirmasi Penerimaan</q-item-label>
               <q-item-label>
-                <q-select 
-                  outlined dense v-model="isReceived" 
+                <q-select
+                  outlined
+                  dense
+                  v-model="isReceived"
                   :options="receivedOption"
-                  map-options emit-value
+                  map-options
+                  emit-value
                   @input="updateStatus"
-                  />
+                />
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -153,9 +159,7 @@
               :color="getColor(x.status)"
               :icon="getIcon(x.status)"
             >
-              <div>
-                {{ x.content }}
-              </div>
+              <div>{{ x.content }}</div>
             </q-timeline-entry>
           </q-timeline>
         </q-card-section>
@@ -165,7 +169,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from "moment";
 
 export default {
   data() {
@@ -176,91 +180,106 @@ export default {
       history: [],
       show_history: false,
       selected: {},
-      filterOption:[], filter: '',
+      filterOption: [],
+      filter: "",
       isReceived: 0,
-      receivedOption:[
-        { label: "fully received", value: '2' },
-        { label: "half received", value: '1' },
-        { label: "not received", value: '0' },
-      ],
+      receivedOption: [
+        { label: "fully received", value: "2" },
+        { label: "half received", value: "1" },
+        { label: "not received", value: "0" }
+      ]
     };
   },
   mounted() {
+    this.$http
+      .get("/list_month_user", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token-purchase")
+        }
+      })
+      .then(result => {
+        this.filterOption = result.data;
+        this.filter = result.data[0].value;
+        this.filterOption.unshift({ value: "%25", label: "all" });
 
-    this.$http.get("/list_month_user", {
-      headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
-    }).then((result) => {
-      this.filterOption = result.data
-      this.filter = result.data[0].value
-      this.filterOption.unshift({value: '%25', label: 'all' })
-
-      this.fetchData();
-    })
+        this.fetchData();
+      });
   },
   methods: {
     fetchData() {
       this.sppList = [];
-      this.$http.get("/spp_byuserid/" + this.$store.state.currentUser.user_id+'/'+this.filter, {}).then((result) => {
-        for (var i = 0; i < result.data.length; i++) {
-          result.data[i].status = this.status(result.data[i]);
-          this.sppList.push(result.data[i]);
-        }
-      });
+      this.$http
+        .get(
+          "/spp_byuserid/" +
+            this.$store.state.currentUser.user_id +
+            "/" +
+            this.filter,
+          {}
+        )
+        .then(result => {
+          for (var i = 0; i < result.data.length; i++) {
+            result.data[i].status = this.status(result.data[i]);
+            this.sppList.push(result.data[i]);
+          }
+        });
     },
     showDetail() {
       this.selected = this.sppList[this.slcIndex];
-      this.isReceived = this.selected.is_received
+      this.isReceived = this.selected.is_received;
       this.show_detail = true;
     },
-    updateStatus(){
-      var data = { spp_id:  this.selected.spp_id, is_received: this.isReceived}
-      this.selected.is_received = this.isReceived
+    updateStatus() {
+      var data = { spp_id: this.selected.spp_id, is_received: this.isReceived };
+      this.selected.is_received = this.isReceived;
 
-      this.$http.put("/update_spp/" + this.selected.spp_id, data, {})
-      .then((result) => {
-        let history = {
-          spp_id: this.selected.spp_id,
-          status: "process",
-          content: "update oleh pembuat SPP (" + this.$store.state.currentUser.username + ")",
-        };
-        if (this.isReceived == 2) {
-          history.status = "done";
-        }
-        this.$http.post("/new_history", history, {}).then((result) => {});
+      this.$http
+        .put("/update_spp/" + this.selected.spp_id, data, {})
+        .then(result => {
+          let history = {
+            spp_id: this.selected.spp_id,
+            status: "process",
+            content:
+              "update oleh pembuat SPP (" +
+              this.$store.state.currentUser.username +
+              ")"
+          };
+          if (this.isReceived == 2) {
+            history.status = "done";
+          }
+          this.$http.post("/new_history", history, {}).then(result => {});
 
-        var info = ''
-        if(this.isReceived == 2)
-          info = 'barang sudah diterima penuh'
-        if(this.isReceived == 1)
-          info = 'barang sudah diterima sebagian'
+          var info = "";
+          if (this.isReceived == 2) info = "barang sudah diterima penuh";
+          if (this.isReceived == 1) info = "barang sudah diterima sebagian";
 
-        var notifikasi ={
-          from_id: this.$store.state.currentUser.user_id,
-          to_id: this.selected.handle_by,
-          notif: 'Konfimrasi penerimaan oleh pemohon',
-          note: info,
-          spp_id: this.selected.spp_id ,
-          reference_page: '/po/list'
-        }
-        this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-        
-        notifikasi.to_id = 1 // Notif ke Manager purchasing
-        this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-        
-        this.$q.notify({
-          icon: "done",
-          color: "positive",
-          message: "Status penerimaan sudah diubah",
+          var notifikasi = {
+            from_id: this.$store.state.currentUser.user_id,
+            to_id: this.selected.handle_by,
+            notif: "Konfimrasi penerimaan oleh pemohon",
+            note: info,
+            spp_id: this.selected.spp_id,
+            reference_page: "/po/list"
+          };
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+
+          notifikasi.to_id = 1; // Notif ke Manager purchasing
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+
+          this.$q.notify({
+            icon: "done",
+            color: "positive",
+            message: "Status penerimaan sudah diubah"
+          });
+
+          this.fetchData();
         });
-
-        this.fetchData()
-      });
-
     },
     showHistory() {
-      this.$http.get("/spp_history/" + this.sppList[this.slcIndex].spp_id, {}).then((result) => {
-        this.history = result.data;
-      });
+      this.$http
+        .get("/spp_history/" + this.sppList[this.slcIndex].spp_id, {})
+        .then(result => {
+          this.history = result.data;
+        });
       this.show_history = true;
     },
     status(val) {
@@ -280,12 +299,18 @@ export default {
         return "process";
       } else if (val.is_received == 2) {
         return "done";
+      } else if (val.is_received == 300) {
+        return "suspended";
+      } else if (val.is_received == 40000) {
+        return "closed";
       }
     },
     getColor(val) {
       if (val == "done") return "positive";
       else if (val == "rejected" || val == "canceled") return "red-7";
       else if (val == "process") return "primary";
+      else if (val == "suspended") return "accent";
+      else if (val == "closed") return "black";
       else return "orange";
     },
     getIcon(val) {
@@ -294,8 +319,10 @@ export default {
       else if (val == "process") return "hourglass_bottom";
       else if (val == "created") return "library_add";
       else if (val == "canceled") return "close";
+      else if (val == "suspended") return "alarm";
+      else if (val == "closed") return "highlight_off";
       else return "pending_actions";
-    },
+    }
   },
   computed: {
     status_note() {
@@ -312,12 +339,14 @@ export default {
       } else if (this.selected.is_received == 0) {
         return "Sedang diproses oleh " + this.selected.handler_name;
       } else if (this.selected.is_received == 1) {
-        return "Barang sudah diterima sebagian [" + this.selected.handler_name + "]";
+        return (
+          "Barang sudah diterima sebagian [" + this.selected.handler_name + "]"
+        );
       } else if (this.selected.is_received == 2) {
         return "Barang sudah diterima";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

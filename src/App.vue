@@ -141,7 +141,7 @@ export default {
         borderRadius: "5px",
         backgroundColor: "#027be3",
         width: "5px",
-        opacity: 0.75,
+        opacity: 0.75
       },
 
       barStyle: {
@@ -149,8 +149,8 @@ export default {
         borderRadius: "9px",
         backgroundColor: "#027be3",
         width: "9px",
-        opacity: 0.2,
-      },
+        opacity: 0.2
+      }
     };
   },
   mounted() {
@@ -158,13 +158,14 @@ export default {
       // this.menu = []
       await this.fetchData();
     });
-    
-    this.$root.$on('notifikasi', async () => { 
-      this.$http.get("/count_notif/" + this.$store.state.currentUser.user_id, {})
-      .then(result => {
-        this.count_notif = result.data.count
-      })
-    })   
+
+    this.$root.$on("notifikasi", async () => {
+      this.$http
+        .get("/count_notif/" + this.$store.state.currentUser.user_id, {})
+        .then(result => {
+          this.count_notif = result.data.count;
+        });
+    });
 
     this.preRun();
   },
@@ -173,15 +174,22 @@ export default {
     reloadData() {
       this.$http
         .get(
-          "/count_data/" + this.$store.state.currentUser.user_id + "/" + this.$store.state.currentUser.is_purch_manager,
+          "/count_data/" +
+            this.$store.state.currentUser.user_id +
+            "/" +
+            this.$store.state.currentUser.is_purch_manager,
           {}
         )
-        .then((result) => {
-          this.menu.forEach((x) => {
-            if (x.link == "/spp/approval") this.$set(x, "count", result.data.count_approve);
-            if (x.link == "/spp/approval-pm") this.$set(x, "count", result.data.count_approvePM);
-            if (x.link == "/spp/approved") this.$set(x, "count", result.data.count_spp);
-            if (x.link == "/po/list") this.$set(x, "count", result.data.count_po);
+        .then(result => {
+          this.menu.forEach(x => {
+            if (x.link == "/spp/approval")
+              this.$set(x, "count", result.data.count_approve);
+            if (x.link == "/spp/approval-pm")
+              this.$set(x, "count", result.data.count_approvePM);
+            if (x.link == "/spp/approved")
+              this.$set(x, "count", result.data.count_spp);
+            if (x.link == "/po/list")
+              this.$set(x, "count", result.data.count_po);
           });
 
           this.count = result.data;
@@ -204,37 +212,40 @@ export default {
 
     fetchData() {
       this.menu = [];
-      if(this.$store.state.currentUser.is_purchasing == 1){
+      if (this.$store.state.currentUser.is_purchasing == 1) {
         this.menu.push({
           icon: "dashboard",
           title: "Home",
-          link: "/dashboard",
+          link: "/dashboard"
         });
       }
       this.menu.push({
         icon: "create",
         title: "Buat SPP",
-        link: "/spp/create",
+        link: "/spp/create"
       });
 
       this.$http
         .get(
-          "/count_data/" + this.$store.state.currentUser.user_id + "/" + this.$store.state.currentUser.is_purch_manager,
+          "/count_data/" +
+            this.$store.state.currentUser.user_id +
+            "/" +
+            this.$store.state.currentUser.is_purch_manager,
           {}
         )
-        .then((result) => {
+        .then(result => {
           this.count = result.data;
           this.menu.push({
             icon: "inbox",
             title: "SPP Anda",
-            link: "/spp/list",
+            link: "/spp/list"
           });
           if (this.$store.state.currentUser.is_manager == "1") {
             this.menu.push({
               icon: "group",
               title: "Persetujuan Manager",
               link: "/spp/approval",
-              count: result.data.count_approve,
+              count: result.data.count_approve
             });
           }
           if (this.$store.state.currentUser.is_purch_manager == "1") {
@@ -242,7 +253,7 @@ export default {
               icon: "how_to_reg",
               title: "Persetujuan Man.Purchasing",
               link: "/spp/approval-pm",
-              count: result.data.count_approvePM,
+              count: result.data.count_approvePM
             });
           }
           if (this.$store.state.currentUser.is_purchasing == "1") {
@@ -250,28 +261,27 @@ export default {
               icon: "beenhere",
               title: "SPP Disetujui",
               link: "/spp/approved",
-              count: result.data.count_spp,
+              count: result.data.count_spp
             });
             this.menu.push({
               icon: "ballot",
               title: "PO",
               link: "/po/list",
-              count: result.data.count_po,
+              count: result.data.count_po
             });
             this.menu.push({
               icon: "bar_chart",
               title: "List Harga",
-              link: "/price/list",
+              link: "/price/list"
             });
           }
         });
 
-
-      this.$http.get("/count_notif/" + this.$store.state.currentUser.user_id, {})
+      this.$http
+        .get("/count_notif/" + this.$store.state.currentUser.user_id, {})
         .then(result => {
-          this.count_notif = result.data.count
-        })
-
+          this.count_notif = result.data.count;
+        });
     },
     toggleLogin(val) {
       this.isLogin = val;
@@ -279,17 +289,20 @@ export default {
     },
     updateKurs() {
       this.isLoading = true;
-      axios.get(process.env.VUE_APP_BASE_URL+"/../kurs_api").then((result) => {
+      console.log("trying to update kurs...");
+      axios.get(process.env.VUE_APP_BASE_URL + "/../kurs_api").then(result => {
         this.kurs = result.data;
         this.isLoading = false;
         this.showKurs = true;
+        console.log(this.kurs);
+        console.log(this.kurs.Jsondata);
       });
     },
     logout() {
       localStorage.removeItem("token-purchase");
       this.$router.push("/login");
-    },
+    }
   },
-  computed: mapState(["currentUser"]),
+  computed: mapState(["currentUser"])
 };
 </script>

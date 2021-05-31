@@ -15,15 +15,7 @@
             <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
               <q-item-section>
                 <q-badge
-                  :color="
-                  scope.opt.label== 'fully received'
-                    ? 'positive'
-                    : scope.opt.label == 'half received'
-                    ? 'warning'
-                    : scope.opt.label == 'not received'
-                    ? 'negative'
-                    : 'primary'
-                "
+                  :color="getLabelColor(scope.opt.label)"
                   text-color="white"
                   dense
                 >{{ scope.opt.label }}</q-badge>
@@ -77,13 +69,7 @@
             <td class="text-left col">
               <div>{{ d.po_id }}</div>
               <q-chip
-                :color="
-                  d.is_received == 'fully received'
-                    ? 'positive'
-                    : d.is_received == 'half received'
-                    ? 'warning'
-                    : 'negative'
-                "
+                :color="getLabelColor(d.is_received)"
                 text-color="white"
                 dense
                 size="sm"
@@ -210,7 +196,7 @@ export default {
   components: { Money },
   data() {
     return {
-      sortBy: '',
+      sortBy: "",
       poList: [],
       slcPO: null,
       selected: [],
@@ -218,20 +204,25 @@ export default {
         { label: "no", value: "0" },
         { label: "partial", value: "1" },
         { label: "full", value: "2" },
-      ], 
-      isReceived: 'not',
-      receivedOption:[
+        { label: "suspended", value: "300" },
+        { label: "closed", value: "40000" }
+      ],
+      isReceived: "not",
+      receivedOption: [
         { label: "show all", value: "%25" },
         { label: "fully received", value: "fully" },
         { label: "half received", value: "half" },
         { label: "not received", value: "not" },
+        { label: "suspended", value: "suspended" },
+        { label: "closed", value: "closed" }
       ],
       is_COA: [
         { label: "no", value: "0" },
-        { label: "yes", value: "1" },
+        { label: "yes", value: "1" }
       ],
       show_detail: false,
-      filterOption:[], filter: '',
+      filterOption: [],
+      filter: "",
 
       onEdit: false,
       edited: [],
@@ -241,7 +232,7 @@ export default {
         prefix: "Rp ",
         suffix: "",
         precision: 0,
-        masked: false,
+        masked: false
       },
       moneyUSD: {
         decimal: ",",
@@ -249,57 +240,79 @@ export default {
         prefix: "$ ",
         suffix: "",
         precision: 0,
-        masked: false,
-        
+        masked: false
       },
       curr: "IDR",
-      cost_ctg: ['Marketing/Sales', 'RnD', 'Produksi/Gudang', 'Purchasing/Accounting', 'Lab Pusat', 'Lab Beton', 'IT', 'Umum/HRD']
-
+      cost_ctg: [
+        "Marketing/Sales",
+        "RnD",
+        "Produksi/Gudang",
+        "Purchasing/Accounting",
+        "Lab Pusat",
+        "Lab Beton",
+        "IT",
+        "Umum/HRD"
+      ]
     };
   },
   mounted() {
-    
-    this.$http.get("/list_month_po", {
-      headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
-    }).then((result) => {
-      this.filterOption = result.data
-      this.filter = '%25'
-      this.filterOption.unshift({value: '%25', label: 'all' })
-    
-      this.fetchData();
-    })
+    this.$http
+      .get("/list_month_po", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token-purchase")
+        }
+      })
+      .then(result => {
+        this.filterOption = result.data;
+        this.filter = "%25";
+        this.filterOption.unshift({ value: "%25", label: "all" });
+
+        this.fetchData();
+      });
   },
   methods: {
+    getLabelColor(label) {
+      if (label == "fully received") return "positive";
+      else if (label == "half received") return "warning";
+      else if (label == "not received") return "negative";
+      else if (label == "suspended") return "accent";
+      else if (label == "closed") return "dark";
+      else return "primary";
+    },
     fetchData() {
       this.poList = [];
-      this.$http.get("/po/" + this.isReceived + "/" + this.filter, {
-        headers: { Authorization: "Bearer " + localStorage.getItem('token-purchase') }
-      }).then((result) => {
-        for (var i = 0; i < result.data.length; i++) {
+      this.$http
+        .get("/po/" + this.isReceived + "/" + this.filter, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token-purchase")
+          }
+        })
+        .then(result => {
+          for (var i = 0; i < result.data.length; i++) {
             this.poList.push(result.data[i]);
-        }
-      });
+          }
+        });
     },
     openForm(id) {
-      this.edited = []
-      this.$http.post("/podetail_byid", { po_id: id }, {}).then((result) => {
+      this.edited = [];
+      this.$http.post("/podetail_byid", { po_id: id }, {}).then(result => {
         this.selected = result.data;
         this.show_detail = true;
-        for(var i = 0; i < this.selected.length; i++){
+        for (var i = 0; i < this.selected.length; i++) {
           this.edited.push({
             item: this.selected[i].item,
             qty: this.selected[i].qty,
             unit: this.selected[i].unit,
             price: this.selected[i].price,
             currency: this.selected[i].currency,
-            est_arrival: this.selected[i].est_arrival,
-          })
+            est_arrival: this.selected[i].est_arrival
+          });
         }
       });
     },
     closeForm() {
       this.show_detail = false;
-      this.onEdit = false
+      this.onEdit = false;
     },
     async updateSPP() {
       for (var i = 0; i < this.selected.length; i++) {
@@ -308,67 +321,98 @@ export default {
           coa: this.selected[i].coa,
           note: this.selected[i].note,
           cost_category: this.selected[0].cost_category,
-          
+
           item: this.edited[i].item,
           qty: this.edited[i].qty,
           unit: this.edited[i].unit,
           price: this.edited[i].price,
           est_arrival: this.edited[i].est_arrival
         };
-        var note_add= ''
-        if(this.selected[i].item != this.edited[i].item){
-          note_add = note_add + ', nama item: ' + this.selected[i].item + ' => ' + this.edited[i].item
+        var note_add = "";
+        if (this.selected[i].item != this.edited[i].item) {
+          note_add =
+            note_add +
+            ", nama item: " +
+            this.selected[i].item +
+            " => " +
+            this.edited[i].item;
         }
-        if(this.selected[i].qty != this.edited[i].qty){
-          note_add = note_add + ', qty: ' + this.selected[i].qty + ' => ' + this.edited[i].qty
+        if (this.selected[i].qty != this.edited[i].qty) {
+          note_add =
+            note_add +
+            ", qty: " +
+            this.selected[i].qty +
+            " => " +
+            this.edited[i].qty;
         }
-        if(this.selected[i].unit != this.edited[i].unit){
-          note_add = note_add + ', unit: ' + this.selected[i].unit + ' => ' + this.edited[i].unit
+        if (this.selected[i].unit != this.edited[i].unit) {
+          note_add =
+            note_add +
+            ", unit: " +
+            this.selected[i].unit +
+            " => " +
+            this.edited[i].unit;
         }
-        if(this.selected[i].price != this.edited[i].price){
-          note_add = note_add + ', harga: ' + this.selected[i].price + ' => ' + this.edited[i].price
+        if (this.selected[i].price != this.edited[i].price) {
+          note_add =
+            note_add +
+            ", harga: " +
+            this.selected[i].price +
+            " => " +
+            this.edited[i].price;
         }
-        if(note_add != '') data.revision = this.$store.state.currentUser.username
+        if (note_add != "")
+          data.revision = this.$store.state.currentUser.username;
 
-        await this.$http.put("/update_spp/" + this.selected[i].spp_id, data, {}).then((result) => {});
+        await this.$http
+          .put("/update_spp/" + this.selected[i].spp_id, data, {})
+          .then(result => {});
 
         let history = {
           spp_id: this.selected[i].spp_id,
           status: "process",
-          content: this.selected[i].note + note_add,
+          content: this.selected[i].note + note_add
         };
         if (this.selected[i].is_received == 2) {
           history.status = "done";
         }
-        this.$http.post("/new_history", history, {}).then((result) => {});
-        var info = ''
-        if(this.selected[i].is_received == 2)
-          info = 'barang sudah diterima penuh'
-        if(this.selected[i].is_received == 1)
-          info = 'barang sudah diterima sebagian'
-
-        var notifikasi ={
-            from_id: this.$store.state.currentUser.user_id,
-            to_id: this.selected[i].user_id,
-            notif: 'Konfirmasi Penerimaan barang',
-            note: info,
-            spp_id: this.selected[i].spp_id ,
-            reference_page: '/spp/list'
-          }
-        if(info != 0){
-          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-          
-          notifikasi.to_id = 1 // Notif ke Manager purchasing
-          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+        if (this.selected[i].is_received == 300) {
+          history.status = "suspended";
         }
+        if (this.selected[i].is_received == 40000) {
+          history.status = "closed";
+        }
+        this.$http.post("/new_history", history, {}).then(result => {});
+        var info = "";
+        if (this.selected[i].is_received == 2)
+          info = "barang sudah diterima penuh";
+        if (this.selected[i].is_received == 1)
+          info = "barang sudah diterima sebagian";
+        if (this.selected[i].is_received == 300)
+          info = "PO sementara di suspend";
+        if (this.selected[i].is_received == 40000)
+          info = "PO dinyatakan closed";
+        console.log(this.selected[i].is_received);
+        var notifikasi = {
+          from_id: this.$store.state.currentUser.user_id,
+          to_id: this.selected[i].user_id,
+          notif: "Konfirmasi Penerimaan barang",
+          note: info,
+          spp_id: this.selected[i].spp_id,
+          reference_page: "/spp/list"
+        };
+        if (info != 0) {
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
 
-
+          notifikasi.to_id = 1; // Notif ke Manager purchasing
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+        }
       }
       this.show_detail = false;
       await this.fetchData();
       await this.$root.$emit("refresh");
       this.$q.notify("Data PO berhasil diubah!");
-      this.onEdit = false
+      this.onEdit = false;
     },
     setCurrency(price, cur) {
       if (cur == "IDR") {
@@ -376,7 +420,7 @@ export default {
           style: "currency",
           currency: "IDR",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 0,
+          minimumFractionDigits: 0
         });
         return formatter.format(price);
       } else if (cur == "USD") {
@@ -384,13 +428,12 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2,
+          minimumFractionDigits: 2
         });
         return formatter.format(price);
       }
     },
     chgCurrency() {
-      
       if (this.curr == "IDR") {
         this.money.precision = 0;
         this.money.prefix = "Rp ";
@@ -398,33 +441,29 @@ export default {
         this.money.precision = 2;
         this.money.prefix = "$ ";
       }
-    },
+    }
   },
   computed: {
     sortedListPO() {
-      let temp = this.poList.slice(0)
-      if(this.sortBy == 'est_arrival') {
-        return temp.sort((a,b) => {
-          let x = new Date(a.est_arrival)
-          let y = new Date(b.est_arrival)
-          return (y - x) * -1
-        })
-      
-      }
-      else if(this.sortBy == 'po_date') {
-        return temp.sort((a,b) => {
-          let x = new Date(a.po_date)
-          let y = new Date(b.po_date)
-          return y - x
-        })
-      
-      }
-      else {
-        console.log('else')
-        return this.poList
+      let temp = this.poList.slice(0);
+      if (this.sortBy == "est_arrival") {
+        return temp.sort((a, b) => {
+          let x = new Date(a.est_arrival);
+          let y = new Date(b.est_arrival);
+          return (y - x) * -1;
+        });
+      } else if (this.sortBy == "po_date") {
+        return temp.sort((a, b) => {
+          let x = new Date(a.po_date);
+          let y = new Date(b.po_date);
+          return y - x;
+        });
+      } else {
+        console.log("else");
+        return this.poList;
       }
     }
-  },
+  }
 };
 </script>
 
