@@ -12,17 +12,7 @@ Vue.prototype.$http = axios.create({
 });
 
 Vue.use(require('vue-moment'));
-
-Vue.use(require('vue-moment'));
 Vue.use(Vue2Filters)
-// Vue.use(money, {
-//   decimal: ',',
-//   thousands: '.',
-//   prefix: 'Rp ',
-//   suffix: '',
-//   precision: 0,
-//   masked: false
-// })
 
 Vue.config.productionTip = false
 

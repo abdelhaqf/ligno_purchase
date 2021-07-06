@@ -11,6 +11,11 @@ function getLink()
 
 //---------------------------------------------------------------------------------------------
 
+Flight::route('GET /list/user', function () {
+  $q = "SELECT user_id,user_id as value,concat(dept , ' - ' , name) as label FROM user 
+  ORDER BY dept, name";
+  runQuery($q);
+});
 Flight::route('GET /current_user/@username', function ($username) {
 
   $q = "SELECT * FROM user WHERE username like '$username'";
@@ -22,7 +27,7 @@ Flight::route('GET /spp_byuserid/@id/@filter', function ($id, $filter) {
           FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          WHERE spp.user_id = $id
+          WHERE spp.user_id = $id OR spp.cc = $id
           HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
           ORDER BY spp.spp_id DESC
     ";
@@ -154,8 +159,8 @@ Flight::route('GET /list_month_user', function () {
   $q = "SELECT DISTINCT CONCAT( YEAR(create_at),'-',MONTH(create_at)) AS 'value',  CONCAT(MONTHNAME(create_at), ' ', YEAR(create_at)) AS 'label', 
   YEAR(create_at) AS 'year', MONTH(create_at) AS 'month'
   FROM spp 
-  WHERE user_id = $id
-  ORDER BY year, month DESC";
+  WHERE user_id = $id OR cc = $id
+  ORDER BY year DESC, month DESC";
   runQuery($q);
 });
 
@@ -323,7 +328,7 @@ Flight::route('GET /notifikasi/@id', function ($id) {
   $q = " SELECT n.* , user.name
          FROM notifikasi n
          INNER JOIN user ON user.user_id = n.from_id
-         WHERE to_id = $id AND to_id <> from_id
+         WHERE to_id = $id 
          ORDER BY notif_id DESC
          LIMIT 20
          ";
