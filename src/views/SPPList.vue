@@ -1,6 +1,6 @@
 <template>
   <div class="row relative q-px-lg q-pt-lg">
-    <q-card class="col-12 bg-white rounded-borders">
+    <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- toolbar -->
       <q-card-section class="q-pa-md row justify-between">
         <div class="q-gutter-md">

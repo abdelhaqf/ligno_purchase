@@ -1,6 +1,6 @@
 <template>
   <div class="row relative q-px-lg q-pt-lg">
-    <q-card class="col-12 bg-white rounded-borders" v-if="!show_detail">
+    <q-card flat bordered class="col-12 bg-white rounded-borders" v-if="!show_detail">
       <q-card-section class="q-pa-md q-gutter-md row justify-between">
         <q-select
           outlined
@@ -95,25 +95,32 @@
     </q-card>
 
     <!-- detail PO  -->
-    <q-card v-if="show_detail" class="col-12">
+    <q-card flat bordered v-if="show_detail" class="col-12">
       <q-card-section class="bg-primary text-white">Detail PO : {{ selected[0].po_id }}</q-card-section>
 
       <q-card-section class="q-pa-md">
         <table>
           <tr>
             <td class="text-caption">PO Date</td>
-            <td>: {{ selected[0].po_date | moment("DD MMM YYYY") }}</td>
+            <td class="q-px-sm">:</td>
+            <td>{{ selected[0].po_date | moment("DD MMM YYYY") }}</td>
           </tr>
           <tr>
             <td class="text-caption">Handle By</td>
-            <td>: {{ selected[0].handler_name }}</td>
+            <td class="q-px-sm">:</td>
+
+            <td>{{ selected[0].handler_name }}</td>
           </tr>
           <tr>
             <td class="text-caption">Vendor</td>
-            <td>: {{ selected[0].vendor }}</td>
+            <td class="q-px-sm">:</td>
+
+            <td>{{ selected[0].vendor }}</td>
           </tr>
           <tr>
             <td class="text-caption">Kategori Biaya</td>
+            <td class="q-px-sm">:</td>
+
             <td>
               <q-select outlined dense v-model="selected[0].cost_category" :options="cost_ctg" />
             </td>

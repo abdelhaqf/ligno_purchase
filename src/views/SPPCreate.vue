@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-center q-py-lg rounded-borders">
-    <q-card class="bg-white">
+    <q-card flat bordered class="bg-white">
       <!-- form  -->
       <q-card-section horizontal class="q-pa-none">
         <!-- petunjuk pengisian  -->
@@ -39,7 +39,13 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label>5. Input keterangan tentang permintaan ini</q-item-label>
+                <q-item-label>5. Input CC(Copy Carbon)</q-item-label>
+                <q-item-label caption>Contoh, purchasing membuat SPP karena bag.produksi berhalangan</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-item-label>6. Input keterangan tentang permintaan ini</q-item-label>
                 <q-item-label
                   caption
                 >isi dengan data tambahan seperti nama vendor, spesifikasi barang, dll</q-item-label>
@@ -47,7 +53,7 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label>6. Klik tombol ajukan</q-item-label>
+                <q-item-label>7. Klik tombol ajukan</q-item-label>
                 <q-item-label
                   caption
                 >bila permintaan berhasil dikirim anda akan melihat pesan "SPP Berhasil dibuat"</q-item-label>
@@ -55,7 +61,7 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <q-item-label>7. Selesai</q-item-label>
+                <q-item-label>8. Selesai</q-item-label>
                 <q-item-label caption>Cek perkembangan SPP di menu "SPP Anda"</q-item-label>
               </q-item-section>
             </q-item>
@@ -148,7 +154,8 @@
               outlined
               stack-label
               emit-value
-              label=". cc"
+              map-options
+              label="5. cc"
               :options="listUser"
               v-model="spp.cc"
             ></q-select>
@@ -157,7 +164,7 @@
               outlined
               v-model="spp.description"
               class="q-mb-lg"
-              label="5. Keterangan"
+              label="6. Keterangan"
               stack-label
               dense
               type="textarea"
@@ -201,6 +208,11 @@ export default {
     async getUsers() {
       let result = await this.$http.get("/list/user", {});
       this.listUser = result.data;
+      this.listUser.unshift({
+        value: 0,
+        label: "-",
+        id_user: 0
+      });
     },
     limitDate(date) {
       return date >= moment().format("YYYY/MM/DD");

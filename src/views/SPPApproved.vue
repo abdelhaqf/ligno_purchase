@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-center q-pa-lg">
-    <q-card v-if="!formPO" class="col-12 bg-white rounded-borders">
+    <q-card flat bordered v-if="!formPO" class="col-12 bg-white rounded-borders">
       <!-- table control -->
       <q-card-section class="q-pa-md row justify-between">
         <div class="q-gutter-md">
@@ -66,7 +66,7 @@
     </q-card>
 
     <!-- form PO baru -->
-    <q-card v-if="formPO">
+    <q-card flat bordered v-if="formPO">
       <q-card-section class="bg-primary text-white text-h6">PO Baru</q-card-section>
       <div class="q-pa-md q-gutter-md">
         <div class="row">
@@ -152,10 +152,10 @@
             <td>{{ i + 1 }}</td>
             <td style="width: 250px;">{{ x.item }} ({{x.qty}} {{x.unit}})</td>
             <td style="padding: 0px;">
-              <money v-model="x.price" v-bind="money"></money>
+              <money v-model="x.price" v-bind="money" class="q-mx-sm"></money>
             </td>
-            <td style="padding: 0px;">
-              <q-input filled square bg-color="white" v-model="x.est_arrival">
+            <td>
+              <q-input outlined dense bg-color="white" v-model="x.est_arrival" readonly>
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
