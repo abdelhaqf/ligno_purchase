@@ -1,6 +1,11 @@
 <template>
   <div class="row relative q-px-lg q-pt-lg">
-    <q-card flat bordered class="col-12 bg-white rounded-borders" v-if="!show_detail">
+    <q-card
+      flat
+      bordered
+      class="col-12 bg-white rounded-borders"
+      v-if="!show_detail"
+    >
       <q-card-section class="q-pa-md q-gutter-md row justify-between">
         <q-select
           outlined
@@ -18,7 +23,8 @@
                   :color="getLabelColor(scope.opt.label)"
                   text-color="white"
                   dense
-                >{{ scope.opt.label }}</q-badge>
+                  >{{ scope.opt.label }}</q-badge
+                >
               </q-item-section>
             </q-item>
           </template>
@@ -37,19 +43,37 @@
         <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;">
-              <q-btn flat dense icon="keyboard_arrow_down" size="xs" @click="sortBy=''"></q-btn>
+              <q-btn
+                flat
+                dense
+                icon="keyboard_arrow_down"
+                size="xs"
+                @click="sortBy = ''"
+              ></q-btn>
             </th>
             <th class="text-left">PO Number</th>
             <th class="text-left">
               PO Date
-              <q-btn flat dense icon="keyboard_arrow_down" size="xs" @click="sortBy='po_date'"></q-btn>
+              <q-btn
+                flat
+                dense
+                icon="keyboard_arrow_down"
+                size="xs"
+                @click="sortBy = 'po_date'"
+              ></q-btn>
             </th>
             <th class="text-left">Handle By</th>
             <th class="text-left">Vendor</th>
             <th class="text-left">Items</th>
             <th class="text-left">
               Est. Arrival
-              <q-btn flat dense icon="keyboard_arrow_up" size="xs" @click="sortBy='est_arrival'"></q-btn>
+              <q-btn
+                flat
+                dense
+                icon="keyboard_arrow_up"
+                size="xs"
+                @click="sortBy = 'est_arrival'"
+              ></q-btn>
             </th>
             <th class="text-right">value</th>
           </tr>
@@ -73,16 +97,22 @@
                 text-color="white"
                 dense
                 size="sm"
-              >{{ d.is_received }}</q-chip>
+                >{{ d.is_received }}</q-chip
+              >
             </td>
             <td class="text-left">{{ d.po_date | moment("DD MMM YYYY") }}</td>
             <td class="text-left">{{ d.handler_name | truncate(8) }}</td>
             <td class="text-left">{{ d.vendor | truncate(11) }}</td>
-            <td
-              class="text-left col"
-            >{{ d.item | truncate(20)}}{{d.spp_count>1?' [+'+(d.spp_count - 1)+']' : ''}}</td>
-            <td class="text-left col">{{d.est_arrival | moment('DD MMM YYYY')}}</td>
-            <td class="text-right">{{ setCurrency(d.total_price, d.currency) }}</td>
+            <td class="text-left col">
+              {{ d.item | truncate(20)
+              }}{{ d.spp_count > 1 ? " [+" + (d.spp_count - 1) + "]" : "" }}
+            </td>
+            <td class="text-left col">
+              {{ d.est_arrival | moment("DD MMM YYYY") }}
+            </td>
+            <td class="text-right">
+              {{ setCurrency(d.total_price, d.currency) }}
+            </td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
@@ -96,7 +126,9 @@
 
     <!-- detail PO  -->
     <q-card flat bordered v-if="show_detail" class="col-12">
-      <q-card-section class="bg-primary text-white">Detail PO : {{ selected[0].po_id }}</q-card-section>
+      <q-card-section class="bg-primary text-white"
+        >Detail PO : {{ selected[0].po_id }}</q-card-section
+      >
 
       <q-card-section class="q-pa-md">
         <table>
@@ -122,7 +154,12 @@
             <td class="q-px-sm">:</td>
 
             <td>
-              <q-select outlined dense v-model="selected[0].cost_category" :options="cost_ctg" />
+              <q-select
+                outlined
+                dense
+                v-model="selected[0].cost_category"
+                :options="cost_ctg"
+              />
             </td>
           </tr>
         </table>
@@ -147,13 +184,29 @@
             <td class="text-left">{{ d.name }}</td>
             <td class="text-left">
               <div v-if="!onEdit">{{ d.item }}</div>
-              <q-input v-else outlined dense v-model="edited[i].item" class="bg-white" />
+              <q-input
+                v-else
+                outlined
+                dense
+                v-model="edited[i].item"
+                class="bg-white"
+              />
             </td>
             <td class="text-right">
               <div v-if="!onEdit">{{ d.qty }} {{ d.unit }}</div>
               <div v-else class style="width: 60px;">
-                <q-input outlined dense class="bg-white" v-model="edited[i].qty" />
-                <q-input outlined dense class="bg-white" v-model="edited[i].unit" />
+                <q-input
+                  outlined
+                  dense
+                  class="bg-white"
+                  v-model="edited[i].qty"
+                />
+                <q-input
+                  outlined
+                  dense
+                  class="bg-white"
+                  v-model="edited[i].unit"
+                />
               </div>
             </td>
             <td class="text-right">
@@ -168,28 +221,63 @@
               </div>
             </td>
             <td class="text-left">
-              <div v-if="!onEdit">{{ d.est_arrival | moment("DD MMM YYYY") }}</div>
+              <div v-if="!onEdit">
+                {{ d.est_arrival | moment("DD MMM YYYY") }}
+              </div>
               <div v-else class="row" style="width: 100px;">
-                <q-input outlined dense class="bg-white" v-model="edited[i].est_arrival"></q-input>
+                <q-input
+                  outlined
+                  dense
+                  class="bg-white"
+                  v-model="edited[i].est_arrival"
+                ></q-input>
               </div>
             </td>
             <td class="text-left bg-white" style="padding:0px;">
-              <q-option-group v-model="d.is_received" :options="isReceivedOption" />
+              <q-option-group
+                v-model="d.is_received"
+                :options="isReceivedOption"
+              />
             </td>
             <td class="text-left bg-white" style="padding:0px;">
               <q-option-group class v-model="d.coa" :options="is_COA" />
             </td>
             <td class="text-left" style="padding: 0px;">
-              <q-input square filled type="textarea" bg-color="white" v-model="d.note" dense />
+              <q-input
+                square
+                filled
+                type="textarea"
+                bg-color="white"
+                v-model="d.note"
+                dense
+              />
             </td>
           </tr>
         </tbody>
       </q-markup-table>
 
       <q-card-actions class="row justify-end">
-        <q-btn flat style="width: 100px;" color="grey" label="Kembali" @click="closeForm" />
-        <q-btn flat style="width: 100px;" color="secondary" label="Edit" @click="onEdit = true" />
-        <q-btn flat style="width: 100px;" color="primary" label="Simpan" @click="updateSPP()" />
+        <q-btn
+          flat
+          style="width: 100px;"
+          color="grey"
+          label="Kembali"
+          @click="closeForm"
+        />
+        <q-btn
+          flat
+          style="width: 100px;"
+          color="secondary"
+          label="Edit"
+          @click="onEdit = true"
+        />
+        <q-btn
+          flat
+          style="width: 100px;"
+          color="primary"
+          label="Simpan"
+          @click="updateSPP()"
+        />
       </q-card-actions>
     </q-card>
   </div>
@@ -212,7 +300,7 @@ export default {
         { label: "partial", value: "1" },
         { label: "full", value: "2" },
         { label: "suspended", value: "300" },
-        { label: "closed", value: "40000" }
+        { label: "closed", value: "40000" },
       ],
       isReceived: "not",
       receivedOption: [
@@ -221,11 +309,11 @@ export default {
         { label: "half received", value: "half" },
         { label: "not received", value: "not" },
         { label: "suspended", value: "suspended" },
-        { label: "closed", value: "closed" }
+        { label: "closed", value: "closed" },
       ],
       is_COA: [
         { label: "no", value: "0" },
-        { label: "yes", value: "1" }
+        { label: "yes", value: "1" },
       ],
       show_detail: false,
       filterOption: [],
@@ -239,7 +327,7 @@ export default {
         prefix: "Rp ",
         suffix: "",
         precision: 0,
-        masked: false
+        masked: false,
       },
       moneyUSD: {
         decimal: ",",
@@ -247,7 +335,7 @@ export default {
         prefix: "$ ",
         suffix: "",
         precision: 0,
-        masked: false
+        masked: false,
       },
       curr: "IDR",
       cost_ctg: [
@@ -258,18 +346,19 @@ export default {
         "Lab Pusat",
         "Lab Beton",
         "IT",
-        "Umum/HRD"
-      ]
+        "Umum/HRD",
+        "Maintenance",
+      ],
     };
   },
   mounted() {
     this.$http
       .get("/list_month_po", {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token-purchase")
-        }
+          Authorization: "Bearer " + localStorage.getItem("token-purchase"),
+        },
       })
-      .then(result => {
+      .then((result) => {
         this.filterOption = result.data;
         this.filter = "%25";
         this.filterOption.unshift({ value: "%25", label: "all" });
@@ -291,10 +380,10 @@ export default {
       this.$http
         .get("/po/" + this.isReceived + "/" + this.filter, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token-purchase")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token-purchase"),
+          },
         })
-        .then(result => {
+        .then((result) => {
           for (var i = 0; i < result.data.length; i++) {
             this.poList.push(result.data[i]);
           }
@@ -302,7 +391,7 @@ export default {
     },
     openForm(id) {
       this.edited = [];
-      this.$http.post("/podetail_byid", { po_id: id }, {}).then(result => {
+      this.$http.post("/podetail_byid", { po_id: id }, {}).then((result) => {
         this.selected = result.data;
         this.show_detail = true;
         for (var i = 0; i < this.selected.length; i++) {
@@ -312,7 +401,7 @@ export default {
             unit: this.selected[i].unit,
             price: this.selected[i].price,
             currency: this.selected[i].currency,
-            est_arrival: this.selected[i].est_arrival
+            est_arrival: this.selected[i].est_arrival,
           });
         }
       });
@@ -333,7 +422,7 @@ export default {
           qty: this.edited[i].qty,
           unit: this.edited[i].unit,
           price: this.edited[i].price,
-          est_arrival: this.edited[i].est_arrival
+          est_arrival: this.edited[i].est_arrival,
         };
         var note_add = "";
         if (this.selected[i].item != this.edited[i].item) {
@@ -373,12 +462,12 @@ export default {
 
         await this.$http
           .put("/update_spp/" + this.selected[i].spp_id, data, {})
-          .then(result => {});
+          .then((result) => {});
 
         let history = {
           spp_id: this.selected[i].spp_id,
           status: "process",
-          content: this.selected[i].note + note_add
+          content: this.selected[i].note + note_add,
         };
         if (this.selected[i].is_received == 2) {
           history.status = "done";
@@ -389,7 +478,7 @@ export default {
         if (this.selected[i].is_received == 40000) {
           history.status = "closed";
         }
-        this.$http.post("/new_history", history, {}).then(result => {});
+        this.$http.post("/new_history", history, {}).then((result) => {});
         var info = "";
         if (this.selected[i].is_received == 2)
           info = "barang sudah diterima penuh";
@@ -406,13 +495,13 @@ export default {
           notif: "Konfirmasi Penerimaan barang",
           note: info,
           spp_id: this.selected[i].spp_id,
-          reference_page: "/spp/list"
+          reference_page: "/spp/list",
         };
         if (info != 0) {
-          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
           notifikasi.to_id = 1; // Notif ke Manager purchasing
-          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
         }
       }
       this.show_detail = false;
@@ -427,7 +516,7 @@ export default {
           style: "currency",
           currency: "IDR",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 0
+          minimumFractionDigits: 0,
         });
         return formatter.format(price);
       } else if (cur == "USD") {
@@ -435,7 +524,7 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2
+          minimumFractionDigits: 2,
         });
         return formatter.format(price);
       }
@@ -448,7 +537,7 @@ export default {
         this.money.precision = 2;
         this.money.prefix = "$ ";
       }
-    }
+    },
   },
   computed: {
     sortedListPO() {
@@ -469,8 +558,8 @@ export default {
         console.log("else");
         return this.poList;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
