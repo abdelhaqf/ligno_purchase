@@ -66,6 +66,17 @@
             <th class="text-left">Vendor</th>
             <th class="text-left">Items</th>
             <th class="text-left">
+              Cost Category
+
+              <q-btn
+                flat
+                dense
+                icon="keyboard_arrow_up"
+                size="xs"
+                @click="sortBy = 'cost_category'"
+              ></q-btn>
+            </th>
+            <th class="text-left">
               Est. Arrival
               <q-btn
                 flat
@@ -107,6 +118,7 @@
               {{ d.item | truncate(20)
               }}{{ d.spp_count > 1 ? " [+" + (d.spp_count - 1) + "]" : "" }}
             </td>
+            <td>{{ d.cost_category }}</td>
             <td class="text-left col">
               {{ d.est_arrival | moment("DD MMM YYYY") }}
             </td>
@@ -553,6 +565,12 @@ export default {
           let x = new Date(a.po_date);
           let y = new Date(b.po_date);
           return y - x;
+        });
+      } else if (this.sortBy == "cost_category") {
+        return temp.sort((a, b) => {
+          let x = a.cost_category;
+          let y = b.cost_category;
+          return x.localeCompare(y);
         });
       } else {
         console.log("else");
