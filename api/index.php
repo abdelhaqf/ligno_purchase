@@ -5,7 +5,13 @@ use \Firebase\JWT\JWT;
 
 function getLink()
 {
-  $link = mysqli_connect('localhost', 'root', '', 'ligno_purchase') or die('connection failed!');
+  $is_local = true;
+  $link = null;
+  if ($is_local) {
+    $link = mysqli_connect('localhost', 'lignosof_root', 'lignosc313', 'lignosof_lignoapp_purchase', 3307) or die('connection failed!');
+  } else {
+    $link = mysqli_connect('localhost', 'root', '', 'ligno_purchase') or die('connection failed!');
+  }
   return $link;
 }
 
