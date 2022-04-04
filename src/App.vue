@@ -17,8 +17,12 @@
           </q-avatar>
         </q-item-section>
         <q-item-section v-if="$store.state.currentUser">
-          <q-item-label class="text-subtitle2">{{ $store.state.currentUser.username | capitalize }}</q-item-label>
-          <q-item-label caption>{{ $store.state.currentUser.dept }}</q-item-label>
+          <q-item-label class="text-subtitle2">{{
+            $store.state.currentUser.username | capitalize
+          }}</q-item-label>
+          <q-item-label caption>{{
+            $store.state.currentUser.dept
+          }}</q-item-label>
         </q-item-section>
         <q-item-section class="relative-position">
           <q-btn
@@ -35,17 +39,31 @@
             style="top:5px;"
             class="absolute-center text-white"
             color="orange-4"
-          >{{count_notif>20?'20+':count_notif}}</q-chip>
+            >{{ count_notif > 20 ? "20+" : count_notif }}</q-chip
+          >
         </q-item-section>
         <q-item-section side>
           <q-item-label caption>
-            <q-btn flat label="logout" size="sm" color="negative" @click="logout" />
+            <q-btn
+              flat
+              label="logout"
+              size="sm"
+              color="negative"
+              @click="logout"
+            />
           </q-item-label>
         </q-item-section>
       </q-item>
       <q-separator />
       <!-- menus -->
-      <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link" @click="reloadData">
+      <q-item
+        clickable
+        v-ripple
+        v-for="m in menu"
+        :key="m.title"
+        :to="m.link"
+        @click="reloadData"
+      >
         <q-item-section avatar>
           <q-icon :name="m.icon" color="indigo-2" />
         </q-item-section>
@@ -53,13 +71,15 @@
           <q-item-label class="row items-center">
             <div>{{ m.title }}</div>
             <div style="height: 30px; padding: 0 5px;">
-              <q-badge color="orange-4" v-if="m.count > 0">{{ m.count }}</q-badge>
+              <q-badge color="orange-4" v-if="m.count > 0">{{
+                m.count
+              }}</q-badge>
             </div>
           </q-item-label>
         </q-item-section>
       </q-item>
       <q-separator />
-      <q-expansion-item label="Info Kurs" header-class="text-h6">
+      <!-- <q-expansion-item label="Info Kurs" header-class="text-h6">
         <q-card class="relative-position bg-grey-2" flat>
           <q-card-section>
             <transition
@@ -105,7 +125,7 @@
             <q-spinner-gears size="50px" color="primary" />
           </q-inner-loading>
         </q-card>
-      </q-expansion-item>
+      </q-expansion-item> -->
     </q-drawer>
 
     <q-page-container>
@@ -115,7 +135,11 @@
         :bar-style="barStyle"
         style="height: 100vh;"
       >
-        <router-view @isLogin="toggleLogin" @updateKurs="updateKurs" />
+        <router-view
+          v-if="$route.name == 'Login' || $store.state.currentUser"
+          @isLogin="toggleLogin"
+          @updateKurs="updateKurs"
+        />
       </q-scroll-area>
     </q-page-container>
   </q-layout>
@@ -141,7 +165,7 @@ export default {
         borderRadius: "5px",
         backgroundColor: "#027be3",
         width: "5px",
-        opacity: 0.75
+        opacity: 0.75,
       },
 
       barStyle: {
@@ -149,25 +173,28 @@ export default {
         borderRadius: "9px",
         backgroundColor: "#027be3",
         width: "9px",
-        opacity: 0.2
-      }
+        opacity: 0.2,
+      },
     };
   },
-  mounted() {
+  async mounted() {
     this.$root.$on("refresh", async () => {
       // this.menu = []
       await this.fetchData();
     });
 
-    this.$root.$on("notifikasi", async () => {
-      this.$http
-        .get("/count_notif/" + this.$store.state.currentUser.user_id, {})
-        .then(result => {
-          this.count_notif = result.data.count;
-        });
-    });
+    if (localStorage.getItem("token-purchase") != "undefined") {
+      this.$root.$on("notifikasi", async () => {
+        this.$http
+          .get("/count_notif/" + this.$store.state.currentUser.user_id, {})
+          .then((result) => {
+            this.count_notif = result.data.count;
+          });
+      });
+      let token = localStorage.getItem("token-purchase") != "undefined";
 
-    this.preRun();
+      await this.preRun();
+    }
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
@@ -180,8 +207,8 @@ export default {
             this.$store.state.currentUser.is_purch_manager,
           {}
         )
-        .then(result => {
-          this.menu.forEach(x => {
+        .then((result) => {
+          this.menu.forEach((x) => {
             if (x.link == "/spp/approval")
               this.$set(x, "count", result.data.count_approve);
             if (x.link == "/spp/approval-pm")
@@ -211,18 +238,19 @@ export default {
     },
 
     fetchData() {
+      if (this.$store.state.currentUser == null) return;
       this.menu = [];
-      if (this.$store.state.currentUser.is_purchasing == 1) {
+      if (this.$store.state.currentUser?.is_purchasing == 1) {
         this.menu.push({
           icon: "dashboard",
           title: "Home",
-          link: "/dashboard"
+          link: "/dashboard",
         });
       }
       this.menu.push({
         icon: "create",
         title: "Buat SPP",
-        link: "/spp/create"
+        link: "/spp/create",
       });
 
       this.$http
@@ -233,19 +261,19 @@ export default {
             this.$store.state.currentUser.is_purch_manager,
           {}
         )
-        .then(result => {
+        .then((result) => {
           this.count = result.data;
           this.menu.push({
             icon: "inbox",
             title: "SPP Anda",
-            link: "/spp/list"
+            link: "/spp/list",
           });
           if (this.$store.state.currentUser.is_manager == "1") {
             this.menu.push({
               icon: "group",
               title: "Persetujuan Manager",
               link: "/spp/approval",
-              count: result.data.count_approve
+              count: result.data.count_approve,
             });
           }
           if (this.$store.state.currentUser.is_purch_manager == "1") {
@@ -253,7 +281,7 @@ export default {
               icon: "how_to_reg",
               title: "Persetujuan Man.Purchasing",
               link: "/spp/approval-pm",
-              count: result.data.count_approvePM
+              count: result.data.count_approvePM,
             });
           }
           if (this.$store.state.currentUser.is_purchasing == "1") {
@@ -261,25 +289,25 @@ export default {
               icon: "beenhere",
               title: "SPP Disetujui",
               link: "/spp/approved",
-              count: result.data.count_spp
+              count: result.data.count_spp,
             });
             this.menu.push({
               icon: "ballot",
               title: "PO",
               link: "/po/list",
-              count: result.data.count_po
+              count: result.data.count_po,
             });
             this.menu.push({
               icon: "bar_chart",
               title: "List Harga",
-              link: "/price/list"
+              link: "/price/list",
             });
           }
         });
 
       this.$http
         .get("/count_notif/" + this.$store.state.currentUser.user_id, {})
-        .then(result => {
+        .then((result) => {
           this.count_notif = result.data.count;
         });
     },
@@ -288,21 +316,21 @@ export default {
       if (this.isLogin == false) this.preRun();
     },
     updateKurs() {
-      this.isLoading = true;
-      console.log("trying to update kurs...");
-      axios.get(process.env.VUE_APP_BASE_URL + "/../kurs_api").then(result => {
-        this.kurs = result.data;
-        this.isLoading = false;
-        this.showKurs = true;
-        console.log(this.kurs);
-        console.log(this.kurs.Jsondata);
-      });
+      // this.isLoading = true;
+      // console.log("trying to update kurs...");
+      // axios.get(process.env.VUE_APP_BASE_URL + "/../kurs_api").then(result => {
+      //   this.kurs = result.data;
+      //   this.isLoading = false;
+      //   this.showKurs = true;
+      //   console.log(this.kurs);
+      //   console.log(this.kurs.Jsondata);
+      // });
     },
     logout() {
       localStorage.removeItem("token-purchase");
       this.$router.push("/login");
-    }
+    },
   },
-  computed: mapState(["currentUser"])
+  computed: mapState(["currentUser"]),
 };
 </script>

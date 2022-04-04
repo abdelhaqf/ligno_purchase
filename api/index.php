@@ -46,7 +46,7 @@ Flight::route('GET /spp-approval', function () {
     ";
   runQuery($q);
 });
-Flight::route('GET /spp_approved/@id/@ispurch', function ($id, $ispurch) {
+Flight::route('GET /spp_approved/@id/@ispurch/@order', function ($id, $ispurch,$order) {
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
@@ -54,7 +54,7 @@ Flight::route('GET /spp_approved/@id/@ispurch', function ($id, $ispurch) {
                 AND (spp.handle_by = $id OR $ispurch = 1)
                 AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1 
           
-          ORDER BY spp.spp_id DESC
+          ORDER BY spp.$order
     ";
   runQuery($q);
 });
@@ -63,9 +63,30 @@ Flight::route('GET /spp_byid/@id', function ($id) {
   runQuery2($q);
 });
 
-Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
+Flight::route('POST /po', function () {
   $is_purch_manager = checkJWT()->data->is_purch_manager;
   $user_id = checkJWT()->data->user_id;
+
+  $data = Flight::request()->data;
+  $is_rcv = $data["is_rcv"];
+  $filter = $data["filter"];
+  $vendor = $data["vendor"];
+  $category = $data["cat"];
+
+  $w_src = "";
+  if($is_rcv != ""){
+    $w_src = "AND is_received LIKE '%$is_rcv%'";
+  }
+
+  $w_cat = "";
+  if($category != ""){
+    $w_cat = "AND cost_category = '$category'";
+  }
+
+  $w_vendor = "";
+  if($vendor != ""){
+    $w_vendor = "AND vendor = '$vendor'";
+  }
 
   $q = " SELECT * FROM (
     SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, spp.est_arrival, usr.name AS 'handler_name', 
@@ -79,10 +100,10 @@ Flight::route('GET /po/@is_rcv/@filter', function ($is_rcv, $filter) {
             FROM po INNER JOIN spp on po.po_id = spp.po_id 
             INNER JOIN `user` usr on usr.user_id = po.user_id
             GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-          WHERE is_received LIKE '%$is_rcv%' 
-          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
+          WHERE 1 = 1 $w_src $w_cat $w_vendor
+          HAVING CONCAT(YEAR(po_date),'-',MONTH(po_date)) LIKE '%$filter%'
           ";
-
+  //  echo $q;
   runQuery($q);
 });
 Flight::route('GET /po_byid/@id', function ($id) {
@@ -118,6 +139,14 @@ Flight::route('GET /list_item', function () {
           ORDER BY item ASC";
   runQuery($q);
 });
+
+Flight::route('GET /list_vendor', function () {
+  $q = "SELECT DISTINCT vendor as 'value', vendor as 'label' FROM po
+          WHERE po_id IS NOT NULL AND vendor <> ''
+          ORDER BY vendor ASC";
+  runQuery($q);
+});
+
 Flight::route('GET /list_user', function () {
   $q = "SELECT DISTINCT `user_id` as 'value', `name` as 'label' FROM user
           WHERE is_purchasing = 1
@@ -125,10 +154,22 @@ Flight::route('GET /list_user', function () {
   runQuery($q);
 });
 
-Flight::route('GET /pricelist/@item', function ($item) {
+Flight::route('GET /pricelist/@item/@vendor', function ($item,$vendor) {
+  $whereClause = "";
+  if($item != "null" && $vendor != "null") {
+    $whereClause = "WHERE spp.item like '%$item%' AND po.vendor like '%$vendor%'";
+  }else if($item != "null") {
+    $whereClause = "WHERE spp.item like '%$item%' ";
+  }else if($vendor != "null") {
+    $whereClause = "WHERE  po.vendor like '%$vendor%'";
+  }
+  else {
+    $whereClause = "WHERE 0 = 1";
+
+  }
   $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor 
           FROM spp INNER JOIN po ON po.po_id = spp.po_id
-          WHERE spp.item like '%$item%'
+          $whereClause
           ";
   runQuery($q);
 });

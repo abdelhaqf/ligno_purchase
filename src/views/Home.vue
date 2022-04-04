@@ -20,27 +20,48 @@
 
     <div class="row q-pa-md q-gutter-md justify-between">
       <q-card flat bordered class="summary-card">
-        <q-card-section :class="classSummary">{{summary.count_spp}}</q-card-section>
-        <q-card-section class="q-pt-none text-caption">SPP Diproses</q-card-section>
+        <q-card-section :class="classSummary">{{
+          summary.count_spp
+        }}</q-card-section>
+        <q-card-section class="q-pt-none text-caption"
+          >SPP Diproses</q-card-section
+        >
       </q-card>
       <q-card flat bordered class="summary-card">
-        <q-card-section :class="classSummary">{{summary.on_process}}</q-card-section>
-        <q-card-section class="q-pt-none text-caption">SPP Dalam Persetujuan</q-card-section>
+        <q-card-section :class="classSummary">{{
+          summary.on_process
+        }}</q-card-section>
+        <q-card-section class="q-pt-none text-caption"
+          >SPP Dalam Persetujuan</q-card-section
+        >
       </q-card>
       <q-card flat bordered class="summary-card">
-        <q-card-section :class="classSummary">{{setCurrency(summary.value_idr, 'IDR')}}</q-card-section>
-        <q-card-section class="q-pt-none text-caption">Pembelian (IDR)</q-card-section>
+        <q-card-section :class="classSummary">{{
+          setCurrency(summary.value_idr, "IDR")
+        }}</q-card-section>
+        <q-card-section class="q-pt-none text-caption"
+          >Pembelian (IDR)</q-card-section
+        >
       </q-card>
       <q-card flat bordered class="summary-card">
-        <q-card-section :class="classSummary">{{setCurrency(summary.value_usd, 'USD')}}</q-card-section>
-        <q-card-section class="q-pt-none text-caption">Pembelian (USD)</q-card-section>
+        <q-card-section :class="classSummary">{{
+          setCurrency(summary.value_usd, "USD")
+        }}</q-card-section>
+        <q-card-section class="q-pt-none text-caption"
+          >Pembelian (USD)</q-card-section
+        >
       </q-card>
     </div>
 
     <div class="row q-pa-md q-gutter-md">
       <q-card flat bordered class="col">
         <q-card-section>
-          <v-chart :options="option50" theme="default" :autoresize="true" />
+          <v-chart
+            :options="option50"
+            theme="default"
+            :autoresize="true"
+            @click="handleClick50"
+          />
         </q-card-section>
       </q-card>
     </div>
@@ -48,7 +69,12 @@
     <div class="row q-pa-md q-gutter-md">
       <q-card flat bordered class="col">
         <q-card-section>
-          <v-chart :options="option80" theme="default" :autoresize="true" />
+          <v-chart
+            :options="option80"
+            theme="default"
+            :autoresize="true"
+            @click="handleClick80"
+          />
         </q-card-section>
       </q-card>
     </div>
@@ -56,7 +82,13 @@
     <div class="row q-pa-md q-gutter-md">
       <q-card flat bordered class="col">
         <q-card-section>
-          <v-chart :options="optionBydept" theme="default" :autoresize="true" />
+          <v-chart
+            ref="chart1"
+            :options="optionBydept"
+            theme="default"
+            :autoresize="true"
+            @click="handleClickByDept"
+          />
         </q-card-section>
       </q-card>
     </div>
@@ -65,6 +97,7 @@
 
 <script>
 import ECharts from "vue-echarts";
+import * as echart from "echarts";
 import "echarts/lib/chart/pie";
 import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
@@ -78,19 +111,20 @@ const colorPalette = [
   "#9C27B0",
   "#C10015",
   "#31CCEC",
-  "#F2C037"
+  "#F2C037",
 ];
 
 export default {
   components: {
-    "v-chart": ECharts
+    "v-chart": ECharts,
   },
   data() {
     return {
+      myChart: null,
       classSummary: "text-h4 text-center text-blue-5 text-weight-bold",
       showOption: [
         { value: new Date().getFullYear(), label: "Tahun Ini" },
-        { value: new Date().getMonth() + 1, label: "Bulan Ini" }
+        { value: new Date().getMonth() + 1, label: "Bulan Ini" },
       ],
       selectedShow: new Date().getFullYear(),
       summary: {},
@@ -108,7 +142,7 @@ export default {
       option50: {
         title: {
           text: "DATA 50 % PENGELUARAN BELANJA",
-          left: "center"
+          left: "center",
         },
         tooltip: {
           trigger: "item",
@@ -122,19 +156,19 @@ export default {
               param.percent +
               "%)"
             );
-          }
+          },
         },
         emphasis: {
           label: {
             show: true,
             fontSize: "20",
-            fontWeight: "bold"
-          }
+            fontWeight: "bold",
+          },
         },
         legend: {
           orient: "horizontal",
           bottom: 10,
-          data: []
+          data: [],
         },
         series: [
           {
@@ -147,17 +181,17 @@ export default {
               itemStyle: {
                 shadowBlur: 10,
                 shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)"
-              }
-            }
-          }
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
         ],
-        color: colorPalette
+        color: colorPalette,
       },
       option80: {
         title: {
           text: "DATA 80 % PENGELUARAN BELANJA",
-          left: "center"
+          left: "center",
         },
         tooltip: {
           trigger: "item",
@@ -171,14 +205,14 @@ export default {
               param.percent +
               "%)"
             );
-          }
+          },
         },
         emphasis: {
           label: {
             show: true,
             fontSize: "20",
-            fontWeight: "bold"
-          }
+            fontWeight: "bold",
+          },
         },
         series: [
           {
@@ -191,18 +225,19 @@ export default {
               itemStyle: {
                 shadowBlur: 10,
                 shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)"
-              }
-            }
-          }
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
         ],
-        color: colorPalette
+        color: colorPalette,
       },
       optionBydept: {
         title: {
           text: "Data Belanja Per Departemen",
-          left: "center"
+          left: "center",
         },
+
         tooltip: {
           trigger: "item",
           // formatter: "{b}<br/>Rp {c} ({d}%)",
@@ -215,14 +250,14 @@ export default {
               param.percent +
               "%)"
             );
-          }
+          },
         },
         emphasis: {
           label: {
             show: true,
             fontSize: "20",
-            fontWeight: "bold"
-          }
+            fontWeight: "bold",
+          },
         },
         series: [
           {
@@ -235,13 +270,13 @@ export default {
               itemStyle: {
                 shadowBlur: 10,
                 shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)"
-              }
-            }
-          }
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
         ],
-        color: colorPalette
-      }
+        color: colorPalette,
+      },
     };
   },
   mounted() {
@@ -250,11 +285,49 @@ export default {
       this.$store.state.currentUser.username == "ceo"
     ) {
       this.fetchData();
+      // this.myChart = echart.init();
+
+      // this.myChart.on("click", (params) => {
+      //   console.log(params);
+      // });
+      // console.log(this.$refs.chart1);
+      // console.log(ECharts);
+      // ECharts.refresh();
     } else {
       this.$router.push("/spp/create");
     }
   },
   methods: {
+    handleClick50(...args) {
+      let temp = args[0];
+      let name = temp.name.split("/");
+      if (name.length > 1) {
+        name = name.join("%2F");
+      } else {
+        name = name.join("");
+      }
+      this.$router.push(`/po/list/null/${name}/null`);
+    },
+    handleClick80(...args) {
+      let temp = args[0];
+      let name = temp.name.split("/");
+      if (name.length > 1) {
+        name = name.join("%2F");
+      } else {
+        name = name.join("");
+      }
+      this.$router.push(`/po/list/null/${name}/null`);
+    },
+    handleClickByDept(...args) {
+      let temp = args[0];
+      let name = temp.name.split("/");
+      if (name.length > 1) {
+        name = name.join("%2F");
+      } else {
+        name = name.join("");
+      }
+      this.$router.push(`/po/list/null/null/${name}`);
+    },
     fetchData() {
       this.report_50 = [];
       this.option50.series[0].data = [];
@@ -271,16 +344,16 @@ export default {
       }
     },
     showByYear(val) {
-      this.$http.get("/yearly_summary", {}).then(result => {
+      this.$http.get("/yearly_summary", {}).then((result) => {
         this.summary = result.data;
       });
 
-      this.$http.get("/yearly_total_price", {}).then(result => {
+      this.$http.get("/yearly_total_price", {}).then((result) => {
         this.totalPrice = parseInt(result.data.total);
         var margin_80 = this.totalPrice * 0.8;
         var margin_50 = this.totalPrice * 0.5;
 
-        this.$http.get("/yearly_data_report", {}).then(result => {
+        this.$http.get("/yearly_data_report", {}).then((result) => {
           this.report = result.data;
           this.total_80 = 0;
           this.total_50 = 0;
@@ -290,7 +363,7 @@ export default {
               this.report_80.push(result.data[i]);
               this.option80.series[0].data.push({
                 value: result.data[i].price,
-                name: result.data[i].vendor
+                name: result.data[i].vendor,
               });
             }
 
@@ -299,7 +372,7 @@ export default {
               this.report_50.push(result.data[i]);
               this.option50.series[0].data.push({
                 value: result.data[i].price,
-                name: result.data[i].vendor
+                name: result.data[i].vendor,
               });
               this.option50.legend.data.push(result.data[i].vendor);
             }
@@ -318,28 +391,28 @@ export default {
             " )";
         });
 
-        this.$http.get("/yearly_dept_report", {}).then(resp => {
+        this.$http.get("/yearly_dept_report", {}).then((resp) => {
           for (var i = 0; i < resp.data.length; i++) {
             this.report_bydept.push(resp.data[i]);
             this.optionBydept.series[0].data.push({
               value: resp.data[i].price,
-              name: resp.data[i].cost_category.toUpperCase()
+              name: resp.data[i].cost_category.toUpperCase(),
             });
           }
         });
       });
     },
     showByMonth(val) {
-      this.$http.get("/monthly_summary", {}).then(result => {
+      this.$http.get("/monthly_summary", {}).then((result) => {
         this.summary = result.data;
       });
 
-      this.$http.get("/monthly_total_price", {}).then(result => {
+      this.$http.get("/monthly_total_price", {}).then((result) => {
         this.totalPrice = parseInt(result.data.total);
         var margin_80 = this.totalPrice * 0.8;
         var margin_50 = this.totalPrice * 0.5;
 
-        this.$http.get("/monthly_data_report", {}).then(result => {
+        this.$http.get("/monthly_data_report", {}).then((result) => {
           this.report = result.data;
           this.total_80 = 0;
           this.total_50 = 0;
@@ -349,7 +422,7 @@ export default {
               this.report_80.push(result.data[i]);
               this.option80.series[0].data.push({
                 value: result.data[i].price,
-                name: result.data[i].vendor
+                name: result.data[i].vendor,
               });
             }
 
@@ -358,7 +431,7 @@ export default {
               this.report_50.push(result.data[i]);
               this.option50.series[0].data.push({
                 value: result.data[i].price,
-                name: result.data[i].vendor
+                name: result.data[i].vendor,
               });
               this.option50.legend.data.push(result.data[i].vendor);
             }
@@ -384,7 +457,7 @@ export default {
           style: "currency",
           currency: "IDR",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 0
+          minimumFractionDigits: 0,
         });
         return formatter.format(price);
       } else if (cur == "USD") {
@@ -392,12 +465,12 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2
+          minimumFractionDigits: 2,
         });
         return formatter.format(price);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

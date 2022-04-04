@@ -25,24 +25,24 @@ const routes = [
     component: () => import("../views/SPPList.vue"),
   },
   {
-    path: '/spp/approval',
-    name: 'SPPApprove',
-    component: () => import('../views/SPPApproval.vue')
+    path: "/spp/approval",
+    name: "SPPApprove",
+    component: () => import("../views/SPPApproval.vue"),
   },
   {
-    path: '/spp/approval-pm',
-    name: 'SPPApprovePM',
-    component: () => import('../views/SPPApprovalPM.vue')
+    path: "/spp/approval-pm",
+    name: "SPPApprovePM",
+    component: () => import("../views/SPPApprovalPM.vue"),
   },
   {
-    path: '/spp/approved',
-    name: 'SPPApproved',
-    component: () => import('../views/SPPApproved.vue')
+    path: "/spp/approved",
+    name: "SPPApproved",
+    component: () => import("../views/SPPApproved.vue"),
   },
   {
-    path: '/po/list',
-    name: 'POList',
-    component: () => import('../views/POList.vue')
+    path: "/po/list/:status?/:vendor?/:category?",
+    name: "POList",
+    component: () => import("../views/POList.vue"),
   },
   {
     path: "/price/list",
@@ -71,14 +71,16 @@ router.beforeEach((to, from, next) => {
     } else {
       next();
     }
+  } else {
+    next();
   }
-  if (to.name == "Login") {
-    if (localStorage.getItem("token-purchase")) {
-      next({ name: "Home" });
-    } else {
-      next();
-    }
-  }
+  // if (to.name == "Login") {
+  //   if (localStorage.getItem("token-purchase")) {
+  //     next({ name: "Home" });
+  //   } else {
+  //     next();
+  //   }
+  // }
 });
 
 export default router;

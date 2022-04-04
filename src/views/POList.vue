@@ -7,28 +7,12 @@
       v-if="!show_detail"
     >
       <q-card-section class="q-pa-md q-gutter-md row justify-between">
-        <q-select
-          outlined
-          dense
-          v-model="isReceived"
-          :options="receivedOption"
-          map-options
-          emit-value
-          @input="fetchData"
-        >
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-              <q-item-section>
-                <q-badge
-                  :color="getLabelColor(scope.opt.label)"
-                  text-color="white"
-                  dense
-                  >{{ scope.opt.label }}</q-badge
-                >
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
+        <q-btn
+          unelevated
+          color="primary"
+          @click="dialogFilter = true"
+          label="FILTER"
+        ></q-btn>
         <q-select
           outlined
           dense
@@ -90,7 +74,11 @@
           </tr>
         </thead>
         <tbody v-if="poList.length" class="bg-blue-grey-1">
-          <tr v-for="d in sortedListPO" :key="d.id">
+          <tr
+            v-for="d in sortedListPO"
+            :key="d.id"
+            :class="{ 'bg-red-2': isPastEstimation(d.est_arrival) }"
+          >
             <td style="padding: 0px;">
               <q-btn
                 color="primary"
@@ -186,7 +174,7 @@
             <th class="text-right">value</th>
             <th class="text-left">Est Arrival</th>
             <th class="text-left">Received</th>
-            <th class="text-left">COA</th>
+            <!-- <th class="text-left">COA</th> -->
             <th class="text-left">Note</th>
           </tr>
         </thead>
@@ -251,9 +239,9 @@
                 :options="isReceivedOption"
               />
             </td>
-            <td class="text-left bg-white" style="padding:0px;">
+            <!-- <td class="text-left bg-white" style="padding:0px;">
               <q-option-group class v-model="d.coa" :options="is_COA" />
-            </td>
+            </td> -->
             <td class="text-left" style="padding: 0px;">
               <q-input
                 square
@@ -292,6 +280,91 @@
         />
       </q-card-actions>
     </q-card>
+    <q-dialog v-model="dialogFilter" position="bottom">
+      <q-card style="width: 300px">
+        <q-card-section class="row justify-between items-center">
+          <div class="text-h6">Filter</div>
+        </q-card-section>
+        <q-card-section class="q-gutter-y-sm">
+          <q-select
+            label="Status"
+            outlined
+            v-model="isReceived"
+            :options="receivedOption"
+            map-options
+            emit-value
+            @input="
+              replaceRoute();
+              fetchData();
+            "
+          >
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+                <q-item-section>
+                  <q-badge
+                    :color="getLabelColor(scope.opt.label)"
+                    text-color="white"
+                    dense
+                    >{{ scope.opt.label }}</q-badge
+                  >
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+          <q-select
+            label="Cost Category"
+            outlined
+            v-model="selCat"
+            :options="cost_ctg"
+            @input="
+              replaceRoute();
+              fetchData();
+            "
+          ></q-select>
+          <q-select
+            outlined
+            v-model="selVendor"
+            map-options
+            emit-value
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="0"
+            :options="filVendor"
+            @filter="filterVD"
+            label="Nama Vendor"
+            class="col-3"
+            @input="
+              replaceRoute();
+              fetchData();
+            "
+          >
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section class="text-grey">No results</q-item-section>
+              </q-item>
+            </template>
+            <template v-slot:append>
+              <q-btn
+                v-if="selectVendor != null"
+                icon="close"
+                dense
+                @click="
+                  selectVendor = null;
+                  fetchData();
+                  replaceRoute();
+                "
+                flat
+                size="sm"
+              ></q-btn>
+            </template>
+          </q-select>
+        </q-card-section>
+        <q-card-section class="row justify-end">
+          <q-btn label="close" color="primary" v-close-popup></q-btn>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -303,6 +376,8 @@ export default {
   components: { Money },
   data() {
     return {
+      dialogFilter: false,
+
       sortBy: "",
       poList: [],
       slcPO: null,
@@ -361,10 +436,28 @@ export default {
         "Umum/HRD",
         "Maintenance",
       ],
+
+      optVendor: [],
+      filVendor: [],
+      selVendor: null,
+
+      selCat: null,
     };
   },
-  mounted() {
-    this.$http
+  async mounted() {
+    if (this.$route.params?.category != "null") {
+      this.selCat = this.$route.params?.category;
+    }
+
+    if (this.$route.params?.vendor != "null") {
+      this.selVendor = this.$route.params?.vendor;
+    }
+
+    if (this.$route.params?.status != "null") {
+      this.is_received = this.$route.params?.status;
+    }
+
+    await this.$http
       .get("/list_month_po", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token-purchase"),
@@ -372,13 +465,50 @@ export default {
       })
       .then((result) => {
         this.filterOption = result.data;
-        this.filter = "%25";
-        this.filterOption.unshift({ value: "%25", label: "all" });
-
-        this.fetchData();
+        this.filter = "%";
+        this.filterOption.unshift({ value: "%", label: "all" });
       });
+
+    await this.$http
+      .get(`/list_vendor`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token-purchase"),
+        },
+      })
+      .then((resp) => {
+        this.optVendor = resp.data;
+      });
+
+    await this.fetchData();
   },
   methods: {
+    filterVD(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filVendor = this.optVendor.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    replaceRoute() {
+      let the_cat = null;
+      if (this.selCat) {
+        the_cat = this.selCat.split("/");
+        if (the_cat.length > 1) {
+          the_cat = the_cat.join("%2F");
+        } else {
+          the_cat = the_cat.join("");
+        }
+      }
+
+      this.$router.replace({
+        path: `/po/list/${this.isReceived}/${this.selVendor}/${the_cat}`,
+      });
+    },
+    isPastEstimation(est_date) {
+      if (moment().isAfter(moment(est_date))) return true;
+      return false;
+    },
     getLabelColor(label) {
       if (label == "fully received") return "positive";
       else if (label == "half received") return "warning";
@@ -387,10 +517,18 @@ export default {
       else if (label == "closed") return "dark";
       else return "primary";
     },
-    fetchData() {
+    async fetchData() {
       this.poList = [];
-      this.$http
-        .get("/po/" + this.isReceived + "/" + this.filter, {
+
+      let payload = {
+        is_rcv: this.isReceived,
+        filter: this.filter,
+        vendor: this.selVendor,
+        cat: this.selCat,
+      };
+
+      await this.$http
+        .post(`/po`, payload, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token-purchase"),
           },
@@ -500,7 +638,6 @@ export default {
           info = "PO sementara di suspend";
         if (this.selected[i].is_received == 40000)
           info = "PO dinyatakan closed";
-        console.log(this.selected[i].is_received);
         var notifikasi = {
           from_id: this.$store.state.currentUser.user_id,
           to_id: this.selected[i].user_id,
@@ -573,7 +710,6 @@ export default {
           return x.localeCompare(y);
         });
       } else {
-        console.log("else");
         return this.poList;
       }
     },
