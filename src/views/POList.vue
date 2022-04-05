@@ -320,7 +320,22 @@
               replaceRoute();
               fetchData();
             "
-          ></q-select>
+          >
+            <template v-slot:append>
+              <q-btn
+                v-if="selCat != null"
+                icon="close"
+                dense
+                @click="
+                  selCat = null;
+                  fetchData();
+                  replaceRoute();
+                "
+                flat
+                size="sm"
+              ></q-btn>
+            </template>
+          </q-select>
           <q-select
             outlined
             v-model="selVendor"
@@ -346,11 +361,11 @@
             </template>
             <template v-slot:append>
               <q-btn
-                v-if="selectVendor != null"
+                v-if="selVendor != null"
                 icon="close"
                 dense
                 @click="
-                  selectVendor = null;
+                  selVendor = null;
                   fetchData();
                   replaceRoute();
                 "
@@ -391,7 +406,7 @@ export default {
       ],
       isReceived: "not",
       receivedOption: [
-        { label: "show all", value: "%25" },
+        { label: "show all", value: null },
         { label: "fully received", value: "fully" },
         { label: "half received", value: "half" },
         { label: "not received", value: "not" },
@@ -426,6 +441,7 @@ export default {
       },
       curr: "IDR",
       cost_ctg: [
+        "BELUM DIKATEGORIKAN",
         "Marketing/Sales",
         "RnD",
         "Produksi/Gudang",

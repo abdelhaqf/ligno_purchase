@@ -80,7 +80,11 @@ Flight::route('POST /po', function () {
 
   $w_cat = "";
   if($category != ""){
-    $w_cat = "AND cost_category = '$category'";
+    if($category == "BELUM DIKATEGORIKAN"){
+      $w_cat = "AND cost_category = ''";
+    }else{
+      $w_cat = "AND cost_category = '$category'";
+    }
   }
 
   $w_vendor = "";
