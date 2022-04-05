@@ -40,7 +40,7 @@ const routes = [
     component: () => import("../views/SPPApproved.vue"),
   },
   {
-    path: "/po/list/:status?/:vendor?/:category?",
+    path: "/po/list/:status/:vendor/:category",
     name: "POList",
     component: () => import("../views/POList.vue"),
   },

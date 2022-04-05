@@ -289,7 +289,7 @@
           <q-select
             label="Status"
             outlined
-            v-model="isReceived"
+            v-model="is_received"
             :options="receivedOption"
             map-options
             emit-value
@@ -328,8 +328,8 @@
                 dense
                 @click="
                   selCat = null;
-                  fetchData();
                   replaceRoute();
+                  fetchData();
                 "
                 flat
                 size="sm"
@@ -366,8 +366,8 @@
                 dense
                 @click="
                   selVendor = null;
-                  fetchData();
                   replaceRoute();
+                  fetchData();
                 "
                 flat
                 size="sm"
@@ -404,9 +404,9 @@ export default {
         { label: "suspended", value: "300" },
         { label: "closed", value: "40000" },
       ],
-      isReceived: "not",
+      is_received: "notz",
       receivedOption: [
-        { label: "show all", value: null },
+        { label: "show all", value: "null" },
         { label: "fully received", value: "fully" },
         { label: "half received", value: "half" },
         { label: "not received", value: "not" },
@@ -460,19 +460,15 @@ export default {
       selCat: null,
     };
   },
-  async mounted() {
-    if (this.$route.params?.category != "null") {
-      this.selCat = this.$route.params?.category;
+  async created() {
+    if (this.$route.params.category != "null") {
+      this.selCat = this.$route.params.category;
     }
 
     if (this.$route.params?.vendor != "null") {
-      this.selVendor = this.$route.params?.vendor;
+      this.selVendor = this.$route.params.vendor;
     }
-
-    if (this.$route.params?.status != "null") {
-      this.is_received = this.$route.params?.status;
-    }
-
+    this.is_received = this.$route.params.status;
     await this.$http
       .get("/list_month_po", {
         headers: {
@@ -518,7 +514,7 @@ export default {
       }
 
       this.$router.replace({
-        path: `/po/list/${this.isReceived}/${this.selVendor}/${the_cat}`,
+        path: `/po/list/${this.is_received}/${this.selVendor}/${the_cat}`,
       });
     },
     isPastEstimation(est_date) {
@@ -537,7 +533,7 @@ export default {
       this.poList = [];
 
       let payload = {
-        is_rcv: this.isReceived,
+        is_rcv: this.is_received,
         filter: this.filter,
         vendor: this.selVendor,
         cat: this.selCat,

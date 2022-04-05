@@ -74,7 +74,7 @@ Flight::route('POST /po', function () {
   $category = $data["cat"];
 
   $w_src = "";
-  if($is_rcv != ""){
+  if($is_rcv != "null"){
     $w_src = "AND is_received LIKE '%$is_rcv%'";
   }
 

@@ -294,7 +294,7 @@ export default {
             this.menu.push({
               icon: "ballot",
               title: "PO",
-              link: "/po/list",
+              link: "/po/list/not/null/null",
               count: result.data.count_po,
             });
             this.menu.push({
