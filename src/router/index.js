@@ -59,6 +59,11 @@ const routes = [
     name: "notification",
     component: () => import("../views/Notification.vue"),
   },
+  {
+    path: "/print/:data",
+    name: "print_preview",
+    component: () => import("../views/PrintPreview.vue"),
+  },
 ];
 
 const router = new VueRouter({

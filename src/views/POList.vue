@@ -176,6 +176,7 @@
             <th class="text-left">Received</th>
             <!-- <th class="text-left">COA</th> -->
             <th class="text-left">Note</th>
+            <th class="text-center"></th>
           </tr>
         </thead>
         <tbody class="bg-blue-grey-1">
@@ -246,11 +247,39 @@
               <q-input
                 square
                 filled
+                class="q-ma-sm"
                 type="textarea"
                 bg-color="white"
                 v-model="d.note"
                 dense
               />
+            </td>
+            <td class="text-center">
+              <q-btn
+                v-if="!d.sync"
+                unelevated
+                dense
+                label="SYNC HARGA"
+                color="primary"
+                @click="
+                  selSPP = JSON.parse(JSON.stringify(d));
+                  selSPP.i = i;
+                  confirmed = false;
+                  dialogSync = true;
+                "
+              ></q-btn>
+              <q-btn
+                v-else
+                unelevated
+                dense
+                icon="verified"
+                color="positive"
+                label="Synced"
+              >
+                <q-tooltip>
+                  <div>Synced On {{ momentFilter(d.sync) }}</div>
+                </q-tooltip>
+              </q-btn>
             </td>
           </tr>
         </tbody>
@@ -380,6 +409,104 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="dialogSync">
+      <q-card style="width:425px">
+        <q-card-section class="row justify-between items-center bg-grey-2">
+          <div class="text-bold text-h6">Sinkronisasi Harga RM</div>
+          <q-btn icon="close" flat v-close-popup></q-btn>
+        </q-card-section>
+        <q-card-section>
+          <q-markup-table separator="none" flat>
+            <tr>
+              <td>Nomor SPP</td>
+              <td>:</td>
+              <td>{{ selSPP.spp_id }}</td>
+            </tr>
+            <tr>
+              <td>Item</td>
+              <td>:</td>
+              <td>{{ selSPP.item }}</td>
+            </tr>
+            <tr>
+              <td>Harga PO/{{ selSPP.unit }}</td>
+              <td>:</td>
+              <td>
+                {{
+                  setCurrency(
+                    parseFloat(selSPP.price / selSPP.qty),
+                    selSPP.currency
+                  )
+                }}
+              </td>
+            </tr>
+          </q-markup-table>
+        </q-card-section>
+        <q-card-section class="column q-gutter-y-sm">
+          <div class="text-body1 text-bold">Sync Harga</div>
+          <div class="row items-center">
+            <div style="width:150px;">Nama RM</div>
+            <q-select
+              outlined
+              dense
+              bg-color="white"
+              :options="filtered_formulation_rm"
+              use-input
+              map-options
+              emit-value
+              hide-selected
+              fill-input
+              input-debounce="0"
+              v-model="selSPP.id_rm"
+              @filter="filterRM"
+              style="flex-grow: 99;"
+            >
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">No results</q-item-section>
+                </q-item>
+              </template>
+              <template v-slot:append>
+                <q-btn
+                  v-if="selSPP.id_rm"
+                  icon="close"
+                  dense
+                  @click="selSPP.id_rm = null"
+                  flat
+                  size="sm"
+                ></q-btn>
+              </template>
+            </q-select>
+          </div>
+          <div class="row items-center">
+            <div style="width:150px;">Harga Sinkron</div>
+
+            <money
+              style="flex-grow: 99;"
+              v-model="selSPP.syncPrice"
+              v-bind="money"
+            ></money>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <q-checkbox
+            dense
+            v-model="confirmed"
+            label="Saya yakin akan melakukan penyesuaian harga RM terpilih dengan
+            harga yang telah ditentukan"
+          ></q-checkbox>
+        </q-card-section>
+        <q-card-actions align="stretch">
+          <q-btn
+            unelevated
+            class="full-width"
+            color="primary"
+            label="SINKRON HARGA"
+            :disable="isAllowed"
+            @click="syncFormulation"
+          ></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -458,6 +585,13 @@ export default {
       selVendor: null,
 
       selCat: null,
+
+      // new data
+      formulation_rm: [],
+      filtered_formulation_rm: [],
+      dialogSync: false,
+      selSPP: {},
+      confirmed: false,
     };
   },
   async created() {
@@ -494,6 +628,46 @@ export default {
     await this.fetchData();
   },
   methods: {
+    momentFilter(date) {
+      return moment(date).format("DD MMM YYYY");
+    },
+    async syncFormulation() {
+      try {
+        this.$q.loading.show();
+        let payload = {
+          id: this.selSPP.id_rm,
+          new_price: this.selSPP.syncPrice,
+          id_spp: this.selSPP.spp_id,
+        };
+
+        await this.$http.put("/sync_formula/po", payload);
+
+        await this.$http_formulation.put("/purchase/rm/price", payload);
+        this.$q.notify({
+          message: "Harga Berhasil Di Sinkronisasi!",
+          color: "positive",
+        });
+
+        await this.openForm(this.selSPP.po_id);
+        this.dialogSync = false;
+        this.$q.loading.hide();
+      } catch (err) {
+        console.log(err);
+        this.$q.notify({
+          message: "Harga Gagal Di Sinkronisasi!",
+          color: "negative",
+        });
+        this.$q.loading.hide();
+      }
+    },
+    filterRM(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filtered_formulation_rm = this.formulation_rm.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
     filterVD(val, update, abort) {
       update(() => {
         const needle = val.toLowerCase();
@@ -550,23 +724,29 @@ export default {
             this.poList.push(result.data[i]);
           }
         });
-    },
-    openForm(id) {
-      this.edited = [];
-      this.$http.post("/podetail_byid", { po_id: id }, {}).then((result) => {
-        this.selected = result.data;
-        this.show_detail = true;
-        for (var i = 0; i < this.selected.length; i++) {
-          this.edited.push({
-            item: this.selected[i].item,
-            qty: this.selected[i].qty,
-            unit: this.selected[i].unit,
-            price: this.selected[i].price,
-            currency: this.selected[i].currency,
-            est_arrival: this.selected[i].est_arrival,
-          });
-        }
+      await this.$http_formulation.get(`/purchase/rm/all`).then((resp) => {
+        this.formulation_rm = resp.data;
+        this.filtered_formulation_rm = resp.data;
       });
+    },
+    async openForm(id) {
+      this.edited = [];
+      await this.$http
+        .post("/podetail_byid", { po_id: id }, {})
+        .then((result) => {
+          this.selected = result.data;
+          this.show_detail = true;
+          for (var i = 0; i < this.selected.length; i++) {
+            this.edited.push({
+              item: this.selected[i].item,
+              qty: this.selected[i].qty,
+              unit: this.selected[i].unit,
+              price: this.selected[i].price,
+              currency: this.selected[i].currency,
+              est_arrival: this.selected[i].est_arrival,
+            });
+          }
+        });
     },
     closeForm() {
       this.show_detail = false;
@@ -701,6 +881,14 @@ export default {
     },
   },
   computed: {
+    isAllowed() {
+      let temp = JSON.parse(JSON.stringify(this.selSPP));
+
+      if (!temp.id_rm || !temp.syncPrice || !this.confirmed) {
+        return true;
+      }
+      return false;
+    },
     sortedListPO() {
       let temp = this.poList.slice(0);
       if (this.sortBy == "est_arrival") {

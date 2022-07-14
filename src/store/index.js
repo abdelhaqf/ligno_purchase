@@ -11,10 +11,15 @@ export default new Vuex.Store({
   state: {
     currentUser: null,
     countOfInformationCategory: [],
+    printData: [],
   },
   mutations: {
     getCurrentUser(state, user) {
       state.currentUser = user;
+    },
+    setPrintData(state, data) {
+      console.log("run");
+      state.printData = data;
     },
   },
   actions: {
@@ -32,10 +37,18 @@ export default new Vuex.Store({
         .then((result) => {
           context.commit("getCurrentUser", result.data);
         })
-        .catch(error => {
+        .catch((error) => {
           localStorage.removeItem("token-purchase");
           this.$router.push("/login");
-        })
+        });
+    },
+    sendPrintData(context, data) {
+      context.commit("setPrintData", data);
+    },
+  },
+  getters: {
+    getPrintData(state) {
+      return state.printData;
     },
   },
   modules: {},

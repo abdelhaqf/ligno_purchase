@@ -2,7 +2,7 @@
   <q-layout view="hHh LpR fFf" class="bg-grey-1">
     <!-- left drawer  -->
     <q-drawer
-      v-if="!isLogin"
+      v-if="!isLogin && $route.name != 'print_preview'"
       content-class="bg-grey-2"
       show-if-above
       v-model="left"
@@ -56,14 +56,7 @@
       </q-item>
       <q-separator />
       <!-- menus -->
-      <q-item
-        clickable
-        v-ripple
-        v-for="m in menu"
-        :key="m.title"
-        :to="m.link"
-        @click="reloadData"
-      >
+      <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
         <q-item-section avatar>
           <q-icon :name="m.icon" color="indigo-2" />
         </q-item-section>
@@ -129,18 +122,18 @@
     </q-drawer>
 
     <q-page-container>
-      <q-scroll-area
+      <!-- <q-scroll-area
         :visible="false"
         :thumb-style="thumbStyle"
         :bar-style="barStyle"
         style="height: 100vh;"
-      >
-        <router-view
-          v-if="$route.name == 'Login' || $store.state.currentUser"
-          @isLogin="toggleLogin"
-          @updateKurs="updateKurs"
-        />
-      </q-scroll-area>
+      > -->
+      <router-view
+        v-if="$route.name == 'Login' || $store.state.currentUser"
+        @isLogin="toggleLogin"
+        @updateKurs="updateKurs"
+      />
+      <!-- </q-scroll-area> -->
     </q-page-container>
   </q-layout>
 </template>
@@ -148,7 +141,7 @@
 <script>
 import axios from "axios";
 import { mapState, mapActions } from "vuex";
-
+import Favico from "favico.js";
 export default {
   data() {
     return {
@@ -175,6 +168,13 @@ export default {
         width: "9px",
         opacity: 0.2,
       },
+
+      //interval var
+      notifInterval: null,
+      titleInterval: null,
+      attention: 0,
+      title: document.title,
+      c: 0,
     };
   },
   async mounted() {
@@ -195,11 +195,45 @@ export default {
 
       await this.preRun();
     }
+
+    this.notifInterval = window.setInterval(async () => {
+      if (this.$route.name != "Login" || this.$store.state.currentUser) {
+        await this.reloadData();
+      }
+    }, 5000);
+  },
+  watch: {
+    attention: (val) => {
+      if (val > 0) {
+        var favicon = new Favico({
+          position: "up",
+          animation: "popFade",
+          bgColor: "#dd2c00",
+          textColor: "#fff0e2",
+        });
+        favicon.badge(val);
+      }
+    },
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
-    reloadData() {
-      this.$http
+    async titleSettings() {
+      this.c++;
+      if (this.attention > 0) {
+        if (this.c % 2 != 0) {
+          document.title = `Ada ${this.attention} Approval!`;
+        } else {
+          document.title = this.title;
+        }
+      } else {
+        document.title = this.title;
+      }
+    },
+    async reloadData() {
+      if (this.$route.name == "print_preview") {
+        return;
+      }
+      await this.$http
         .get(
           "/count_data/" +
             this.$store.state.currentUser.user_id +
@@ -208,6 +242,18 @@ export default {
           {}
         )
         .then((result) => {
+          const audio = new Audio(
+            `${process.env.VUE_APP_PUBLIC_URL}/music/notification.mp3`
+          );
+
+          let new_count =
+            parseInt(result.data.count_approve) +
+            parseInt(result.data.count_approvePM);
+          if (new_count != this.attention) {
+            audio.play();
+          }
+          this.attention = new_count;
+          this.titleSettings();
           this.menu.forEach((x) => {
             if (x.link == "/spp/approval")
               this.$set(x, "count", result.data.count_approve);
@@ -237,7 +283,7 @@ export default {
       }
     },
 
-    fetchData() {
+    async fetchData() {
       if (this.$store.state.currentUser == null) return;
       this.menu = [];
       if (this.$store.state.currentUser?.is_purchasing == 1) {
@@ -253,7 +299,7 @@ export default {
         link: "/spp/create",
       });
 
-      this.$http
+      await this.$http
         .get(
           "/count_data/" +
             this.$store.state.currentUser.user_id +
@@ -305,7 +351,7 @@ export default {
           }
         });
 
-      this.$http
+      await this.$http
         .get("/count_notif/" + this.$store.state.currentUser.user_id, {})
         .then((result) => {
           this.count_notif = result.data.count;
@@ -334,3 +380,56 @@ export default {
   computed: mapState(["currentUser"]),
 };
 </script>
+<style lang="scss">
+.stickyTable {
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    background-color: #027be3;
+    color: white;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+    font-weight: bold;
+    // border: 0.1px solid grey;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  &.q-table--loading thead tr:last-child th {
+    top: 48px;
+  }
+}
+
+@font-face {
+  font-family: customfont;
+  src: url(./css/fonts/times.ttf);
+}
+.printPaper {
+  width: 190mm;
+}
+
+.my-font {
+  font-family: "customfont";
+}
+
+.f10 {
+  font-size: 10pt;
+}
+.f12 {
+  font-size: 12pt;
+}
+.f14 {
+  font-size: 14pt;
+}
+.f16 {
+  font-size: 16pt;
+}
+.f18 {
+  font-size: 18pt;
+}
+.f20 {
+  font-size: 20pt;
+}
+</style>

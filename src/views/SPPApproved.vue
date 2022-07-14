@@ -37,7 +37,15 @@
             @click="confirmCancel = true"
           />
         </div>
-        <div>
+        <div class="row q-gutter-sm">
+          <q-btn
+            outline
+            label="print"
+            icon="print"
+            color="secondary"
+            @click="toPreview"
+            :disable="!selectCount"
+          ></q-btn>
           <q-select
             outlined
             label="Urut Per-"
@@ -94,22 +102,30 @@
 
     <!-- form PO baru -->
     <q-card flat bordered v-if="formPO">
-      <q-card-section class="bg-primary text-white text-h6"
+      <q-card-section class="q-pb-none text-bold text-h6"
         >PO Baru</q-card-section
       >
       <div class="q-pa-md q-gutter-md">
-        <div class="row">
+        <div class="row full-width q-gutter-x-md">
+          <q-select
+            outlined
+            dense
+            v-model="type"
+            :options="['PO', 'Non-PO']"
+            @input="changeType()"
+            style="width:150px"
+          />
+
           <q-input
-            class="col-10"
             outlined
             v-model="po.po_id"
             label="Nomor PO"
             stack-label
             dense
             v-if="type == 'PO'"
+            style="flex-grow: 99;"
           />
           <q-input
-            class="col-10"
             outlined
             v-model="po.po_id"
             label="Nomor non-PO"
@@ -117,78 +133,112 @@
             stack-label
             dense
             v-else
+            style="flex-grow: 99;"
           />
-          <div class="col-2">
-            <q-select
-              class="q-ml-sm"
-              outlined
-              dense
-              v-model="type"
-              :options="['PO', 'Non-PO']"
-              @input="changeType()"
-            />
-          </div>
         </div>
-        <div class="row">
+        <div class="full-width q-pl-md">
           <q-input
-            class="col-10"
             outlined
             v-model="po.vendor"
             label="Nama Vendor"
             stack-label
             dense
-          />
-          <div class="col-2">
-            <q-select
-              class="q-ml-sm"
-              outlined
-              dense
-              v-model="curr"
-              :options="['IDR', 'USD']"
-              @input="chgCurrency"
-            />
-          </div>
-        </div>
-        <q-input
-          outlined
-          v-model="po.po_date"
-          mask="date"
-          :rules="['date']"
-          label
-        >
-          <template v-slot:append>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                ref="qDateProxy"
-                transition-show="scale"
-                transition-hide="scale"
+            v-if="showInput"
+          >
+            <template v-slot:append>
+              <q-toggle
+                v-model="showInput"
+                color="green"
+                icon="add"
+                keep-color
+              />
+            </template>
+            <template v-slot:label>
+              Nama Vendor
+              <a class="q-px-sm bg-info text-white rounded-borders"
+                >input baru</a
               >
-                <q-date minimal v-model="po.po_date" :options="limitDate">
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-          <template v-slot:label>
-            Tanggal PO
-            <a class="q-px-sm bg-info text-white rounded-borders"
-              >tahun / bulan / tanggal</a
-            >
-          </template>
-        </q-input>
+            </template>
+          </q-input>
+          <q-select
+            v-else
+            stack-label
+            outlined
+            dense
+            v-model="po.vendor"
+            map-options
+            emit-value
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="0"
+            :options="filteredVD"
+            @filter="filterVD"
+            label="Nama Vendor"
+          >
+            <template v-slot:append>
+              <q-toggle
+                v-model="showInput"
+                color="green"
+                icon="add"
+                keep-color
+              />
+            </template>
+          </q-select>
+        </div>
+        <div class="row justify-between items-center">
+          <q-input
+            outlined
+            v-model="po.po_date"
+            mask="date"
+            label
+            dense
+            style="width:49%"
+          >
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy
+                  ref="qDateProxy"
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date minimal v-model="po.po_date" :options="limitDate">
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+            <template v-slot:label>
+              Tanggal PO
+              <a class="q-px-sm bg-info text-white rounded-borders"
+                >tahun / bulan / tanggal</a
+              >
+            </template>
+          </q-input>
+          <q-select
+            outlined
+            v-model="curr"
+            dense
+            label="Currency"
+            :options="['IDR', 'USD']"
+            @input="chgCurrency"
+            style="width:49%"
+          />
+        </div>
       </div>
       <q-markup-table separator="cell" bordered flat square dense>
-        <thead class="bg-blue-grey-14 text-white">
+        <thead class="bg-primary text-white">
           <tr>
             <th class="text-left">No</th>
             <th class="text-left">Nama Barang</th>
             <th class="text-left">Harga</th>
             <th class="text-left">Est.Arrival</th>
+            <!-- <th class="text-left">RM Refrence</th> -->
           </tr>
         </thead>
-        <tbody class="bg-blue-grey-1">
+        <tbody class="bg-white">
           <tr v-for="(x, i) in sppSelect" :key="i">
             <td>{{ i + 1 }}</td>
             <td style="width: 250px;">
@@ -227,13 +277,47 @@
                 </template>
               </q-input>
             </td>
+            <!-- <td>
+              <q-select
+                outlined
+                dense
+                bg-color="white"
+                :options="filtered_formulation_rm"
+                use-input
+                map-options
+                emit-value
+                hide-selected
+                fill-input
+                input-debounce="0"
+                v-model="x.id_rm"
+                @filter="filterRM"
+              >
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey"
+                      >No results</q-item-section
+                    >
+                  </q-item>
+                </template>
+                <template v-slot:append>
+                  <q-btn
+                    v-if="x.id_rm"
+                    icon="close"
+                    dense
+                    @click="x.id_rm = null"
+                    flat
+                    size="sm"
+                  ></q-btn>
+                </template>
+              </q-select>
+            </td> -->
           </tr>
         </tbody>
       </q-markup-table>
 
       <q-card-actions class="q-gutter-md row justify-end">
-        <q-btn flat color="secondary" label="Kembali" @click="closeForm" />
-        <q-btn flat color="primary" label="Submit" @click="createPO()" />
+        <q-btn flat color="primary" label="Kembali" @click="closeForm" />
+        <q-btn unelevated color="primary" label="Submit" @click="createPO()" />
       </q-card-actions>
     </q-card>
 
@@ -383,13 +467,47 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <q-dialog v-model="dialogConfirm" persistents>
+      <q-card>
+        <q-card-section class="bg-grey-2 row items-center justify-between ">
+          <div class="text-h6 text-bold">Konfirmasi Pembuatan PO</div>
+          <q-btn icon="close" flat v-close-popup></q-btn>
+        </q-card-section>
+        <q-card-section>
+          <div class="q-pb-sm">
+            Apa Anda yakin akan membuat PO untuk {{ sppSelect.length }} SPP
+            terpilih?
+          </div>
+          <div v-if="curr == 'USD'" class="row justify-between items-center">
+            <div>
+              Masukan Kurs Berlaku
+            </div>
+            <money v-model="kurs" v-bind="money_kurs"></money>
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            unelevated
+            color="primary"
+            label="SIMPAN"
+            @click="
+              allowed = true;
+              createPO();
+            "
+            v-close-popup
+          ></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import moment from "moment";
 import { Money } from "v-money";
-
+import axios from "axios";
+import { mapActions } from "vuex";
 export default {
   components: { Money },
   data() {
@@ -435,15 +553,50 @@ export default {
       confirmCancel: false,
       content: "",
       selOrder: "create_at",
+
+      // new data
+      formulation_rm: [],
+      filtered_formulation_rm: [],
+
+      allowed: false,
+      dialogConfirm: false,
+      kurs: 0,
+      money_kurs: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "Rp ",
+        suffix: "",
+        precision: 0,
+        masked: false,
+      },
+      showInput: false,
+      optVendor: [],
+      filteredVD: [],
     };
   },
-  mounted() {
-    this.fetchData();
+  async mounted() {
+    await this.getVendor();
+    await this.fetchData();
   },
   methods: {
-    fetchData() {
+    ...mapActions(["sendPrintData"]),
+    filterVD(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filteredVD = this.optVendor.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    async getVendor() {
+      await this.$http.get("/list_vendor", {}).then((result) => {
+        this.optVendor = result.data;
+        this.filteredVD = result.data;
+      });
+    },
+    async fetchData() {
       this.sppList = [];
-      this.$http
+      await this.$http
         .get(
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
@@ -460,6 +613,16 @@ export default {
             this.sppList.push(result.data[i]);
           }
         });
+    },
+    async toPreview() {
+      let temp = this.sppList.filter((val) => {
+        return val.select;
+      });
+
+      let result = temp.map((a) => a.spp_id);
+
+      let route = this.$router.resolve({ path: "/print" });
+      window.open(`${route.href}/${JSON.stringify(result)}`);
     },
     openForm() {
       for (var i = 0; i < this.sppList.length; i++) {
@@ -495,46 +658,88 @@ export default {
       this.sppSelect = [];
     },
     async createPO() {
+      if (!this.allowed) {
+        this.dialogConfirm = true;
+        return;
+      }
+
       this.po.user_id = this.$store.state.currentUser.user_id;
-      await this.$http.post("/new_po", this.po, {}).then(async (result) => {
-        for (var i = 0; i < this.sppSelect.length; i++) {
-          this.sppSelect[i].po_id = this.po.po_id;
+      try {
+        this.$q.loading.show();
 
-          await this.$http
-            .put(
-              "/update_spp/" + this.sppSelect[i].spp_id,
-              this.sppSelect[i],
-              {}
-            )
-            .then((result) => {});
+        await this.$http.post("/new_po", this.po, {}).then(async (result) => {
+          for (var i = 0; i < this.sppSelect.length; i++) {
+            this.sppSelect[i].po_id = this.po.po_id;
 
-          var history = {
-            spp_id: this.sppSelect[i].spp_id,
-            status: "process",
-            content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+            let temp = JSON.parse(JSON.stringify(this.sppSelect[i]));
+            if (temp.id_rm) {
+              delete temp.id_rm;
+            }
+
+            await this.$http
+              .put("/update_spp/" + this.sppSelect[i].spp_id, temp, {})
+              .then((result) => {});
+
+            var history = {
+              spp_id: this.sppSelect[i].spp_id,
+              status: "process",
+              content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+            };
+            this.$http.post("/new_history", history, {}).then((result) => {});
+
+            var notifikasi = {
+              from_id: this.$store.state.currentUser.user_id,
+              to_id: this.sppSelect[i].user_id,
+              notif: "PO telah dibuat",
+              note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+              spp_id: this.sppSelect[i].spp_id,
+              reference_page: "/spp/list",
+            };
+            this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+          }
+
+          this.formPO = false;
+          this.po = {
+            po_date: moment().format("YYYY/MM/DD"),
           };
-          this.$http.post("/new_history", history, {}).then((result) => {});
+          this.fetchData();
+        });
 
-          var notifikasi = {
-            from_id: this.$store.state.currentUser.user_id,
-            to_id: this.sppSelect[i].user_id,
-            notif: "PO telah dibuat",
-            note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
-            spp_id: this.sppSelect[i].spp_id,
-            reference_page: "/spp/list",
-          };
-          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-        }
+        await this.sync_formula();
 
-        this.formPO = false;
-        this.po = {
-          po_date: moment().format("YYYY/MM/DD"),
-        };
-        this.fetchData();
+        await this.$root.$emit("refresh");
+        this.sppSelect = [];
+        this.allowed = false;
+        this.$q.loading.hide();
+        this.$q.notify("Berhasil membuat PO!");
+      } catch (err) {
+        console.log(err);
+        this.$q.loading.hide();
+      }
+    },
+    async sync_formula() {
+      let temp = this.sppSelect.filter((val) => {
+        return val.id_rm;
       });
-      await this.$root.$emit("refresh");
-      this.sppSelect = [];
-      this.$q.notify("Berhasil membuat PO!");
+
+      if (temp.length > 0) {
+        for (let i = 0; i < temp.length; i++) {
+          let item = temp[i];
+          let payload = {
+            id: item.id_rm,
+            new_price: item.price,
+          };
+
+          if (item.currency == "USD") {
+            payload.new_price = parseFloat(this.kurs * item.price).toFixed(2);
+          }
+
+          payload.new_price =
+            parseFloat(payload.new_price) / parseFloat(item.qty);
+
+          await this.$http_formulation.put("/purchase/rm/price", payload);
+        }
+      }
     },
     changeType() {
       if (this.type == "PO")
@@ -606,6 +811,14 @@ export default {
       else if (val == "created") return "library_add";
       else if (val == "canceled") return "close";
       else return "pending_actions";
+    },
+    filterRM(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filtered_formulation_rm = this.formulation_rm.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
     },
   },
   computed: {

@@ -1,7 +1,10 @@
 <template>
   <div class="row relative q-px-lg q-pt-lg">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
-      <q-card-section class="row q-gutter-x-sm">
+      <q-card-section class="text-h6 text-bold q-pb-none"
+        >LIST HARGA</q-card-section
+      >
+      <q-card-section class="row justify-between">
         <q-select
           outlined
           dense
@@ -15,7 +18,7 @@
           :options="filtered"
           @filter="filterOP"
           label="Nama Barang"
-          class="col-3"
+          style="width:49%"
           @input="change()"
         >
           <template v-slot:no-option>
@@ -50,7 +53,7 @@
           :options="filteredVD"
           @filter="filterVD"
           label="Nama Vendor"
-          class="col-3"
+          style="width:49%"
           @input="change()"
         >
           <template v-slot:no-option>
@@ -73,16 +76,31 @@
           </template>
         </q-select>
       </q-card-section>
-      <q-markup-table flat dense square>
-        <thead class="bg-blue-grey-14 text-white">
-          <th class="text-left">Nomer PO</th>
-          <th class="text-left">Tanggal PO</th>
-          <th class="text-left">Nama Vendor</th>
-          <th class="text-right">Harga Satuan</th>
-          <th class="text-right">Jumlah Pembelian</th>
+      <q-markup-table
+        flat
+        square
+        class="stickyTable"
+        style="height:calc(100vh - 230px)"
+      >
+        <thead>
+          <tr class="bg-blue-grey-14 text-white">
+            <th class="text-left">No</th>
+            <th class="text-left">Nomer PO</th>
+            <th class="text-left">Tanggal PO</th>
+            <th class="text-left">Nama Vendor</th>
+            <th class="text-right">Harga Satuan</th>
+            <th class="text-right">Jumlah Pembelian</th>
+          </tr>
         </thead>
         <tbody v-if="priceList.length" class="bg-blue-grey-1">
-          <tr v-for="p in priceList" :key="p.id">
+          <tr
+            v-for="(p, i) in priceList"
+            :key="i"
+            :class="{ 'bg-white': i % 2 == 0 }"
+          >
+            <td class="text-center">
+              {{ (pagination.current - 1) * 25 + i + 1 }}
+            </td>
             <td class="text-left">{{ p.po_id }}</td>
             <td class="text-left">{{ p.po_date }}</td>
             <td class="text-left">{{ p.vendor }}</td>
@@ -102,8 +120,15 @@
             </td>
           </tr>
         </tbody>
-        <q-card-section></q-card-section>
       </q-markup-table>
+      <q-card-actions align="right">
+        <q-pagination
+          v-model="pagination.current"
+          :max="pagination.max"
+          input
+          @input="change()"
+        ></q-pagination>
+      </q-card-actions>
     </q-card>
   </div>
 </template>
@@ -119,10 +144,16 @@ export default {
       optVendor: [],
       filteredVD: [],
       selectVendor: null,
+
+      pagination: {
+        current: 1,
+        max: 1,
+      },
     };
   },
-  mounted() {
-    this.fetchData();
+  async mounted() {
+    await this.fetchData();
+    await this.change();
   },
   methods: {
     filterOP(val, update, abort) {
@@ -142,26 +173,31 @@ export default {
         );
       });
     },
-    fetchData() {
-      this.$http.get("/list_item", {}).then((result) => {
+    async fetchData() {
+      await this.$http.get("/list_item", {}).then((result) => {
         this.option = result.data;
       });
-      this.$http.get("/list_vendor", {}).then((result) => {
+      await this.$http.get("/list_vendor", {}).then((result) => {
         this.optVendor = result.data;
       });
     },
-    change(val) {
-      this.$http
-        .get(
-          "/pricelist/" +
-            encodeURIComponent(this.selectOption) +
-            "/" +
-            encodeURIComponent(this.selectVendor),
-          {}
-        )
-        .then((result) => {
-          this.priceList = result.data;
+    async change(val) {
+      try {
+        this.$q.loading.show();
+        let payload = {
+          item: this.selectOption,
+          vendor: this.selectVendor,
+          current: this.pagination.current,
+        };
+        await this.$http.post("/pricelist/new", payload).then((result) => {
+          this.priceList = result.data.items;
+
+          this.pagination.max = Math.ceil(parseFloat(result.data.count / 25));
         });
+        this.$q.loading.hide();
+      } catch (err) {
+        this.$q.loading.hide();
+      }
     },
     setCurrency(price, cur) {
       if (cur == "IDR") {
