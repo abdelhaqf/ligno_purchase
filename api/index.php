@@ -92,13 +92,16 @@ Flight::route('POST /po', function () {
   }
 
   $q = " SELECT * FROM (
-    SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, SUM(spp.price) AS 'total_price', spp.currency, spp.est_arrival, usr.name AS 'handler_name', 
+    SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
+    SUM(spp.price) AS 'total_price', 
+    spp.currency, spp.est_arrival, usr.name AS 'handler_name', 
             CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
             WHEN SUM(spp.is_received) = 0 THEN 'not received' 
             WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
             WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
             ELSE 'half received' END as 'is_received',
-    		    COUNT(spp.spp_id) AS 'spp_count', spp.item
+    		    COUNT(spp.spp_id) AS 'spp_count', spp.item, 
+            COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
              
             FROM po INNER JOIN spp on po.po_id = spp.po_id 
             INNER JOIN `user` usr on usr.user_id = po.user_id

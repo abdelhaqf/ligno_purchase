@@ -99,7 +99,14 @@
                 >{{ d.is_received }}</q-chip
               >
             </td>
-            <td class="text-left">{{ d.po_date | moment("DD MMM YYYY") }}</td>
+            <td class="text-left col">
+              <div>
+                {{ d.po_date | moment("DD MMM YYYY") }}
+              </div>
+              <q-chip text-color="white" dense size="sm" color="positive"
+                >{{ d.synced }} of {{ d.spp_count }} Synced</q-chip
+              >
+            </td>
             <td class="text-left">{{ d.handler_name | truncate(8) }}</td>
             <td class="text-left">{{ d.vendor | truncate(11) }}</td>
             <td class="text-left col">
