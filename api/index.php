@@ -5,11 +5,11 @@ use \Firebase\JWT\JWT;
 
 function getLink()
 {
-  $is_local = true;
-  $link = mysqli_connect('localhost', 'lignosof_root', 'lignosc313', 'lignosof_lignoapp_purchase', 3307) or die('connection failed!');
+  // $is_local = true;
+  // $link = mysqli_connect('localhost', 'lignosof_root', 'lignosc313', 'lignosof_lignoapp_purchase', 3307) or die('connection failed!');
   // if ($is_local) {
   // } else {
-  //   $link = mysqli_connect('localhost', 'root', '', 'ligno_purchase') or die('connection failed!');
+  $link = mysqli_connect('localhost', 'root', '', 'ligno_purchase') or die('connection failed!');
   // }
   return $link;
 }
@@ -45,7 +45,7 @@ Flight::route('GET /spp-approval', function () {
     ";
   runQuery($q);
 });
-Flight::route('GET /spp_approved/@id/@ispurch/@order', function ($id, $ispurch,$order) {
+Flight::route('GET /spp_approved/@id/@ispurch/@order', function ($id, $ispurch, $order) {
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
@@ -73,21 +73,21 @@ Flight::route('POST /po', function () {
   $category = $data["cat"];
 
   $w_src = "";
-  if($is_rcv != "null"){
+  if ($is_rcv != "null") {
     $w_src = "AND is_received LIKE '%$is_rcv%'";
   }
 
   $w_cat = "";
-  if($category != ""){
-    if($category == "BELUM DIKATEGORIKAN"){
+  if ($category != "") {
+    if ($category == "BELUM DIKATEGORIKAN") {
       $w_cat = "AND cost_category = ''";
-    }else{
+    } else {
       $w_cat = "AND cost_category = '$category'";
     }
   }
 
   $w_vendor = "";
-  if($vendor != ""){
+  if ($vendor != "") {
     $w_vendor = "AND vendor = '$vendor'";
   }
 
@@ -133,11 +133,11 @@ Flight::route('POST /podetail_byid', function () {
   runQuery($q);
 });
 
-Flight::route('PUT /sync_formula/po', function(){
-  $link =getLink();
-  $data= Flight::request()->data;
-  $q="UPDATE spp SET sync = NOW() WHERE spp_id='{$data['id_spp']}'";
-  mysqli_query($link,$q) or die(mysqli_error($link));
+Flight::route('PUT /sync_formula/po', function () {
+  $link = getLink();
+  $data = Flight::request()->data;
+  $q = "UPDATE spp SET sync = NOW() WHERE spp_id='{$data['id_spp']}'";
+  mysqli_query($link, $q) or die(mysqli_error($link));
 });
 
 Flight::route('GET /spp_history/@spp_id', function ($spp_id) {
@@ -167,18 +167,16 @@ Flight::route('GET /list_user', function () {
   runQuery($q);
 });
 
-Flight::route('GET /pricelist/@item/@vendor', function ($item,$vendor) {
+Flight::route('GET /pricelist/@item/@vendor', function ($item, $vendor) {
   $whereClause = "";
-  if($item != "null" && $vendor != "null") {
+  if ($item != "null" && $vendor != "null") {
     $whereClause = "WHERE spp.item like '%$item%' AND po.vendor like '%$vendor%'";
-  }else if($item != "null") {
+  } else if ($item != "null") {
     $whereClause = "WHERE spp.item like '%$item%' ";
-  }else if($vendor != "null") {
+  } else if ($vendor != "null") {
     $whereClause = "WHERE  po.vendor like '%$vendor%'";
-  }
-  else {
+  } else {
     $whereClause = "WHERE 0 = 1";
-
   }
   $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor 
           FROM spp INNER JOIN po ON po.po_id = spp.po_id
@@ -193,14 +191,14 @@ Flight::route('POST /pricelist/new', function () {
   $item = $data['item'];
   $vendor = $data['vendor'];
 
-  $ofset = ( (int) $data['current']-1) * 25;
+  $ofset = ((int) $data['current'] - 1) * 25;
 
   $whereClause = "";
-  if($item != "null" && $vendor != "null") {
+  if ($item != "null" && $vendor != "null") {
     $whereClause = "WHERE spp.item like '%$item%' AND po.vendor like '%$vendor%'";
-  }else if($item != "null") {
+  } else if ($item != "null") {
     $whereClause = "WHERE spp.item like '%$item%' ";
-  }else if($vendor != "null") {
+  } else if ($vendor != "null") {
     $whereClause = "WHERE  po.vendor like '%$vendor%'";
   }
 
@@ -208,19 +206,19 @@ Flight::route('POST /pricelist/new', function () {
   FROM spp INNER JOIN po ON po.po_id = spp.po_id
   $whereClause ORDER BY po.po_date DESC LIMIT 25 OFFSET $ofset
   ";
-  $res = mysqli_query($link,$q) or die(mysqli_error($link));
+  $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $data = [];
-  while($row = mysqli_fetch_assoc($res)){
-    $data[]=$row;
+  while ($row = mysqli_fetch_assoc($res)) {
+    $data[] = $row;
   }
-  
-  $q="SELECT COUNT(item) AS total
+
+  $q = "SELECT COUNT(item) AS total
   FROM spp INNER JOIN po ON po.po_id = spp.po_id
   $whereClause ORDER BY po.po_date";
-  $res = mysqli_query($link,$q) or die(mysqli_error($link));
+  $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $count = mysqli_fetch_assoc($res);
 
-  $ret = array("items"=>$data, "count"=>$count['total']);
+  $ret = array("items" => $data, "count" => $count['total']);
   Flight::json($ret);
 });
 
@@ -474,20 +472,20 @@ Flight::route('POST /notifikasi', function () {
   runQuery3('POST', 'notifikasi', $data, '');
 });
 
-Flight::route('POST /print/getdata', function(){
+Flight::route('POST /print/getdata', function () {
   $link = getLink();
   $data = Flight::request()->data;
 
   $ret = [];
 
-  for($i = 0; $i<count($data); $i++){
-    $q= "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' 
+  for ($i = 0; $i < count($data); $i++) {
+    $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' 
     FROM spp
     INNER JOIN user 
     ON spp.user_id = user.user_id
     LEFT JOIN user hnd on hnd.user_id = spp.handle_by
     WHERE spp_id = '{$data[$i]}'";
-    $res = mysqli_query($link,$q) or die(mysqli_error($link));
+    $res = mysqli_query($link, $q) or die(mysqli_error($link));
 
     $ret[] = mysqli_fetch_assoc($res);
   }
