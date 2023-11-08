@@ -40,7 +40,7 @@
             <tr>
               <td style="width:100px">Requester</td>
               <td style="width:5px">:</td>
-              <td class="text-left text-capitalize">{{ val.name }}</td>
+              <td class="text-left text-capitalize">{{ val.name }} - {{ val.dept }}</td>
             </tr>
           </q-markup-table>
 
@@ -76,6 +76,9 @@
               <th class="text-center trow" style="font-weight: 600;width:;">
                 Diproses Oleh
               </th>
+              <th class="text-center trow" style="font-weight: 600;width:;">
+                Kategori Barang/Jasa
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -84,6 +87,7 @@
               <td>{{ momentMask(val.deadline) }}</td>
               <td>{{ `${val.qty} ${val.unit}` }}</td>
               <td class="text-capitalize">{{ val.handler_name }}</td>
+              <td class="text-center">{{ val.kategori }}</td>
             </tr>
           </tbody>
         </q-markup-table>

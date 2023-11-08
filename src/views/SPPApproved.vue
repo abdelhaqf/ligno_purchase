@@ -372,6 +372,12 @@
               <q-item-label>{{ selected.description }}</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Kategori Barang/Jasa</q-item-label>
+              <q-item-label>{{ selected.kategori }}</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-separator spaced />
           <q-item v-if="selected.est_arrival">
             <q-item-section>
@@ -620,6 +626,8 @@ export default {
       });
 
       let result = temp.map((a) => a.spp_id);
+
+      console.log(result);
 
       let route = this.$router.resolve({ path: "/print" });
       window.open(`${route.href}/${JSON.stringify(result)}`);

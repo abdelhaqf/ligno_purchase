@@ -159,8 +159,15 @@
         </q-card-section>
         <q-separator></q-separator>
 
-        <q-card-section class>
-          <q-select class="col-4" outlined dense v-model="handleBy" :options="option" map-options />
+        <q-card-section class="column q-gutter-y-sm">
+          <div class="row q-gutter-x-sm items-center">
+            <div style="width:150px">Staff</div>
+            <q-select class="col-4" outlined dense v-model="handleBy" :options="option" map-options style="flex-grow: 99;" />
+          </div>
+          <div class="row q-gutter-x-sm items-center">
+            <div style="width:150px">Kategori Barang/Jasa</div>
+            <q-select class="col-4" outlined dense v-model="selKategori" :options="optionKategori" style="flex-grow: 99;" />
+          </div>
         </q-card-section>
 
         <q-card-actions align="between" class="text-primary">
@@ -209,7 +216,26 @@ export default {
       content: "",
       sppList: [],
       selected: {},
-      option: []
+      option: [],
+      
+      optionKategori:[
+        "Keperluan & Peralatan Produksi",
+        "Packing Barang",
+        "Makan & Minum",
+        "Perbaikan Kendaraan (Produksi/Gudang)",
+        "Perbaikan Kendaraan (Marketing)",
+        "Perbaikan Kendaraan (Umum & Adm)",
+        "Iklan & Promosi",
+        "Perjalanan Dinas",
+        "Entertainment",
+        "Pendidikan & Latihan",
+        "R&D",
+        "Materai & Fotocopy",
+        "ATK & Keperluan Kantor",
+        "Surat & Izin-izin",
+        "Sumbangan",
+      ],
+      selKategori:null
     };
   },
   mounted() {
@@ -237,7 +263,8 @@ export default {
     async approve(val) {
       var data = {
         purch_manager_approve: 1,
-        handle_by: this.handleBy.value
+        handle_by: this.handleBy.value,
+        kategori : this.selKategori
       };
       await this.$http
         .put("/update_spp/" + val.spp_id, data, {})
@@ -297,10 +324,12 @@ export default {
       this.show_detail = false;
       var data = this.sppList.filter(e => e.select === true);
       for (var i = 0; i < data.length; i++) {
+        
         await this.approve(data[i]);
       }
       await this.fetchData();
       await this.$root.$emit("refresh");
+      this.selKategori = null
       this.$q.notify("SPP berhasil disetujui!");
     },
     async rejectSelected() {

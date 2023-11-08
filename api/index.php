@@ -71,6 +71,7 @@ Flight::route('POST /po', function () {
   $filter = $data["filter"];
   $vendor = $data["vendor"];
   $category = $data["cat"];
+  $kategori = $data["kategori"];
 
   $w_src = "";
   if ($is_rcv != "null") {
@@ -91,10 +92,19 @@ Flight::route('POST /po', function () {
     $w_vendor = "AND vendor = '$vendor'";
   }
 
+  $w_kategori = "";
+  if ($kategori != "") {
+    if ($kategori == "BELUM DIKATEGORIKAN") {
+      $w_kategori = "AND kategori = ''";
+    } else {
+      $w_kategori = "AND kategori = '$kategori'";
+    }
+  }
+
   $q = " SELECT * FROM (
     SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
     SUM(spp.price) AS 'total_price', 
-    spp.currency, spp.est_arrival, usr.name AS 'handler_name', 
+    spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
             CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
             WHEN SUM(spp.is_received) = 0 THEN 'not received' 
             WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
@@ -106,7 +116,7 @@ Flight::route('POST /po', function () {
             FROM po INNER JOIN spp on po.po_id = spp.po_id 
             INNER JOIN `user` usr on usr.user_id = po.user_id
             GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-          WHERE 1 = 1 $w_src $w_cat $w_vendor
+          WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori
           HAVING CONCAT(YEAR(po_date),'-',MONTH(po_date)) LIKE '%$filter%'
           ";
   //  echo $q;
@@ -394,6 +404,21 @@ Flight::route('GET /yearly_dept_report', function () {
             ";
   runQuery($q);
 });
+
+Flight::route('GET /yearly_kat_report', function () {
+  $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, 
+            CASE WHEN spp.kategori = '' THEN 'belum dikategorikan' 
+            ELSE  spp.kategori END AS 'kategori'
+         FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+           GROUP BY currency, spp.kategori
+           ORDER BY price DESC
+            ";
+  runQuery($q);
+});
+
 Flight::route('GET /MONTHLY_dept_report', function () {
   $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, 
             CASE WHEN spp.cost_category = '' THEN 'belum dikategorikan' 
@@ -409,6 +434,20 @@ Flight::route('GET /MONTHLY_dept_report', function () {
   runQuery($q);
 });
 
+Flight::route('GET /MONTHLY_kat_report', function () {
+  $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, 
+            CASE WHEN spp.kategori = '' THEN 'belum dikategorikan' 
+            ELSE  spp.kategori END AS 'kategori'
+         FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND MONTH(spp.create_at) = MONTH(CURRENT_DATE)
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+           GROUP BY currency, kategori
+           ORDER BY price DESC
+            ";
+  runQuery($q);
+});
 
 
 

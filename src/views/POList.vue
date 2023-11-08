@@ -410,6 +410,32 @@
               ></q-btn>
             </template>
           </q-select>
+          <q-select
+            outlined
+            v-model="selKategori"
+            :options="kategori"
+            label="Kategori Barang/Jasa"
+            class="col-3"
+            @input="
+              replaceRoute();
+              fetchData();
+            "
+          >
+            <template v-slot:append>
+              <q-btn
+                v-if="selKategori != null"
+                icon="close"
+                dense
+                @click="
+                  selKategori = null;
+                  replaceRoute();
+                  fetchData();
+                "
+                flat
+                size="sm"
+              ></q-btn>
+            </template>
+          </q-select>
         </q-card-section>
         <q-card-section class="row justify-end">
           <q-btn label="close" color="primary" v-close-popup></q-btn>
@@ -587,6 +613,25 @@ export default {
         "Maintenance",
       ],
 
+      kategori:[
+        "Keperluan & Peralatan Produksi",
+        "Packing Barang",
+        "Makan & Minum",
+        "Perbaikan Kendaraan (Produksi/Gudang)",
+        "Perbaikan Kendaraan (Marketing)",
+        "Perbaikan Kendaraan (Umum & Adm)",
+        "Iklan & Promosi",
+        "Perjalanan Dinas",
+        "Entertainment",
+        "Pendidikan & Latihan",
+        "R&D",
+        "Materai & Fotocopy",
+        "ATK & Keperluan Kantor",
+        "Surat & Izin-izin",
+        "Sumbangan",
+      ],
+      selKategori:null,
+
       optVendor: [],
       filVendor: [],
       selVendor: null,
@@ -609,6 +654,11 @@ export default {
     if (this.$route.params?.vendor != "null") {
       this.selVendor = this.$route.params.vendor;
     }
+
+    if (this.$route.params?.kategori != "null") {
+      this.selKategori = this.$route.params.kategori;
+    }
+
     this.is_received = this.$route.params.status;
     await this.$http
       .get("/list_month_po", {
@@ -695,7 +745,7 @@ export default {
       }
 
       this.$router.replace({
-        path: `/po/list/${this.is_received}/${this.selVendor}/${the_cat}`,
+        path: `/po/list/${this.is_received}/${this.selVendor}/${the_cat}/${this.selKategori}`,
       });
     },
     isPastEstimation(est_date) {
@@ -718,6 +768,7 @@ export default {
         filter: this.filter,
         vendor: this.selVendor,
         cat: this.selCat,
+        kategori: this.selKategori == null ? '' : this.selKategori,
       };
 
       await this.$http

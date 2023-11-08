@@ -92,6 +92,20 @@
         </q-card-section>
       </q-card>
     </div>
+
+    <div class="row q-pa-md q-gutter-md">
+      <q-card flat bordered class="col">
+        <q-card-section>
+          <v-chart
+            ref="chart1"
+            :options="optionByKat"
+            theme="default"
+            :autoresize="true"
+            @click="handleClickByKat"
+          />
+        </q-card-section>
+      </q-card>
+    </div>
   </div>
 </template>
 
@@ -133,12 +147,9 @@ export default {
 
       totalPrice: 0,
       report: [],
-      report_80: [],
-      report_50: [],
-      report_bydept: [],
-      total_80: 0,
-      total_50: 0,
-      total_bydept: 0,
+      
+      
+
       option50: {
         title: {
           text: "DATA 50 % PENGELUARAN BELANJA",
@@ -188,6 +199,9 @@ export default {
         ],
         color: colorPalette,
       },
+      report_50: [],
+      total_50: 0,
+
       option80: {
         title: {
           text: "DATA 80 % PENGELUARAN BELANJA",
@@ -232,6 +246,9 @@ export default {
         ],
         color: colorPalette,
       },
+      report_80: [],
+      total_80: 0,
+
       optionBydept: {
         title: {
           text: "Data Belanja Per Departemen",
@@ -277,6 +294,56 @@ export default {
         ],
         color: colorPalette,
       },
+      report_bydept: [],
+      total_bydept: 0,
+
+      optionByKat: {
+        title: {
+          text: "Data Belanja Per Kategori",
+          left: "center",
+        },
+
+        tooltip: {
+          trigger: "item",
+          // formatter: "{b}<br/>Rp {c} ({d}%)",
+          formatter: (param, ticket) => {
+            return (
+              param.name +
+              "<br>" +
+              this.setCurrency(param.value, "IDR") +
+              " (" +
+              param.percent +
+              "%)"
+            );
+          },
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "20",
+            fontWeight: "bold",
+          },
+        },
+        series: [
+          {
+            type: "pie",
+            radius: ["45%", "70%"],
+            center: ["50%", "50%"],
+            selectedMode: "single",
+            data: [],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+        color: colorPalette,
+      },      
+      report_byKat: [],
+      total_byKat: 0,
     };
   },
   mounted() {
@@ -306,7 +373,7 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`/po/list/null/${name}/null`);
+      this.$router.push(`/po/list/null/${name}/null/null`);
     },
     handleClick80(...args) {
       let temp = args[0];
@@ -316,7 +383,7 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`/po/list/null/${name}/null`);
+      this.$router.push(`/po/list/null/${name}/null/null`);
     },
     handleClickByDept(...args) {
       let temp = args[0];
@@ -326,7 +393,17 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`/po/list/null/null/${name}`);
+      this.$router.push(`/po/list/null/null/${name}/null`);
+    },
+    handleClickByKat(...args) {
+      let temp = args[0];
+      let name = temp.name.split("/");
+      if (name.length > 1) {
+        name = name.join("%2F");
+      } else {
+        name = name.join("");
+      }
+      this.$router.push(`/po/list/null/null/null/${name}`);
     },
     fetchData() {
       this.report_50 = [];
@@ -335,6 +412,8 @@ export default {
       this.option80.series[0].data = [];
       this.report_bydept = [];
       this.optionBydept.series[0].data = [];
+      this.report_byKat = [];
+      this.optionByKat.series[0].data = [];
 
       var dt = new Date().getFullYear();
       if (dt == this.selectedShow) {
@@ -397,6 +476,16 @@ export default {
             this.optionBydept.series[0].data.push({
               value: resp.data[i].price,
               name: resp.data[i].cost_category.toUpperCase(),
+            });
+          }
+        });
+
+        this.$http.get("/yearly_kat_report", {}).then((resp) => {
+          for (var i = 0; i < resp.data.length; i++) {
+            this.report_byKat.push(resp.data[i]);
+            this.optionByKat.series[0].data.push({
+              value: resp.data[i].price,
+              name: resp.data[i].kategori,
             });
           }
         });
