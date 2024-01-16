@@ -54,12 +54,14 @@
             </td>
             <td class="text-left">
               {{ d.name }}
-              <q-chip color="accent" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
+              <q-chip color="accent" text-color="white" dense size="sm">{{
+                d.dept
+              }}</q-chip>
             </td>
-            <td class="text-left">{{d.create_at |moment('DD MMM YYYY')}}</td>
-            <td class="text-left">{{ d.deadline |moment('DD MMM YYYY')}}</td>
+            <td class="text-left">{{ d.create_at | moment("DD MMM YYYY") }}</td>
+            <td class="text-left">{{ d.deadline | moment("DD MMM YYYY") }}</td>
             <td class="text-left">{{ d.item }}</td>
-            <td class="text-right">{{ d.qty }} {{d.unit}}</td>
+            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
@@ -71,7 +73,12 @@
       </q-markup-table>
     </q-card>
     <!-- detail  -->
-    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
+    <q-dialog
+      v-model="show_detail"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-primary text-white row">
           <div>NO SPP: {{ selected.spp_id }}</div>
@@ -86,54 +93,72 @@
           <q-item>
             <q-item-section>
               <q-item-label caption>Requester</q-item-label>
-              <q-item-label>{{selected.name}}</q-item-label>
+              <q-item-label>{{ selected.name }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section>
               <q-item-label caption>Request Date</q-item-label>
-              <q-item-label>{{selected.create_at}}</q-item-label>
+              <q-item-label>{{ selected.create_at }}</q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-item-label caption>Deadline</q-item-label>
-              <q-item-label>{{selected.deadline}}</q-item-label>
+              <q-item-label>{{ selected.deadline }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section>
               <q-item-label caption>Item</q-item-label>
-              <q-item-label>{{selected.item}}</q-item-label>
+              <q-item-label>{{ selected.item }}</q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-item-label caption>Quantity</q-item-label>
-              <q-item-label>{{selected.qty}} {{selected.unit}}</q-item-label>
+              <q-item-label
+                >{{ selected.qty }} {{ selected.unit }}</q-item-label
+              >
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section>
               <q-item-label caption>Description</q-item-label>
-              <q-item-label>{{selected.description}}</q-item-label>
+              <q-item-label>{{ selected.description }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-separator spaced />
           <q-item>
             <q-item-section>
               <q-item-label caption>Status</q-item-label>
-              <q-item-label>{{status}}</q-item-label>
+              <q-item-label>{{ status }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
         <q-separator spaced />
 
         <q-card-actions align="between">
-          <q-btn flat label="Tolak" color="negative" @click="confirmReject=true" v-close-popup />
-          <q-btn flat label="Setuju" color="positive" @click="confirmApprove = true" />
+          <q-btn
+            flat
+            label="Tolak"
+            color="negative"
+            @click="confirmReject = true"
+            v-close-popup
+          />
+          <q-btn
+            flat
+            label="Setuju"
+            color="positive"
+            @click="confirmApprove = true"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- history  -->
-    <q-dialog v-model="show_history" persistent transition-show="scale" transition-hide="scale">
+    <q-dialog
+      v-model="show_history"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-secondary text-white row">
           <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
@@ -142,7 +167,10 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-card-section>
-        <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
+        <q-card-section
+          class="q-px-xl q-my-sm"
+          style="height: 450px; overflow: auto;"
+        >
           <q-timeline>
             <q-timeline-entry
               v-for="x in history"
@@ -152,7 +180,7 @@
               :color="getColor(x.status)"
               :icon="getIcon(x.status)"
             >
-              <div>{{x.content}}</div>
+              <div>{{ x.content }}</div>
             </q-timeline-entry>
           </q-timeline>
         </q-card-section>
@@ -166,11 +194,19 @@
           <q-item-label>Konfirmasi persetujuan</q-item-label>
         </q-card-section>
 
-        <q-card-section class>Anda yakin memberi persetujuan untuk SPP ini?</q-card-section>
+        <q-card-section class
+          >Anda yakin memberi persetujuan untuk SPP ini?</q-card-section
+        >
 
         <q-card-actions align="between" class="text-primary">
           <q-btn flat color="negative" label="Cancel" v-close-popup />
-          <q-btn flat color="positive" label="OK" @click="approveSelected()" v-close-popup />
+          <q-btn
+            flat
+            color="positive"
+            label="OK"
+            @click="approveSelected()"
+            v-close-popup
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -194,7 +230,13 @@
 
         <q-card-actions align="between" class="text-primary">
           <q-btn flat color="negative" label="Cancel" v-close-popup />
-          <q-btn flat color="positive" label="OK" @click="rejectSelected()" v-close-popup />
+          <q-btn
+            flat
+            color="positive"
+            label="OK"
+            @click="rejectSelected()"
+            v-close-popup
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -214,7 +256,7 @@ export default {
       content: "",
       sppList: [],
       selected: {},
-      option: []
+      option: [],
     };
   },
   mounted() {
@@ -223,7 +265,7 @@ export default {
   methods: {
     fetchData() {
       this.sppList = [];
-      this.$http.get("/spp-approval", {}).then(result => {
+      this.$http.get("/spp-approval", {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
           if (
             result.data[i].manager_approve == 0 &&
@@ -235,7 +277,7 @@ export default {
         }
       });
 
-      this.$http.get("/list_user", {}).then(result => {
+      this.$http.get("/list_user", {}).then((result) => {
         this.option = result.data;
       });
     },
@@ -243,18 +285,18 @@ export default {
     async approve(val) {
       var data = {
         manager_approve: 1,
-        handle_by: this.handleBy
+        handle_by: this.handleBy,
       };
       await this.$http
         .put("/update_spp/" + val.spp_id, data, {})
-        .then(result => {});
+        .then((result) => {});
 
       var history = {
         spp_id: val.spp_id,
         status: "waiting",
-        content: "Disetujui manager, menunggu persetujuan manager purchasing"
+        content: "Disetujui manager, menunggu persetujuan manager purchasing",
       };
-      await this.$http.post("/new_history", history, {}).then(result => {});
+      await this.$http.post("/new_history", history, {}).then((result) => {});
 
       var notifikasi = {
         from_id: this.$store.state.currentUser.user_id,
@@ -262,40 +304,40 @@ export default {
         notif: "SPP dari " + val.name + " menunggu persetujuan",
         note: val.note,
         spp_id: val.spp_id,
-        reference_page: "/spp/approval-pm"
+        reference_page: "/spp/approval-pm",
       };
-      this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
 
     async reject(val) {
       var data = {
         manager_approve: -1,
-        note: this.content
+        note: this.content,
       };
       await this.$http
         .put("/update_spp/" + val.spp_id, data, {})
-        .then(result => {});
+        .then((result) => {});
 
       var history = {
         spp_id: val.spp_id,
         status: "rejected",
-        content: "SPP ditolak manager: " + this.content
+        content: "SPP ditolak manager: " + this.content,
       };
-      await this.$http.post("/new_history", history, {}).then(result => {});
+      await this.$http.post("/new_history", history, {}).then((result) => {});
       var notifikasi = {
         from_id: this.$store.state.currentUser.user_id,
         to_id: val.user_id,
         notif: "SPP Anda ditolak manager",
         note: this.content,
         spp_id: val.spp_id,
-        reference_page: "/spp/list"
+        reference_page: "/spp/list",
       };
-      this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
 
     async approveSelected() {
       this.show_detail = false;
-      var data = this.sppList.filter(e => e.select === true);
+      var data = this.sppList.filter((e) => e.select === true);
       for (var i = 0; i < data.length; i++) {
         await this.approve(data[i]);
       }
@@ -305,7 +347,7 @@ export default {
     },
 
     async rejectSelected() {
-      var data = this.sppList.filter(e => e.select === true);
+      var data = this.sppList.filter((e) => e.select === true);
       for (var i = 0; i < data.length; i++) {
         await this.reject(data[i]);
       }
@@ -317,7 +359,7 @@ export default {
     showHistory() {
       this.$http
         .get("/spp_history/" + this.selected.spp_id, {})
-        .then(result => {
+        .then((result) => {
           this.history = result.data;
         });
       this.show_history = true;
@@ -341,11 +383,11 @@ export default {
       else if (val == "created") return "library_add";
       else if (val == "canceled") return "close";
       else return "pending_actions";
-    }
+    },
   },
   computed: {
     selectCount() {
-      var data = this.sppList.filter(e => e.select === true);
+      var data = this.sppList.filter((e) => e.select === true);
       var count = data.length;
 
       if (data[0]) this.selected = data[0];
@@ -364,8 +406,8 @@ export default {
       } else {
         return "Sedang diproses oleh " + this.selected.handler_name;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

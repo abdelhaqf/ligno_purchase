@@ -67,6 +67,7 @@
             <th style="width:10px;"></th>
             <th class="text-left">User</th>
             <th class="text-left">Tanggal Pengajuan</th>
+            <th class="text-left">Pelaksana</th>
             <th class="text-left">Deadline</th>
             <th class="text-left">Barang</th>
             <th class="text-right">Jumlah</th>
@@ -84,6 +85,7 @@
               }}</q-chip>
             </td>
             <td class="text-left">{{ d.create_at | moment("DD MMM YYYY") }}</td>
+            <td class="text-left">{{ d.handler_name }}</td>
             <td class="text-left" style="width: 100px;">
               {{ d.deadline | moment("DD MMM YYYY") }}
             </td>
@@ -751,9 +753,9 @@ export default {
     },
     changeType() {
       if (this.type == "PO")
-        this.po.po_id = `OP/CM/${moment().format("YY")}/${
-          this.roman[parseInt(moment().format("M"))]
-        }/`;
+        this.po.po_id = `OP/CM/${moment().format("YY")}/${moment().format(
+          "MM"
+        )}/`;
       else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
     },
     cancelSPP() {

@@ -234,6 +234,8 @@ export default {
         "ATK & Keperluan Kantor",
         "Surat & Izin-izin",
         "Sumbangan",
+        "Raw Material",
+        "Perbaikan Gudang",
       ],
       selKategori:null
     };
