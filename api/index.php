@@ -145,9 +145,12 @@ Flight::route('POST /podetail_byid', function () {
 
 Flight::route('PUT /sync_formula/po', function () {
   $link = getLink();
+  $date1 = new DateTime();
   $data = Flight::request()->data;
   $q = "UPDATE spp SET sync = NOW() WHERE spp_id='{$data['id_spp']}'";
   mysqli_query($link, $q) or die(mysqli_error($link));
+  $date2 = new DateTime();
+  log_query($link, $q, $date1, $date2);
 });
 
 Flight::route('GET /spp_history/@spp_id', function ($spp_id) {
@@ -197,6 +200,7 @@ Flight::route('GET /pricelist/@item/@vendor', function ($item, $vendor) {
 
 Flight::route('POST /pricelist/new', function () {
   $link = getLink();
+  $date1 = new DateTime();
   $data = Flight::request()->data;
   $item = $data['item'];
   $vendor = $data['vendor'];
@@ -229,6 +233,8 @@ Flight::route('POST /pricelist/new', function () {
   $count = mysqli_fetch_assoc($res);
 
   $ret = array("items" => $data, "count" => $count['total']);
+  $date2 = new DateTime();
+  log_query($link, $q, $date1, $date2);
   Flight::json($ret);
 });
 
@@ -254,7 +260,13 @@ Flight::route('GET /count_data/@userid/@ispurch', function ($userid, $ispurch) {
             WHERE spp.is_received <> 2
             AND ($userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) OR po.user_id = $userid) 
               ) tb";
-  runQuery2($q);
+  $link = getLink();
+  $res = mysqli_query($link, $q) or die(mysqli_error($link));
+  $arr = array();
+  while ($row = mysqli_fetch_assoc($res)) {
+    $arr[] = $row;
+  }
+  Flight::json($arr[0]);
 });
 
 
@@ -513,9 +525,11 @@ Flight::route('POST /notifikasi', function () {
 
 Flight::route('POST /print/getdata', function () {
   $link = getLink();
+  $date1 = new DateTime();
   $data = Flight::request()->data;
 
   $ret = [];
+  $q = "";
 
   for ($i = 0; $i < count($data); $i++) {
     $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' 
@@ -528,31 +542,79 @@ Flight::route('POST /print/getdata', function () {
 
     $ret[] = mysqli_fetch_assoc($res);
   }
+  $date2 = new DateTime();
+  log_query($link, $q, $date1, $date2);
   Flight::json($ret);
 });
 
 /// Run Query
+function getDiff($time1, $time2)
+{
+  $dateTime1 = new DateTime($time1);
+  $dateTime2 = new DateTime($time2);
+
+  $interval = $dateTime1->diff($dateTime2);
+  $totalSeconds = ($interval->days * 24 * 60 * 60) +
+    ($interval->h * 60 * 60) +
+    ($interval->i * 60) +
+    $interval->s;
+  $microsecondsDiff = $totalSeconds * 1000000 + ($dateTime2->format('u') - $dateTime1->format('u'));
+  $millisecondsDiff = $microsecondsDiff / 1000;
+  return $millisecondsDiff;
+}
+
+function log_query($link, $q, $time1, $time2)
+{
+  $microseconds1 = $time1->format('u');
+  $milliseconds1 = substr($microseconds1, 0, 3);
+  $formattedDate1 = $time1->format('Y-m-d H:i:s') . '.' . $milliseconds1;
+
+  $microseconds2 = $time2->format('u');
+  $milliseconds2 = substr($microseconds2, 0, 3);
+  $formattedDate2 = $time2->format('Y-m-d H:i:s') . '.' . $milliseconds2;
+
+  $diff = getDiff($formattedDate1, $formattedDate2);
+  $the_q = mysqli_real_escape_string($link, $q);
+
+  $q_log = "INSERT INTO query_log 
+  SET query = '$the_q',
+  start_time = '$formattedDate1',
+  end_time = '$formattedDate2',
+  diff = '$diff'";
+  mysqli_query($link, $q_log) or die(mysqli_error($link));
+}
 //Get Array
 function runQuery($q)
 {
+  $date1 = new DateTime();
+
   $link = getLink();
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
+
   $arr = array();
   while ($row = mysqli_fetch_assoc($res)) {
     $arr[] = $row;
   }
 
+  $date2 = new DateTime();
+  log_query($link, $q, $date1, $date2);
+
+
   Flight::json($arr);
 }
+
 //Get only 1 value/array
 function runQuery2($q)
 {
   $link = getLink();
+  $date1 = new DateTime();
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $arr = array();
   while ($row = mysqli_fetch_assoc($res)) {
     $arr[] = $row;
   }
+  $date2 = new DateTime();
+  log_query($link, $q, $date1, $date2);
   Flight::json($arr[0]);
 }
 //update and post
@@ -563,7 +625,7 @@ function runQuery3($method, $table, $input = [], $col = '', $val = '')
   }
 
   $link = getLink();
-
+  $date1 = new DateTime();
   $columns = array_keys($input);
   $values = array_values($input);
 
@@ -582,6 +644,10 @@ function runQuery3($method, $table, $input = [], $col = '', $val = '')
       break;
   }
   $result = mysqli_query($link, $sql);
+
+  $date2 = new DateTime();
+  log_query($link, $sql, $date1, $date2);
+
   if (!$result) {
     http_response_code(404);
     die(mysqli_error($link));
@@ -598,6 +664,8 @@ function runQuery3($method, $table, $input = [], $col = '', $val = '')
 
 /// Login 
 Flight::route('POST /login', function () {
+  $date1 = new DateTime();
+
   $user = Flight::request()->data;
   $username = $user->username;
   $password = $user->password;
@@ -632,6 +700,8 @@ Flight::route('POST /login', function () {
       )
     );
     $jwt = JWT::encode($token, Flight::get('secret'));
+    $date2 = new DateTime();
+    log_query($link, $q, $date1, $date2);
     echo $jwt;
   } else {
     Flight::halt(401, 'not authorized!');
