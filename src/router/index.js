@@ -15,22 +15,23 @@ const routes = [
     component: () => import("../views/Login.vue"),
   },
   {
+    path: "/spp/list",
+    name: "SPPList",
+    component: () => import("../views/SPPList.vue"),
+    meta: { title: "Daftar SPP", path: ["SPP"] },
+  },
+  {
     path: "/spp/create",
     name: "SPPCreate",
     component: () => import("../views/SPPCreate.vue"),
   },
   {
-    path: "/spp/list",
-    name: "SPPList",
-    component: () => import("../views/SPPList.vue"),
-  },
-  {
-    path: "/spp/approval",
+    path: "/approval/manager",
     name: "SPPApprove",
     component: () => import("../views/SPPApproval.vue"),
   },
   {
-    path: "/spp/approval-pm",
+    path: "/approval/purchasing",
     name: "SPPApprovePM",
     component: () => import("../views/SPPApprovalPM.vue"),
   },

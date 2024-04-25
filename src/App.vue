@@ -1,34 +1,24 @@
 <template>
-  <q-layout view="hHh LpR fFf" class="bg-grey-1">
-    <!-- left drawer  -->
-    <q-drawer
-      v-if="!isLogin && $route.name != 'print_preview'"
-      content-class="bg-grey-2"
-      show-if-above
-      v-model="left"
-      side="left"
-      bordered
+  <q-layout view="hHh LpR fFf" class="bg-grey-2 my-font l-text-body">
+    <q-header
+      v-if="this.$route.name != 'Login'"
+      unelevated
+      class="bg-white text-black"
+      style="box-shadow: 0 8px 28px 0 #f1f1f1  !important"
     >
-      <!-- current user  -->
-      <q-item class="bg-blue-2">
-        <q-item-section avatar>
-          <q-avatar>
-            <img :src="'./avatar.png'" />
-          </q-avatar>
-        </q-item-section>
-        <q-item-section v-if="$store.state.currentUser">
-          <q-item-label class="text-subtitle2">{{
-            $store.state.currentUser.username | capitalize
-          }}</q-item-label>
-          <q-item-label caption>{{
-            $store.state.currentUser.dept
-          }}</q-item-label>
-        </q-item-section>
-        <q-item-section class="relative-position">
+      <q-toolbar class="q-py-xs">
+        <q-img
+          :src="`./Logo/ligno.png`"
+          height="40px"
+          width="115px"
+          fit="contain"
+        ></q-img>
+        <q-space></q-space>
+        <div class="relative-position q-mr-lg">
           <q-btn
             flat
             dense
-            color="indigo-4"
+            color="black"
             icon="notifications"
             @click="$router.push('/notification')"
           />
@@ -38,102 +28,401 @@
             size="sm"
             style="top:5px;"
             class="absolute-center text-white"
-            color="orange-4"
-            >{{ count_notif > 20 ? "20+" : count_notif }}</q-chip
+            color="red-8"
+            >{{ count_notif > 99 ? "99+" : count_notif }}</q-chip
           >
-        </q-item-section>
-        <q-item-section side>
-          <q-item-label caption>
-            <q-btn
-              flat
-              label="logout"
-              size="sm"
-              color="negative"
-              @click="logout"
-            />
-          </q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-separator />
-      <!-- menus -->
-      <q-item clickable v-ripple v-for="m in menu" :key="m.title" :to="m.link">
-        <q-item-section avatar>
-          <q-icon :name="m.icon" color="indigo-2" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label class="row items-center">
-            <div>{{ m.title }}</div>
-            <div style="height: 30px; padding: 0 5px;">
-              <q-badge color="orange-4" v-if="m.count > 0">{{
-                m.count
-              }}</q-badge>
-            </div>
-          </q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-separator />
-      <!-- <q-expansion-item label="Info Kurs" header-class="text-h6">
-        <q-card class="relative-position bg-grey-2" flat>
-          <q-card-section>
-            <transition
-              appear
-              enter-active-class="animated fadeIn"
-              leave-active-class="animated fadeOut"
-            >
-              <div v-if="showKurs">
-                <q-list bordered separator class="bg-white rounded-borders">
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label class="text-subtitle2">BCA</q-item-label>
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Rp {{ kurs.Jsondata.bcarate | number("0,0") }}</q-item-label>
-                      <q-item-label caption>{{ kurs.Jsondata.date3 }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label class="text-subtitle2">BI</q-item-label>
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Rp {{ kurs.Jsondata.birate | number("0,0") }}</q-item-label>
-                      <q-item-label caption>{{ kurs.Jsondata.date2 }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label class="text-subtitle2">MenKeu</q-item-label>
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Rp {{ kurs.Jsondata.menkeurate | number("0,0") }}</q-item-label>
-                      <q-item-label caption>{{ kurs.Jsondata.date1 }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
+        </div>
+        <div class="row items-center q-gutter-x-sm">
+          <q-avatar>
+            <img :src="'./avatar.png'" />
+          </q-avatar>
+          <q-btn-dropdown
+            flat
+            no-caps
+            dropdown-icon="keyboard_arrow_down"
+            dense
+          >
+            <template v-slot:label>
+              <div class="text-left">
+                <div class="text-bold">Nama</div>
+                <div class="l-text-thin text-grey-6" style="line-height: 14px;">
+                  Jabatan
+                </div>
               </div>
-            </transition>
-          </q-card-section>
+            </template>
 
-          <q-inner-loading :showing="isLoading">
-            <q-spinner-gears size="50px" color="primary" />
-          </q-inner-loading>
-        </q-card>
-      </q-expansion-item> -->
+            <q-card class="row no-wrap all-radius column" style="width: 250px;">
+              <q-card-section class="column items-center q-gutter-y-sm">
+                <q-avatar size="72px">
+                  <img :src="'./avatar.png'" />
+                </q-avatar>
+                <div class="text-center">
+                  <div class="text-bold l-text-detail">Nama</div>
+                  <div
+                    class="l-text-thin text-grey-6"
+                    style="line-height: 14px;"
+                  >
+                    Jabatan
+                  </div>
+                </div>
+              </q-card-section>
+
+              <q-btn
+                dense
+                flat
+                class="q-px-md q-py-xs"
+                icon="lock"
+                label="Ubah Sandi"
+                no-caps
+                align="left"
+                v-close-popup
+              />
+              <q-separator size="1px" color="grey-4"></q-separator>
+              <q-btn
+                dense
+                flat
+                class="q-px-md q-py-xs"
+                icon="logout"
+                label="Logout"
+                color="negative"
+                no-caps
+                align="left"
+                v-close-popup
+                @click="logout"
+              />
+            </q-card>
+          </q-btn-dropdown>
+        </div>
+        <!-- <q-btn flat @click="logout" label="Keluar" no-caps icon="logout" /> -->
+      </q-toolbar>
+      <q-separator />
+    </q-header>
+
+    <!-- left drawer  -->
+    <q-drawer
+      v-if="!isLogin && $route.name != 'print_preview'"
+      show-if-above
+      v-model="left"
+      side="left"
+      bordered
+      class="column"
+      :mini="miniState"
+      @mouseover="miniState = false"
+      @mouseout="miniState = true"
+      mini-to-overlay
+    >
+      <q-list class="column" style="height: 100%;">
+        <!-- <q-item
+          clickable
+          v-ripple
+          v-for="m in menu"
+          :key="m.title"
+          :to="m.link"
+          :active="$route.name == m.name"
+          class="inactive-menu"
+          :active-class="
+            miniState ? 'text-primary' : 'text-primary active-menu'
+          "
+        >
+          <q-item-section avatar>
+            <q-icon :name="m.icon" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              <div>{{ m.title }}</div>
+
+              <q-badge
+                rounded
+                color="pink"
+                class="q-ml-sm round-radius"
+                v-if="m.count > 0"
+                :label="m.count"
+              ></q-badge>
+            </q-item-label>
+          </q-item-section>
+        </q-item> -->
+        <q-item
+          clickable
+          v-ripple
+          :active="$route.name == 'Dashboard'"
+          class="inactive-menu"
+          :active-class="
+            miniState ? 'text-primary' : 'text-primary active-menu'
+          "
+          to="/dashboard"
+        >
+          <q-item-section avatar>
+            <q-icon name="dashboard" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              <div>Dashboard</div>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-expansion-item
+          class="cursor-pointer"
+          :class="
+            $route.name == 'SPPList' || $route.name == 'SPPCreate'
+              ? 'text-primary'
+              : ''
+          "
+        >
+          <template v-slot:header>
+            <q-item-section avatar>
+              <q-icon name="list_alt" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>SPP</q-item-label>
+            </q-item-section>
+          </template>
+          <q-item
+            active-class="active-menu"
+            :active="$route.name == 'SPPList'"
+            to="/spp/list"
+            clickable
+          >
+            <q-item-section avatar></q-item-section>
+            <q-item-section
+              :class="$route.name == 'SPPList' ? 'text-primary' : 'text-black'"
+              >List SPP Anda</q-item-section
+            >
+          </q-item>
+          <q-item
+            active-class="active-menu"
+            :active="$route.name == 'SPPCreate'"
+            to="/spp/create"
+            clickable
+          >
+            <q-item-section avatar></q-item-section>
+            <q-item-section
+              :class="
+                $route.name == 'SPPCreate' ? 'text-primary' : 'text-black'
+              "
+              >Buat SPP</q-item-section
+            >
+          </q-item>
+        </q-expansion-item>
+        <q-expansion-item
+          class="cursor-pointer"
+          :class="
+            $route.name == 'SPPApprove' || $route.name == 'SPPApprovePM'
+              ? 'text-primary'
+              : ''
+          "
+        >
+          <template v-slot:header>
+            <q-item-section avatar>
+              <q-icon name="assignment_turned_in"> </q-icon>
+              <q-chip
+                v-if="
+                  miniState &&
+                    (count.count_approve > 0 || count.count_approvePM > 0)
+                "
+                dense
+                size="sm"
+                style="top:10px;right:3px"
+                class="absolute-center text-white"
+                color="red-8"
+                >{{
+                  parseInt(count.count_approve + count.count_approvePM)
+                }}</q-chip
+              >
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>
+                Persetujuan &nbsp;
+                <q-badge
+                  class="q-ml-sm"
+                  v-if="
+                    !miniState &&
+                      (count.count_approve > 0 || count.count_approvePM > 0)
+                  "
+                  rounded
+                  color="red-8"
+                  :label="parseInt(count.count_approve + count.count_approvePM)"
+                ></q-badge>
+              </q-item-label>
+            </q-item-section>
+          </template>
+          <q-item
+            active-class="active-menu"
+            :active="$route.name == 'SPPApprove'"
+            to="/approval/manager"
+            clickable
+          >
+            <q-item-section avatar></q-item-section>
+            <q-item-section
+              :class="
+                $route.name == 'SPPApprove' ? 'text-primary' : 'text-black'
+              "
+            >
+              <q-item-label>
+                Pers. Manager
+                <q-badge
+                  v-if="count.count_approve > 0"
+                  rounded
+                  color="red-8"
+                  :label="count.count_approve"
+                  class="q-ml-sm"
+                ></q-badge>
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item
+            active-class="active-menu"
+            :active="$route.name == 'SPPApprovePM'"
+            to="/approval/purchasing"
+            clickable
+          >
+            <q-item-section avatar></q-item-section>
+            <q-item-section
+              :class="
+                $route.name == 'SPPApprovePM' ? 'text-primary' : 'text-black'
+              "
+            >
+              <q-item-label>
+                Pers. Man. Purchasing
+                <q-badge
+                  v-if="count.count_approvePM > 0"
+                  rounded
+                  color="red-8"
+                  :label="count.count_approvePM"
+                  class="q-ml-sm"
+                ></q-badge>
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-expansion-item>
+        <q-item
+          clickable
+          v-ripple
+          :active="$route.name == 'SPPApproved'"
+          class="inactive-menu"
+          :active-class="
+            miniState ? 'text-primary' : 'text-primary active-menu'
+          "
+          to="/spp/approved"
+        >
+          <q-item-section avatar>
+            <q-icon name="fact_check" />
+            <q-chip
+              v-if="miniState && count.count_spp > 0"
+              dense
+              size="sm"
+              style="top:10px;right:3px"
+              class="absolute-center text-white"
+              color="red-8"
+              >{{ count.count_spp }}</q-chip
+            >
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              SPP Disetujui
+              <q-badge
+                class="q-ml-sm"
+                v-if="count.count_spp > 0"
+                rounded
+                color="red-8"
+                :label="count.count_spp"
+              ></q-badge>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-ripple
+          :active="$route.name == 'POList'"
+          class="inactive-menu"
+          :active-class="
+            miniState ? 'text-primary' : 'text-primary active-menu'
+          "
+          to="/po/list/not/null/null/null"
+        >
+          <q-item-section avatar>
+            <q-icon name="shopping_bag" />
+            <q-chip
+              v-if="miniState && count.count_spp > 0"
+              dense
+              size="sm"
+              style="top:10px;right:3px"
+              class="absolute-center text-white"
+              color="red-8"
+              >{{ count.count_po }}</q-chip
+            >
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              List PO
+              <q-badge
+                class="q-ml-sm"
+                v-if="count.count_po > 0"
+                rounded
+                color="red-8"
+                :label="count.count_po"
+              ></q-badge>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-ripple
+          :active="$route.name == 'PriceList'"
+          class="inactive-menu"
+          :active-class="
+            miniState ? 'text-primary' : 'text-primary active-menu'
+          "
+          to="/price/list"
+        >
+          <q-item-section avatar>
+            <q-icon name="price_check" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              <div>Daftar Harga</div>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <!-- menus -->
+        <q-separator />
+        <div style="flex-grow: 99 !important;"></div>
+        <!-- <q-separator />
+        <q-item clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="keyboard_arrow_left" color="indigo-2" />
+          </q-item-section>
+          <q-item-label class="row items-center">Tutup Menu</q-item-label>
+        </q-item> -->
+      </q-list>
     </q-drawer>
 
-    <q-page-container>
-      <!-- <q-scroll-area
-        :visible="false"
-        :thumb-style="thumbStyle"
-        :bar-style="barStyle"
-        style="height: 100vh;"
-      > -->
+    <q-page-container class="q-mx-auto q-py-md" style="max-width: 1440px;">
+      <q-card-section class="q-px-lg">
+        <div>
+          <q-breadcrumbs>
+            <q-breadcrumbs-el
+              class="text-grey-8"
+              v-for="(el, i) in routeMeta ? routeMeta.path : []"
+              :label="el"
+            />
+            <q-breadcrumbs-el
+              class="text-primary"
+              :label="routeMeta ? routeMeta.title : ''"
+            />
+          </q-breadcrumbs>
+        </div>
+        <div
+          class="l-text-title text-bold"
+          style="line-height: 1.2 !important;"
+        >
+          {{ routeMeta ? routeMeta.title : "" }}
+        </div>
+      </q-card-section>
       <router-view
         v-if="$route.name == 'Login' || $store.state.currentUser"
         @isLogin="toggleLogin"
         @updateKurs="updateKurs"
       />
-      <!-- </q-scroll-area> -->
     </q-page-container>
   </q-layout>
 </template>
@@ -150,7 +439,12 @@ export default {
       isLoading: false,
       showKurs: false,
       kurs: [],
-      count: {},
+      count: {
+        count_approve: 0,
+        count_approvePM: 0,
+        count_po: 0,
+        count_spp: 0,
+      },
       menu: [],
       count_notif: 0,
       thumbStyle: {
@@ -175,6 +469,10 @@ export default {
       attention: 0,
       title: document.title,
       c: 0,
+      miniState: true,
+
+      curRoute: {},
+      routeMeta: null,
     };
   },
   async mounted() {
@@ -212,6 +510,11 @@ export default {
           textColor: "#fff0e2",
         });
         favicon.badge(val);
+      }
+    },
+    $route(to, from) {
+      if (to) {
+        this.routeMeta = JSON.parse(JSON.stringify(to.meta));
       }
     },
   },
@@ -291,13 +594,14 @@ export default {
           icon: "dashboard",
           title: "Home",
           link: "/dashboard",
+          name: "Home",
         });
       }
-      this.menu.push({
-        icon: "create",
-        title: "Buat SPP",
-        link: "/spp/create",
-      });
+      // this.menu.push({
+      //   icon: "create",
+      //   title: "Buat SPP",
+      //   link: "/spp/create",
+      // });
 
       await this.$http
         .get(
@@ -309,11 +613,13 @@ export default {
         )
         .then((result) => {
           this.count = result.data;
-          this.menu.push({
-            icon: "inbox",
-            title: "SPP Anda",
-            link: "/spp/list",
-          });
+          console.log(this.count);
+
+          // this.menu.push({
+          //   icon: "inbox",
+          //   title: "SPP Anda",
+          //   link: "/spp/list",
+          // });
           if (this.$store.state.currentUser.is_manager == "1") {
             this.menu.push({
               icon: "group",
@@ -381,12 +687,14 @@ export default {
 };
 </script>
 <style lang="scss">
+@import "@/styles/quasar.scss";
 .stickyTable {
   .q-table__top,
   .q-table__bottom,
   thead tr:first-child th {
-    background-color: #027be3;
-    color: white;
+    background-color: #f0faff;
+    color: black;
+    text-align: center;
   }
   thead tr th {
     position: sticky;
@@ -410,8 +718,29 @@ export default {
   width: 190mm;
 }
 
+@font-face {
+  font-family: mainfont;
+  src: url(./styles/fonts/Oxygen-Regular.ttf);
+}
+
+@font-face {
+  font-family: mainfont;
+  src: url("./styles/fonts/Oxygen-Bold.ttf");
+  font-weight: 700;
+}
+@font-face {
+  font-family: mainfont;
+  src: url("./styles/fonts/Oxygen-Regular.ttf");
+  font-weight: 400;
+}
+@font-face {
+  font-family: mainfont;
+  src: url("./styles/fonts/Oxygen-Light.ttf");
+  font-weight: 300;
+}
+
 .my-font {
-  font-family: "customfont";
+  font-family: "mainfont";
 }
 
 .f10 {
@@ -431,5 +760,91 @@ export default {
 }
 .f20 {
   font-size: 20pt;
+}
+.l-text-thin {
+  font-weight: 300 !important;
+}
+.l-text-thinner {
+  font-weight: 200 !important;
+}
+
+.border-card {
+  border-radius: 10px !important;
+}
+
+.long-text-dots {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.kiri-radius {
+  border: 1px solid #bbbbbb;
+  border-radius: 8px 0 0 8px !important;
+}
+
+.kanan-radius {
+  border: 1px solid #bbbbbb;
+  border-radius: 0 8px 8px 0 !important;
+}
+.atas-radius {
+  border: 1px solid #bbbbbb;
+  border-radius: 8px 8px 0 0 !important;
+}
+.bawah-radius {
+  border: 1px solid #bbbbbb;
+  border-radius: 0 0 8px 8px !important;
+}
+
+.all-radius {
+  border: 1px solid #bbbbbb;
+  border-radius: 8px 8px 8px 8px !important;
+}
+
+.active-menu {
+  padding-left: 14px !important;
+  border-left: 2px solid $primary !important;
+  background-color: #e6f3fa !important;
+}
+
+.inactive-menu {
+  border-left: none;
+}
+
+.l-text-header {
+  font-size: 48px !important;
+  line-height: 1.8;
+}
+
+.l-text-title {
+  font-size: 36px !important;
+  line-height: 1.8;
+}
+
+.l-text-subtitle {
+  font-size: 24px !important;
+  line-height: 1.8;
+}
+
+.l-text-detail {
+  font-size: 16px !important;
+  line-height: 1.8;
+}
+
+.l-text-body {
+  font-size: 13px !important;
+  line-height: 1.8;
+}
+
+.l-text-description {
+  font-size: 11px !important;
+  line-height: 1.8;
+}
+
+.round-radius {
+  border-radius: 500px !important;
+}
+.capsule {
+  border-radius: 50px;
 }
 </style>
