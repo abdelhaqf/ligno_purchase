@@ -44,9 +44,11 @@
           >
             <template v-slot:label>
               <div class="text-left">
-                <div class="text-bold">Nama</div>
+                <div class="text-bold">
+                  {{ curUser ? curUser.name : "" }}
+                </div>
                 <div class="l-text-thin text-grey-6" style="line-height: 14px;">
-                  Jabatan
+                  {{ curUser ? curUser.dept : "" }}
                 </div>
               </div>
             </template>
@@ -57,12 +59,14 @@
                   <img :src="'./avatar.png'" />
                 </q-avatar>
                 <div class="text-center">
-                  <div class="text-bold l-text-detail">Nama</div>
+                  <div class="text-bold l-text-detail">
+                    {{ curUser ? curUser.name : "" }}
+                  </div>
                   <div
                     class="l-text-thin text-grey-6"
                     style="line-height: 14px;"
                   >
-                    Jabatan
+                    {{ curUser ? curUser.dept : "" }}
                   </div>
                 </div>
               </q-card-section>
@@ -150,6 +154,7 @@
             miniState ? 'text-primary' : 'text-primary active-menu'
           "
           to="/dashboard"
+          v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
             <q-icon name="dashboard" />
@@ -163,7 +168,9 @@
         <q-expansion-item
           class="cursor-pointer"
           :class="
-            $route.name == 'SPPList' || $route.name == 'SPPCreate'
+            $route.name == 'SPPList' ||
+            $route.name == 'SPPCreate' ||
+            $route.name == 'SPPDetail'
               ? 'text-primary'
               : ''
           "
@@ -210,6 +217,7 @@
               ? 'text-primary'
               : ''
           "
+          v-can="['PURCHASING', 'MANAGER']"
         >
           <template v-slot:header>
             <q-item-section avatar>
@@ -250,6 +258,7 @@
             :active="$route.name == 'SPPApprove'"
             to="/approval/manager"
             clickable
+            v-can="['MANAGER']"
           >
             <q-item-section avatar></q-item-section>
             <q-item-section
@@ -274,6 +283,7 @@
             :active="$route.name == 'SPPApprovePM'"
             to="/approval/purchasing"
             clickable
+            v-can="['PURCHASING MANAGER']"
           >
             <q-item-section avatar></q-item-section>
             <q-item-section
@@ -303,6 +313,7 @@
             miniState ? 'text-primary' : 'text-primary active-menu'
           "
           to="/spp/approved"
+          v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
             <q-icon name="fact_check" />
@@ -338,6 +349,7 @@
             miniState ? 'text-primary' : 'text-primary active-menu'
           "
           to="/po/list/not/null/null/null"
+          v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
             <q-icon name="shopping_bag" />
@@ -373,6 +385,7 @@
             miniState ? 'text-primary' : 'text-primary active-menu'
           "
           to="/price/list"
+          v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
             <q-icon name="price_check" />
@@ -396,7 +409,10 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container class="q-mx-auto q-py-md" style="max-width: 1440px;">
+    <q-page-container
+      class="q-mx-auto q-py-md "
+      style="max-width: 1440px; padding-left: 0 !important"
+    >
       <q-card-section class="q-px-lg">
         <div>
           <q-breadcrumbs>
@@ -517,6 +533,10 @@ export default {
         this.routeMeta = JSON.parse(JSON.stringify(to.meta));
       }
     },
+    $store(to, from) {
+      console.log("prev", from);
+      console.log("next", to);
+    },
   },
   methods: {
     ...mapActions(["getCurrentUser"]),
@@ -613,7 +633,6 @@ export default {
         )
         .then((result) => {
           this.count = result.data;
-          console.log(this.count);
 
           // this.menu.push({
           //   icon: "inbox",
@@ -683,7 +702,15 @@ export default {
       this.$router.push("/login");
     },
   },
-  computed: mapState(["currentUser"]),
+  computed: {
+    ...mapState(["currentUser"]),
+    curUser() {
+      if (this.$store.state.currentUser) {
+        return this.$store.state.currentUser;
+      }
+      return false;
+    },
+  },
 };
 </script>
 <style lang="scss">
@@ -741,6 +768,7 @@ export default {
 
 .my-font {
   font-family: "mainfont";
+  letter-spacing: 1px !important;
 }
 
 .f10 {
@@ -844,7 +872,16 @@ export default {
 .round-radius {
   border-radius: 500px !important;
 }
+
 .capsule {
   border-radius: 50px;
+}
+
+.l-grow {
+  flex-grow: 99 !important;
+}
+
+button {
+  letter-spacing: 1px !important;
 }
 </style>

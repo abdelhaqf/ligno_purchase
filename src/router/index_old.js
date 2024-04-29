@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import axios from "axios";
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -15,31 +15,22 @@ const routes = [
     component: () => import("../views/Login.vue"),
   },
   {
-    path: "/spp/list",
-    name: "SPPList",
-    component: () => import("../views/SPPList.vue"),
-    meta: { title: "Daftar SPP", path: ["SPP"] },
-  },
-  {
     path: "/spp/create",
     name: "SPPCreate",
     component: () => import("../views/SPPCreate.vue"),
-    meta: { title: "SPP Baru", path: ["SPP", "Daftar SPP"] },
   },
   {
-    path: "/spp/detail/:id",
-    name: "SPPDetail",
-    component: () => import("../views/SPPDetail.vue"),
-    meta: { title: "SPP Detail", path: ["SPP", "Daftar SPP"] },
+    path: "/spp/list",
+    name: "SPPList",
+    component: () => import("../views/SPPList.vue"),
   },
   {
-    path: "/approval/manager",
+    path: "/spp/approval",
     name: "SPPApprove",
     component: () => import("../views/SPPApproval.vue"),
-    meta: { title: "Persetujuan Manager", path: ["Persetujuan"] },
   },
   {
-    path: "/approval/purchasing",
+    path: "/spp/approval-pm",
     name: "SPPApprovePM",
     component: () => import("../views/SPPApprovalPM.vue"),
   },
@@ -78,21 +69,11 @@ const routes = [
 const router = new VueRouter({
   routes,
 });
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
   if (to.name != "Login") {
     if (!localStorage.getItem("token-purchase")) {
       next({ name: "Login" });
     } else {
-      // await axios
-      //   .get(`${process.env.VUE_APP_BASE_URL}/user/info/`, {
-      //     headers: {
-      //       Authorization: "Bearer " + localStorage.getItem("token-purchase"),
-      //     },
-      //   })
-      //   .then((result) => {
-      //     console.log("user obtained");
-      //     to.meta.currentUser = result.data;
-      //   });
       next();
     }
   } else {

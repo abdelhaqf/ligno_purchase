@@ -21,6 +21,36 @@ Vue.use(Vue2Filters);
 
 Vue.config.productionTip = false;
 
+Vue.directive("can", {
+  bind: async (el, binding, vnode) => {
+    // vuex diisi saat sukses login
+    let resp = await axios.get(`${process.env.VUE_APP_BASE_URL}/user/info/`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token-purchase"),
+      },
+    });
+
+    let user = resp.data;
+    if (user?.dept == "IT" && user?.is_manager == "1") {
+      return;
+    } else if (
+      binding.value.includes("PURCHASING") &&
+      user?.is_purchasing == "1"
+    ) {
+      return;
+    } else if (binding.value.includes("MANAGER") && user?.is_manager == "1") {
+      return;
+    } else if (
+      binding.value.includes("PURCHASING MANAGER") &&
+      user?.is_purch_manager == "1"
+    ) {
+      return;
+    } else {
+      vnode.elm.style.display = "none";
+    }
+  },
+});
+
 new Vue({
   router,
   store,
