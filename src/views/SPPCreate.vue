@@ -1,170 +1,168 @@
 <template>
-  <div class="q-pa-lg rounded-borders full-width">
+  <div class="q-px-lg rounded-borders full-width">
     <q-card flat bordered class="bg-white">
       <!-- form  -->
 
-      <q-card-section class="q-pa-none">
-        <!-- form SPP -->
-        <q-card-section class="row justify-between">
-          <div class=" text-h6">
-            SPP Baru
-          </div>
-          <q-btn
-            flat
-            color="primary"
-            label="lihat cara membuat spp"
-            icon="description"
-            @click="dialogStep = true"
-          ></q-btn>
-        </q-card-section>
-        <q-card-section class="q-gutter-md">
-          <div>
-            <q-input
-              outlined
-              v-model="spp.item"
-              label="1. Nama Barang"
-              stack-label
-              v-if="showInput"
-              dense
-              class="full-width"
-            >
-              <template v-slot:append>
-                <q-toggle
-                  v-model="showInput"
-                  color="green"
-                  icon="add"
-                  keep-color
-                />
-              </template>
-              <template v-slot:label>
-                1. Nama Barang
-                <a class="q-px-sm bg-info text-white rounded-borders"
-                  >input baru</a
-                >
-              </template>
-            </q-input>
-            <q-select
-              v-else
-              stack-label
-              outlined
-              dense
-              v-model="spp.item"
-              map-options
-              emit-value
-              use-input
-              hide-selected
-              fill-input
-              input-debounce="0"
-              :options="filtered"
-              @filter="filterOP"
-              label="1. Nama Barang"
-              class="full-width"
-            >
-              <template v-slot:append>
-                <q-toggle
-                  v-model="showInput"
-                  color="green"
-                  icon="add"
-                  keep-color
-                />
-              </template>
-            </q-select>
+      <q-scroll-area style="height:calc(100vh - 225px)">
+        <q-card-section class="q-gutter-y-md">
+          <div class="row items-center">
+            <div class="text-black" style="width: 125px;">
+              Nama Barang
+            </div>
+            <div class="l-grow">
+              <q-input
+                outlined
+                v-model="spp.item"
+                v-if="showInput"
+                dense
+                class="l-grow"
+                placeholder="Masukan Nama Barang"
+              >
+                <template v-slot:append>
+                  <q-toggle
+                    v-model="showInput"
+                    color="green"
+                    icon="add"
+                    keep-color
+                  />
+                </template>
+                <template v-slot:label>
+                  1. Nama Barang
+                  <a class="q-px-sm bg-info text-white rounded-borders"
+                    >input baru</a
+                  >
+                </template>
+              </q-input>
+              <q-select
+                v-else
+                outlined
+                dense
+                v-model="spp.item"
+                map-options
+                emit-value
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                :options="filtered"
+                @filter="filterOP"
+                class="l-grow"
+                placeholder="Pilih Nama Barang"
+              >
+                <template v-slot:append>
+                  <q-toggle
+                    v-model="showInput"
+                    color="green"
+                    icon="add"
+                    keep-color
+                  />
+                </template>
+              </q-select>
+            </div>
           </div>
 
-          <div class="row justify-between">
-            <q-input
-              type="number"
-              style="width:49%"
-              outlined
-              v-model="spp.qty"
-              label="2. Qty"
-              stack-label
-              dense
-            />
-            <q-input
-              style="width:49%"
-              outlined
-              v-model="spp.unit"
-              label
-              stack-label
-              dense
-            >
-              <template v-slot:label>
-                3. Satuan
-                <a class="q-px-sm bg-info text-white rounded-borders"
-                  >kg / m / dus</a
-                >
-              </template>
-            </q-input>
+          <div class="row items-center q-gutter-x-xl">
+            <div class="row items-center l-grow">
+              <div style="width: 125px;">Qty</div>
+              <q-input
+                type="number"
+                style="width:49%"
+                outlined
+                v-model="spp.qty"
+                dense
+                class="l-grow"
+                placeholder="0"
+              />
+            </div>
+            <div class="row items-center l-grow">
+              <div style="width: 75px;">Satuan</div>
+              <q-input
+                style="width:49%"
+                outlined
+                v-model="spp.unit"
+                dense
+                class="l-grow"
+                placeholder="e.g. kg / m / dus"
+              >
+              </q-input>
+            </div>
           </div>
-          <div class="row justify-between">
-            <q-input
-              outlined
-              v-model="spp.deadline"
-              mask="date"
-              label
-              style="width:49%"
-            >
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy
-                    ref="qDateProxy"
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date minimal v-model="spp.deadline">
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
+          <div class="row items-center">
+            <div style="width: 125px;">Deadline</div>
+
+            <q-field dense outlined class="l-grow">
+              <template v-slot:prepend>
+                <q-icon name="date_range" />
               </template>
-              <template v-slot:label>
-                4. Deadline
-                <a class="q-px-sm bg-info text-white rounded-borders"
-                  >tahun / bulan / tanggal</a
-                >
+
+              <template v-slot:control>
+                <div class="self-center full-width no-outline" tabindex="0">
+                  {{ date_model }}
+                </div>
               </template>
-            </q-input>
+              <q-popup-proxy
+                style="width:fit-content"
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-date v-model="spp.deadline" :options="limitDate">
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Close" color="primary" flat />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-field>
+          </div>
+          <div class="row items-center">
+            <div style="width: 125px;">CC</div>
             <q-select
               outlined
-              stack-label
+              dense
               emit-value
               map-options
-              label="5. cc"
               :options="listUser"
               v-model="spp.cc"
-              style="width:49%"
+              class="l-grow"
+              placeholder="Pilih Nama"
             ></q-select>
           </div>
-          <q-input
-            outlined
-            v-model="spp.description"
-            class="q-mb-lg"
-            label="6. Keterangan"
-            stack-label
-            dense
-            type="textarea"
-          />
+          <div class="row items-start">
+            <div class="q-mt-xs" style="width: 125px;">Keterangan</div>
+            <q-input
+              outlined
+              v-model="spp.description"
+              dense
+              type="textarea"
+              class="l-grow"
+            />
+          </div>
         </q-card-section>
-        <q-card-actions class="q-px-md" align="right">
+      </q-scroll-area>
+    </q-card>
+
+    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
+      <q-card-section class="row justify-between">
+        <q-btn
+          outline
+          label="Kembali"
+          no-caps
+          color="grey-8"
+          to="/spp/list"
+        ></q-btn>
+        <div>
           <q-btn flat color="primary" label="Reset" @click="resetForm"></q-btn>
           <q-btn
             unelevated
-            class=" no-border-radius"
+            class="text-bold border-radius"
             color="primary"
-            label="Ajukan"
             @click="createSPP()"
-          />
-        </q-card-actions>
+          >
+            <div>Ajukan</div>
+          </q-btn>
+        </div>
       </q-card-section>
-    </q-card>
+    </q-footer>
+
     <q-dialog v-model="dialogStep">
       <q-card>
         <q-card-section class="bg-blue-grey-1 q-pa-none">
@@ -289,6 +287,13 @@ export default {
       if (this.option.length == 0) this.showInput = true;
     });
     this.getUsers();
+  },
+  computed: {
+    date_model() {
+      if (!this.spp.deadline) return "Pilih Tanggal Dibutuhkan";
+
+      return moment(this.spp.deadline).format("DD MMMM YYYY");
+    },
   },
   methods: {
     resetForm() {
