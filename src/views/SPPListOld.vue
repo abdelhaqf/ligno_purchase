@@ -1,105 +1,54 @@
 <template>
-  <div class="row relative q-px-lg ">
-    <q-card flat square class="col-12 bg-white rounded-borders">
+  <div class="row relative q-px-lg q-pt-lg">
+    <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- toolbar -->
-      <q-card-section class="row justify-between items-center">
-        <div class="row q-gutter-x-md">
-          <q-field
-            dense
-            outlined
-            style="width: 225px;"
-            v-model="selDate"
-            clearable
-            @clear="fetchData"
-          >
-            <template v-slot:prepend>
-              <q-icon name="date_range" />
-            </template>
-
-            <template v-slot:control>
-              <div class="self-center full-width no-outline" tabindex="0">
-                {{ date_model }}
-              </div>
-            </template>
-
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date range v-model="selDate" @input="fetchData">
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-field>
-          <q-input
-            outlined
-            dense
-            placeholder="Cari Nama Barang"
-            style="width: 275px;"
-            v-model="searchTerm"
-            @input="fetchData"
-            clearable
-            @clear="searchTerm = ''"
-          >
-            <template class="q-pt-none" v-slot:prepend>
-              <q-icon name="search"></q-icon>
-            </template>
-          </q-input>
+      <q-card-section class="q-pa-md row justify-between">
+        <div class="q-gutter-md">
+          <q-btn label="Detail" color="primary" @click="showDetail()" :disable="slcIndex < 0" />
+          <q-btn
+            flat
+            label="History"
+            color="secondary"
+            @click="showHistory()"
+            :disable="slcIndex <0"
+          />
         </div>
-
-        <q-btn
-          label="SPP Baru"
-          icon="add"
-          color="primary"
-          to="/spp/create"
-          unelevated
-        />
+        <div>
+          <q-select
+            outlined
+            dense
+            v-model="filter"
+            :options="filterOption"
+            map-options
+            emit-value
+            @input="fetchData"
+          />
+        </div>
       </q-card-section>
 
       <!-- table  -->
-      <q-markup-table class="stickyTable" style="height: calc(100vh - 320px);">
+      <q-markup-table bordered dense>
         <thead class="bg-blue-grey-14 text-white">
           <tr>
-            <th style="width:25px;">No</th>
-            <th>Dibuat</th>
-            <th>Deadline</th>
-            <th>Barang</th>
-            <th>Jumlah</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th style="width:10px;"></th>
+            <th class="text-left">Dibuat</th>
+            <th class="text-left">Deadline</th>
+            <th class="text-left">Barang</th>
+            <th class="text-right">Jumlah</th>
           </tr>
         </thead>
-        <tbody v-if="sppList.length" separator="horizontal">
+        <tbody v-if="sppList.length" class="bg-blue-grey-1">
           <tr v-for="(d, index) in sppList" :key="d.spp_id">
-            <td class="text-center">
-              <!-- <q-radio v-model="slcIndex" :val="index" /> -->
-              {{ (pagination.current - 1) * pagination.limit + index + 1 }}
-            </td>
-            <td class="text-center">
-              {{ d.create_at | moment("DD MMM YYYY") }}
-            </td>
-            <td class="text-center">
-              {{ d.deadline | moment("DD MMM YYYY") }}
-            </td>
-            <td class="text-left l-grow">{{ d.item }}</td>
-            <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
             <td>
-              <div
-                class="capsule text-white q-px-md q-mx-auto"
-                style="width: fit-content;"
-                :class="`bg-${getColor(d.status)}`"
-              >
-                {{ d.status }}
-              </div>
+              <q-radio v-model="slcIndex" :val="index" />
             </td>
-            <td class="text-center">
-              <q-btn
-                flat
-                no-caps
-                label="Detail"
-                color="primary"
-                :to="`/spp/detail/${d.spp_id}`"
-              ></q-btn>
+            <td class="text-left">
+              {{ d.create_at | moment("DD MMM YYYY") }}
+              <q-badge :color="getColor(d.status)" text-color="white" dense size="sm">{{ d.status }}</q-badge>
             </td>
+            <td class="text-left" style="width: 100px;">{{ d.deadline | moment("DD MMM YYYY") }}</td>
+            <td class="text-left">{{ d.item }}</td>
+            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
           </tr>
         </tbody>
         <tbody v-else class="bg-green-1">
@@ -108,24 +57,11 @@
           </tr>
         </tbody>
       </q-markup-table>
-
-      <q-card-section class="row justify-center">
-        <q-pagination
-          input
-          :max="pagination.max"
-          v-model="pagination.current"
-          @input="fetchData"
-        ></q-pagination>
-      </q-card-section>
+      <q-card-section></q-card-section>
     </q-card>
 
     <!-- detail  -->
-    <q-dialog
-      v-model="show_detail"
-      persistent
-      transition-show="scale"
-      transition-hide="scale"
-    >
+    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-primary text-white row">
           <div>NO SPP: {{ selected.spp_id }}</div>
@@ -146,9 +82,7 @@
           <q-item>
             <q-item-section>
               <q-item-label caption>Pada Tanggal</q-item-label>
-              <q-item-label>{{
-                selected.create_at | moment(" hh:mm, DD MMM YYYY ")
-              }}</q-item-label>
+              <q-item-label>{{ selected.create_at | moment(" hh:mm, DD MMM YYYY ") }}</q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-item-label caption>Deadline</q-item-label>
@@ -162,17 +96,13 @@
             </q-item-section>
             <q-item-section side>
               <q-item-label caption>Jumlah</q-item-label>
-              <q-item-label
-                >{{ selected.qty }} {{ selected.unit }}</q-item-label
-              >
+              <q-item-label>{{ selected.qty }} {{ selected.unit }}</q-item-label>
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section v-if="show_detail">
               <q-item-label caption>Keterangan</q-item-label>
-              <q-item-label v-if="selected.description.length">{{
-                selected.description
-              }}</q-item-label>
+              <q-item-label v-if="selected.description.length">{{ selected.description }}</q-item-label>
               <q-item-label v-else>-</q-item-label>
             </q-item-section>
           </q-item>
@@ -210,12 +140,7 @@
     </q-dialog>
 
     <!-- history  -->
-    <q-dialog
-      v-model="show_history"
-      persistent
-      transition-show="scale"
-      transition-hide="scale"
-    >
+    <q-dialog v-model="show_history" persistent transition-show="scale" transition-hide="scale">
       <q-card style="min-width: 350px;">
         <q-card-section class="bg-secondary text-white row">
           <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
@@ -224,10 +149,7 @@
             <q-tooltip>Close</q-tooltip>
           </q-btn>
         </q-card-section>
-        <q-card-section
-          class="q-px-xl q-my-sm"
-          style="height: 450px; overflow: auto;"
-        >
+        <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
           <q-timeline>
             <q-timeline-entry
               v-for="x in history"
@@ -264,26 +186,18 @@ export default {
       receivedOption: [
         { label: "fully received", value: "2" },
         { label: "half received", value: "1" },
-        { label: "not received", value: "0" },
-      ],
-
-      selDate: null,
-      searchTerm: "",
-      pagination: {
-        max: 1,
-        current: 1,
-        limit: 25,
-      },
+        { label: "not received", value: "0" }
+      ]
     };
   },
   mounted() {
     this.$http
       .get("/list_month_user", {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token-purchase"),
-        },
+          Authorization: "Bearer " + localStorage.getItem("token-purchase")
+        }
       })
-      .then((result) => {
+      .then(result => {
         this.filterOption = result.data;
         this.filter = result.data[0].value;
         this.filterOption.unshift({ value: "%25", label: "all" });
@@ -294,35 +208,16 @@ export default {
   methods: {
     fetchData() {
       this.sppList = [];
-      let q_filter = `?current=${this.pagination.current}&limit=${
-        this.pagination.limit
-      }&search=${this.searchTerm ? this.searchTerm : ""}`;
-
-      if (this.selDate) {
-        if (this.selDate.from) {
-          q_filter = `${q_filter}&from=${moment(this.selDate.from).format(
-            "YYYY-MM-DD"
-          )}&to=${moment(this.selDate.to).format("YYYY-MM-DD")}`;
-        } else {
-          q_filter = `${q_filter}&date=${moment(this.selDate).format(
-            "YYYY-MM-DD"
-          )}`;
-        }
-      }
-
       this.$http
         .get(
-          `/spp/list/${this.$store.state.currentUser.user_id}${q_filter}`,
+          "/spp_byuserid/" +
+            this.$store.state.currentUser.user_id +
+            "/" +
+            this.filter,
           {}
         )
-        .then((result) => {
+        .then(result => {
           for (var i = 0; i < result.data.length; i++) {
-            if (i == 0) {
-              let total_count = parseInt(result.data[i].total_count);
-              this.pagination.max = Math.ceil(
-                total_count / this.pagination.limit
-              );
-            }
             result.data[i].status = this.status(result.data[i]);
             this.sppList.push(result.data[i]);
           }
@@ -339,19 +234,19 @@ export default {
 
       this.$http
         .put("/update_spp/" + this.selected.spp_id, data, {})
-        .then((result) => {
+        .then(result => {
           let history = {
             spp_id: this.selected.spp_id,
             status: "process",
             content:
               "update oleh pembuat SPP (" +
               this.$store.state.currentUser.username +
-              ")",
+              ")"
           };
           if (this.isReceived == 2) {
             history.status = "done";
           }
-          this.$http.post("/new_history", history, {}).then((result) => {});
+          this.$http.post("/new_history", history, {}).then(result => {});
 
           var info = "";
           if (this.isReceived == 2) info = "barang sudah diterima penuh";
@@ -363,17 +258,17 @@ export default {
             notif: "Konfimrasi penerimaan oleh pemohon",
             note: info,
             spp_id: this.selected.spp_id,
-            reference_page: "/po/list",
+            reference_page: "/po/list"
           };
-          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
 
           notifikasi.to_id = 1; // Notif ke Manager purchasing
-          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+          this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
 
           this.$q.notify({
             icon: "done",
             color: "positive",
-            message: "Status penerimaan sudah diubah",
+            message: "Status penerimaan sudah diubah"
           });
 
           this.fetchData();
@@ -382,7 +277,7 @@ export default {
     showHistory() {
       this.$http
         .get("/spp_history/" + this.sppList[this.slcIndex].spp_id, {})
-        .then((result) => {
+        .then(result => {
           this.history = result.data;
         });
       this.show_history = true;
@@ -427,7 +322,7 @@ export default {
       else if (val == "suspended") return "alarm";
       else if (val == "closed") return "highlight_off";
       else return "pending_actions";
-    },
+    }
   },
   computed: {
     status_note() {
@@ -450,19 +345,8 @@ export default {
       } else if (this.selected.is_received == 2) {
         return "Barang sudah diterima";
       }
-    },
-    date_model() {
-      if (!this.selDate) return "Pilih Tanggal Dibuat";
-
-      if (this.selDate.from) {
-        return `${moment(this.selDate.from).format("DD/MM/YY")} ~ ${moment(
-          this.selDate.to
-        ).format("DD/MM/YY")}`;
-      } else {
-        return moment(this.selDate).format("DD/MM/YY");
-      }
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -27,21 +27,108 @@ Flight::route('GET /current_user/@username', function ($username) {
   runQuery2($q);
 });
 
-Flight::route('GET /spp_byuserid/@id/@filter', function ($id, $filter) {
-  $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name'
+Flight::route('GET /spp_byuserid/@id', function ($id) {
+
+  $query = Flight::request()->query;
+
+  $current = $query->current;
+  $limit = $query->limit;
+  $offset = ($current - 1) * $limit;
+
+  $w_search = "";
+  if ($query->search != "") {
+    $w_search = "AND spp.item LIKE '%$query->search%'";
+  }
+
+  $w_date = "";
+  if ($query->date) {
+    $w_date = "AND DATE(create_at) = '$query->date'";
+  } else if ($query->from && $query->to) {
+    $w_date = "AND DATE(create_at) BETWEEN '$query->from' AND '$query->to'";
+  }
+
+  $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name',
+          (SELECT COUNT(spp.spp_id)
           FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          WHERE spp.user_id = $id OR spp.cc = $id
-          HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
-          ORDER BY spp.spp_id DESC
+          WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
+          ) AS total_count
+        FROM spp
+        INNER JOIN user ON spp.user_id = user.user_id
+        LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+        WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
+        ORDER BY spp.spp_id DESC
+        LIMIT $limit OFFSET $offset
     ";
   runQuery($q);
 });
+
+Flight::route('GET /spp_byuserid/@id/@filter', function ($id, $filter) {
+  $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name'
+  FROM spp
+  INNER JOIN user ON spp.user_id = user.user_id
+  LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+  WHERE spp.user_id = $id OR spp.cc = $id
+  HAVING CONCAT(YEAR(create_at),'-',MONTH(create_at)) LIKE '%$filter%'
+  ORDER BY spp.spp_id DESC
+  ";
+  runQuery($q);
+});
+
+Flight::route('GET /spp/list/@id', function ($id) {
+
+  $query = Flight::request()->query;
+
+  $current = $query->current;
+  $limit = $query->limit;
+  $offset = ($current - 1) * $limit;
+
+  $w_search = "";
+  if ($query->search != "") {
+    $w_search = "AND spp.item LIKE '%$query->search%'";
+  }
+
+  $w_date = "";
+  if ($query->date) {
+    $w_date = "AND DATE(create_at) = '$query->date'";
+  } else if ($query->from && $query->to) {
+    $w_date = "AND DATE(create_at) BETWEEN '$query->from' AND '$query->to'";
+  }
+
+  $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name',
+          (SELECT COUNT(spp.spp_id)
+          FROM spp
+          INNER JOIN user ON spp.user_id = user.user_id
+          LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+          WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
+          ) AS total_count
+        FROM spp
+        INNER JOIN user ON spp.user_id = user.user_id
+        LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+        WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
+        ORDER BY spp.spp_id DESC
+        LIMIT $limit OFFSET $offset
+    ";
+  runQuery($q);
+});
+
 Flight::route('GET /spp-approval', function () {
+  $query = Flight::request()->query;
+
+  $w_search = "";
+  if ($query->search) $w_search = "AND spp.item LIKE '%{$query['search']}%'";
+
+  $sort = "";
+  if ($query->sort) {
+    $sort = "ORDER BY {$query['sort']}";
+  }
+
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+          WHERE manager_approve = 0 $w_search
+          $sort
     ";
   runQuery($q);
 });
@@ -320,7 +407,22 @@ Flight::route('GET /monthly_summary/@from/@to', function ($dateFrom, $dateTo) {
   runQuery($q);
 });
 
+Flight::route('GET /spp/detail/@id', function ($id) {
+  $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name'
+  FROM spp
+  INNER JOIN user ON spp.user_id = user.user_id
+  LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+  WHERE spp.spp_id = $id";
+  $spp = getRows($q)[0];
 
+  $q = "SELECT * 
+  FROM spp_history 
+  WHERE spp_id = $id
+  ORDER BY history_id DESC";
+  $spp["history"] = getRows($q);
+
+  Flight::json($spp);
+});
 
 
 Flight::route('GET /yearly_summary', function () {
@@ -510,6 +612,15 @@ Flight::route('POST /new_history', function () {
   runQuery3('POST', 'spp_history', $data, '');
 });
 ///
+
+Flight::route('PUT /spp/konfirmasi', function () {
+  $data = Flight::request()->data;
+
+  $q = "UPDATE spp SET is_received = {$data['is_received']} WHERE spp_id = {$data['spp_id']}";
+
+  runQuery($q);
+});
+
 Flight::route('PUT /update_spp/@spp_id', function ($spp_id) {
   $data = Flight::request()->getBody();
   $data = (array) json_decode($data);
@@ -584,6 +695,24 @@ function log_query($link, $q, $time1, $time2)
   mysqli_query($link, $q_log) or die(mysqli_error($link));
 }
 //Get Array
+function getRows($q)
+{
+  $date1 = new DateTime();
+
+  $link = getLink();
+  $res = mysqli_query($link, $q) or die(mysqli_error($link));
+
+  $arr = array();
+  while ($row = mysqli_fetch_assoc($res)) {
+    $arr[] = $row;
+  }
+
+  $date2 = new DateTime();
+  log_query($link, $q, $date1, $date2);
+
+  return $arr;
+}
+
 function runQuery($q)
 {
   $date1 = new DateTime();
@@ -646,7 +775,6 @@ function runQuery3($method, $table, $input = [], $col = '', $val = '')
   $result = mysqli_query($link, $sql);
 
   $date2 = new DateTime();
-  log_query($link, $sql, $date1, $date2);
 
   if (!$result) {
     http_response_code(404);
@@ -657,6 +785,7 @@ function runQuery3($method, $table, $input = [], $col = '', $val = '')
   } else {
     echo mysqli_affected_rows($link);
   }
+  log_query($link, $sql, $date1, $date2);
 }
 /// End Run Query
 
@@ -692,6 +821,7 @@ Flight::route('POST /login', function () {
       "data" => array(
         "user_id" => $arr[0]['user_id'],
         "username" => $username,
+        "name" => $arr[0]['name'],
         "manager_id" => $arr[0]['manager_id'],
         "is_manager" => $arr[0]['is_manager'],
         "is_purchasing" => $arr[0]['is_purchasing'],
