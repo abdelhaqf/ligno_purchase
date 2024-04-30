@@ -1,0 +1,618 @@
+[
+  {
+    "label": "SOLAR INDUSTRI",
+    "value": "1"
+  },
+  {
+    "label": "TEXAPON N 70",
+    "value": "2"
+  },
+  {
+    "label": "BEROL 226",
+    "value": "3"
+  },
+  {
+    "label": "DEHYTON KE AS",
+    "value": "4"
+  },
+  {
+    "label": "Tego SMO (Span 80)",
+    "value": "5"
+  },
+  {
+    "label": "Tego SMO 80 V (Tween 80)",
+    "value": "6"
+  },
+  {
+    "label": "PIGMEN ORANGE",
+    "value": "7"
+  },
+  {
+    "label": "PASTA RED ORGANIK EX MATAPEL (RED 112)",
+    "value": "8"
+  },
+  {
+    "label": "SPAN 80 D",
+    "value": "9"
+  },
+  {
+    "label": "WAFEX P SR",
+    "value": "10"
+  },
+  {
+    "label": "DOMSJOO DS 10",
+    "value": "11"
+  },
+  {
+    "label": "WAFEX NA-SA",
+    "value": "12"
+  },
+  {
+    "label": "CM-14 HANSA",
+    "value": "13"
+  },
+  {
+    "label": "SODIUM SULFATE ex. CHINA",
+    "value": "14"
+  },
+  {
+    "label": "WATER GLASS 58\u00b0Be",
+    "value": "15"
+  },
+  {
+    "label": "CALCIUM NITRATE",
+    "value": "16"
+  },
+  {
+    "label": "Antimussol UDF Liq",
+    "value": "17"
+  },
+  {
+    "label": "MINYAK GORENG CURAH",
+    "value": "18"
+  },
+  {
+    "label": "Slack Wax DAO",
+    "value": "19"
+  },
+  {
+    "label": "CPO",
+    "value": "20"
+  },
+  {
+    "label": "MOLASES",
+    "value": "21"
+  },
+  {
+    "label": "CONMASTER LIQUID",
+    "value": "22"
+  },
+  {
+    "label": "SNF-18% Sunchem",
+    "value": "23"
+  },
+  {
+    "label": "SNF-18% ex Yu La",
+    "value": "24"
+  },
+  {
+    "label": "SNF-20% ex SJZ",
+    "value": "25"
+  },
+  {
+    "label": "ZX-42A",
+    "value": "26"
+  },
+  {
+    "label": "ARE-580 FX",
+    "value": "27"
+  },
+  {
+    "label": "SNF 20% ex Sunchem",
+    "value": "28"
+  },
+  {
+    "label": "Urea Non Subsidi",
+    "value": "29"
+  },
+  {
+    "label": "GROTAN GT 01",
+    "value": "30"
+  },
+  {
+    "label": "Defoamer AF-60",
+    "value": "31"
+  },
+  {
+    "label": "NaOH Flake (Sodium Hydroxide)",
+    "value": "32"
+  },
+  {
+    "label": "Desinfectan 96%",
+    "value": "33"
+  },
+  {
+    "label": "Sodium Gluconate",
+    "value": "34"
+  },
+  {
+    "label": "Grotan TK 5 Plus",
+    "value": "35"
+  },
+  {
+    "label": "Asam Sulfat 98%",
+    "value": "36"
+  },
+  {
+    "label": "EDTA",
+    "value": "37"
+  },
+  {
+    "label": "Butil Carbitol",
+    "value": "38"
+  },
+  {
+    "label": "Methyl Cellulose MR",
+    "value": "39"
+  },
+  {
+    "label": "Defoamer AF-60",
+    "value": "40"
+  },
+  {
+    "label": "Calcium Chloride Flex",
+    "value": "41"
+  },
+  {
+    "label": "Acronal 296 D",
+    "value": "42"
+  },
+  {
+    "label": "SNF-18% ex Grecochem",
+    "value": "43"
+  },
+  {
+    "label": "SNF-5% ex Grecochem",
+    "value": "44"
+  },
+  {
+    "label": "Conmaster Powder",
+    "value": "45"
+  },
+  {
+    "label": "PARMETOL DF 35",
+    "value": "46"
+  },
+  {
+    "label": "SNF 5%",
+    "value": "47"
+  },
+  {
+    "label": "Keitol L30R",
+    "value": "48"
+  },
+  {
+    "label": "Prevol 544X",
+    "value": "49"
+  },
+  {
+    "label": "Pasta Blue organik ex Apollo",
+    "value": "50"
+  },
+  {
+    "label": "Pasta Blue ex Roxmon",
+    "value": "51"
+  },
+  {
+    "label": "Talc mesh 800 Treated",
+    "value": "52"
+  },
+  {
+    "label": "GLYCERIN",
+    "value": "53"
+  },
+  {
+    "label": "TEA",
+    "value": "54"
+  },
+  {
+    "label": "CARBOMER",
+    "value": "55"
+  },
+  {
+    "label": "H202",
+    "value": "56"
+  },
+  {
+    "label": "KEIPINE 85%",
+    "value": "57"
+  },
+  {
+    "label": "PIGMEN ORANGE",
+    "value": "58"
+  },
+  {
+    "label": "OSP BROWN 1638 ex ROHA",
+    "value": "59"
+  },
+  {
+    "label": "Red 112 Roxmon",
+    "value": "60"
+  },
+  {
+    "label": "Slack Wax LMO",
+    "value": "61"
+  },
+  {
+    "label": "Tawas Powder",
+    "value": "62"
+  },
+  {
+    "label": "SLACK WAX LMO",
+    "value": "63"
+  },
+  {
+    "label": "SILICA FUME",
+    "value": "65"
+  },
+  {
+    "label": "KAPUR TOHOR (CaO)",
+    "value": "66"
+  },
+  {
+    "label": "Fragrance Lemon Shine",
+    "value": "67"
+  },
+  {
+    "label": "Green DK (Water Soluble)",
+    "value": "68"
+  },
+  {
+    "label": "SNF 5% ex PAS",
+    "value": "70"
+  },
+  {
+    "label": "Semen Gresik Type 1",
+    "value": "71"
+  },
+  {
+    "label": "Ultrazine NA",
+    "value": "72"
+  },
+  {
+    "label": "METANOL",
+    "value": "73"
+  },
+  {
+    "label": "Iron Oxide Red",
+    "value": "74"
+  },
+  {
+    "label": "Aloe Vera Extract",
+    "value": "75"
+  },
+  {
+    "label": "Talk Powder 325 Mesh Treated",
+    "value": "76"
+  },
+  {
+    "label": "Dazling Aloe Vera",
+    "value": "77"
+  },
+  {
+    "label": "Zinc Sulfate",
+    "value": "78"
+  },
+  {
+    "label": "Ferrous Sulfate",
+    "value": "79"
+  },
+  {
+    "label": "Cupper Sulfate",
+    "value": "80"
+  },
+  {
+    "label": "Manganese Sulfate",
+    "value": "81"
+  },
+  {
+    "label": "Sodium Molibdate",
+    "value": "82"
+  },
+  {
+    "label": "Sodium Tetraborate",
+    "value": "83"
+  },
+  {
+    "label": "DP C-501",
+    "value": "84"
+  },
+  {
+    "label": "POWER CON 100",
+    "value": "85"
+  },
+  {
+    "label": "Strong Seal BMastic @kg",
+    "value": "86"
+  },
+  {
+    "label": "Slack Wax SPO",
+    "value": "87"
+  },
+  {
+    "label": "TALK POWDER TREATED 2% MESH 800",
+    "value": "88"
+  },
+  {
+    "label": "Wafex NA 890 P",
+    "value": "89"
+  },
+  {
+    "label": "Oli Bekas (Ltr)",
+    "value": "90"
+  },
+  {
+    "label": "CSA Binder",
+    "value": "91"
+  },
+  {
+    "label": "Nonyl Phenol 10 (NP-10)",
+    "value": "92"
+  },
+  {
+    "label": "Wafex NA 890 P",
+    "value": "93"
+  },
+  {
+    "label": "TOLUENE",
+    "value": "94"
+  },
+  {
+    "label": "OSP YELLOW G 1602",
+    "value": "95"
+  },
+  {
+    "label": "Dispering Agent (HEWR)",
+    "value": "96"
+  },
+  {
+    "label": "CA45",
+    "value": "97"
+  },
+  {
+    "label": "APlus (Cornice Adhesive)",
+    "value": "98"
+  },
+  {
+    "label": "GYPSUM PURIFIED",
+    "value": "99"
+  },
+  {
+    "label": "CORNICE ADHESIVE A-PLUS",
+    "value": "100"
+  },
+  {
+    "label": "CALCIUM CHLORIDE POWDER",
+    "value": "101"
+  },
+  {
+    "label": "IRON OXIDE BLACK EX LANXESS",
+    "value": "102"
+  },
+  {
+    "label": "PVA BP28",
+    "value": "103"
+  },
+  {
+    "label": "VYBAR 103",
+    "value": "104"
+  },
+  {
+    "label": "MAGNESIUM OXIDE",
+    "value": "105"
+  },
+  {
+    "label": "Magnesium Oksida",
+    "value": "106"
+  },
+  {
+    "label": "LUCANE LC 565 (Polyolefin Elastomer)",
+    "value": "107"
+  },
+  {
+    "label": "TRANZOIL 68",
+    "value": "108"
+  },
+  {
+    "label": "NaCl",
+    "value": "109"
+  },
+  {
+    "label": "PVA 17-88",
+    "value": "110"
+  },
+  {
+    "label": "DENKA BP 17",
+    "value": "111"
+  },
+  {
+    "label": "Descofix WL 660",
+    "value": "112"
+  },
+  {
+    "label": "Verlube ",
+    "value": "113"
+  },
+  {
+    "label": "Sodium Sulfat ex Indonesia",
+    "value": "114"
+  },
+  {
+    "label": "BIJI PLASTIK LDPE 250 YZ",
+    "value": "115"
+  },
+  {
+    "label": "AIR",
+    "value": "116"
+  },
+  {
+    "label": "Oli Bekas Coklat",
+    "value": "1000"
+  },
+  {
+    "label": "BCO ",
+    "value": "1001"
+  },
+  {
+    "label": "Garam NaCl Kasar",
+    "value": "1003"
+  },
+  {
+    "label": "Elastobit",
+    "value": "1004"
+  },
+  {
+    "label": "SNF-18% ex Sun Chem",
+    "value": "1005"
+  },
+  {
+    "label": "SNF-5% ex Wanshan",
+    "value": "1006"
+  },
+  {
+    "label": "PFAD",
+    "value": "1007"
+  },
+  {
+    "label": "SA-1806 (Stearic Acid)",
+    "value": "1008"
+  },
+  {
+    "label": "SNF 18 ex Wansan",
+    "value": "1009"
+  },
+  {
+    "label": "Iron Oxide Red 130 ex Yuxing",
+    "value": "1010"
+  },
+  {
+    "label": "Iron Oxide Red 8130 ex Yuxing",
+    "value": "1011"
+  },
+  {
+    "label": "Calcium Carbonate 200 Mesh",
+    "value": "1012"
+  },
+  {
+    "label": "SBS 411 W",
+    "value": "1013"
+  },
+  {
+    "label": "Bitumen pen 60/70",
+    "value": "1014"
+  },
+  {
+    "label": "Talk Untreated 325 Mesh",
+    "value": "1015"
+  },
+  {
+    "label": "Polycarboxylate W 73",
+    "value": "1016"
+  },
+  {
+    "label": "VAE / EVA / Redispersible Polymer",
+    "value": "1017"
+  },
+  {
+    "label": "SLES 70 NJS",
+    "value": "1018"
+  },
+  {
+    "label": "CAPB 35NJS",
+    "value": "1019"
+  },
+  {
+    "label": "Hansa CM NA 100 S",
+    "value": "1020"
+  },
+  {
+    "label": "Polycarboxylate ex Dongsuh",
+    "value": "1021"
+  },
+  {
+    "label": "Crysol ",
+    "value": "1022"
+  },
+  {
+    "label": "HCl",
+    "value": "1023"
+  },
+  {
+    "label": "Iron Oxide Green 5605 ex Yuxing",
+    "value": "1024"
+  },
+  {
+    "label": "Tapioka Powder",
+    "value": "1025"
+  },
+  {
+    "label": "Calcium Carbonate Omya TSV2",
+    "value": "1026"
+  },
+  {
+    "label": "Globalprene 3411",
+    "value": "1027"
+  },
+  {
+    "label": "Iron Oxide Red 130 ex Sunchem",
+    "value": "1029"
+  },
+  {
+    "label": "Pasir",
+    "value": "1030"
+  },
+  {
+    "label": "Sodium Gluconate (Import)",
+    "value": "1033"
+  },
+  {
+    "label": "Iron Oxide Red ex Indonesia",
+    "value": "1035"
+  },
+  {
+    "label": "Zinc Stearate ",
+    "value": "1037"
+  },
+  {
+    "label": "Base Oil ",
+    "value": "1038"
+  },
+  {
+    "label": "Kaolin",
+    "value": "1039"
+  },
+  {
+    "label": "Iron Oxide 7130 ex Yuxing China",
+    "value": "1040"
+  },
+  {
+    "label": "Minyak Goreng",
+    "value": "1041"
+  },
+  {
+    "label": "Oli Coklat Solid 99%",
+    "value": "1043"
+  },
+  {
+    "label": "Stearyl Amine Molten",
+    "value": "1044"
+  },
+  {
+    "label": "Asam Asetat 99% Teknis",
+    "value": "1045"
+  },
+  {
+    "label": "Iron Oxide Green 618",
+    "value": "1046"
+  }
+]

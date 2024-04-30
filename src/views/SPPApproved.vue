@@ -747,7 +747,7 @@ export default {
           payload.new_price =
             parseFloat(payload.new_price) / parseFloat(item.qty);
 
-          await this.$http_formulation.put("/purchase/rm/price", payload);
+          // await this.$http_formulation.put("/purchase/rm/price", payload);
         }
       }
     },

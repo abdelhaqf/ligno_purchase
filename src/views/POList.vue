@@ -546,7 +546,7 @@
 <script>
 import moment from "moment";
 import { Money } from "v-money";
-
+import rm from "../store/rm.json";
 export default {
   components: { Money },
   data() {
@@ -613,7 +613,7 @@ export default {
         "Maintenance",
       ],
 
-      kategori:[
+      kategori: [
         "Keperluan & Peralatan Produksi",
         "Packing Barang",
         "Makan & Minum",
@@ -632,7 +632,7 @@ export default {
         "Raw Material",
         "Perbaikan Gudang",
       ],
-      selKategori:null,
+      selKategori: null,
 
       optVendor: [],
       filVendor: [],
@@ -701,7 +701,7 @@ export default {
 
         await this.$http.put("/sync_formula/po", payload);
 
-        await this.$http_formulation.put("/purchase/rm/price", payload);
+        // await this.$http_formulation.put("/purchase/rm/price", payload);
         this.$q.notify({
           message: "Harga Berhasil Di Sinkronisasi!",
           color: "positive",
@@ -770,7 +770,7 @@ export default {
         filter: this.filter,
         vendor: this.selVendor,
         cat: this.selCat,
-        kategori: this.selKategori == null ? '' : this.selKategori,
+        kategori: this.selKategori == null ? "" : this.selKategori,
       };
 
       await this.$http
@@ -784,10 +784,14 @@ export default {
             this.poList.push(result.data[i]);
           }
         });
-      await this.$http_formulation.get(`/purchase/rm/all`).then((resp) => {
-        this.formulation_rm = resp.data;
-        this.filtered_formulation_rm = resp.data;
-      });
+
+      // temporary
+      this.formulation_rm = JSON.parse(JSON.stringify(rm));
+      this.filtered_formulation_rm = JSON.parse(JSON.stringify(rm));
+      // await this.$http_formulation.get(`/purchase/rm/all`).then((resp) => {
+      //   this.formulation_rm = resp.data;
+      //   this.filtered_formulation_rm = resp.data;
+      // });
     },
     async openForm(id) {
       this.edited = [];
