@@ -117,7 +117,7 @@ Flight::route('GET /spp-approval', function () {
   $query = Flight::request()->query;
 
   $w_search = "";
-  if ($query->search) $w_search = "AND spp.item LIKE '%{$query['search']}%'";
+  if ($query->search) $w_search = "WHERE spp.item LIKE '%{$query['search']}%'";
 
   $sort = "";
   if ($query->sort) {
@@ -127,7 +127,7 @@ Flight::route('GET /spp-approval', function () {
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          WHERE manager_approve = 0 $w_search
+          $w_search
           $sort
     ";
   runQuery($q);

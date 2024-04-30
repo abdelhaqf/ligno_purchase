@@ -75,6 +75,13 @@
                   >
                     Detail
                   </q-item>
+                  <!-- <q-item
+                    :to="`/spp/detail/${d.spp_id}?approval=purchasing`"
+                    clickable
+                    v-close-popup
+                  >
+                    Detail
+                  </q-item> -->
                   <q-item
                     clickable
                     v-close-popup
