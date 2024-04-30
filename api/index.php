@@ -64,6 +64,11 @@ Flight::route('GET /spp_byuserid/@id', function ($id) {
   runQuery($q);
 });
 
+Flight::route('GET /dept', function () {
+  $q = "SELECT DISTINCT dept FROM user";
+  runQuery($q);
+});
+
 Flight::route('GET /spp_byuserid/@id/@filter', function ($id, $filter) {
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name'
   FROM spp

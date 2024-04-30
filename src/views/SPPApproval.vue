@@ -291,10 +291,13 @@ export default {
 
       searchTerm: "",
       check_all: false,
+
+      optDept: [],
     };
   },
   mounted() {
     this.fetchData();
+    this.getDept();
   },
   watch: {
     sppList: {
@@ -315,6 +318,12 @@ export default {
     },
   },
   methods: {
+    async getDept() {
+      // let resp = this.$http.get("/dept")
+      this.$http.get("/dept").then((resp) => {
+        this.optDept = resp.data.map((a) => a.dept);
+      });
+    },
     clearSelect(idx) {
       let temp = JSON.parse(JSON.stringify(this.sppList));
       for (let i in temp) {
