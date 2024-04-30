@@ -48,6 +48,13 @@ const routes = [
     path: "/spp/approved",
     name: "SPPApproved",
     component: () => import("../views/SPPApproved.vue"),
+    meta: { title: "SPP Disetujui", path: [""] },
+  },
+  {
+    path: "/po/create",
+    name: "POCreate",
+    component: () => import("../views/POCreate.vue"),
+    meta: { title: "Form PO Baru", path: ["SPP Disetujui"] },
   },
   {
     path: "/po/list/:status/:vendor/:category/:kategori",

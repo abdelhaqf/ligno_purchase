@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-center q-pa-lg">
+  <div class="row relative q-px-lg ">
     <q-card
       flat
       bordered
@@ -7,7 +7,53 @@
       class="col-12 bg-white rounded-borders"
     >
       <!-- table control -->
-      <q-card-section class="q-pa-md row justify-between items-center">
+      <q-card-section class="row justify-between q-gutter-x-md">
+        <div>
+          <q-input
+            outlined
+            dense
+            v-model="searchTerm"
+            @input="fetchData"
+            clearable
+            @clear="searchTerm = ''"
+            placeholder="Cari Nama Barang"
+            style="width: 400px;"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search"></q-icon>
+            </template>
+          </q-input>
+        </div>
+        
+        <div class="row items-center q-gutter-x-sm">
+          <q-select
+            outlined
+            dense
+            emit-value
+            map-options
+            :options="optDept"
+            v-model="selDivisi"
+            clearable
+            @clear="selDivisi = ''"
+            @input="fetchData"
+            label="Pilih Divisi"
+            style="width: 230px;"
+          ></q-select>
+          <q-select
+            outlined
+            dense
+            emit-value
+            map-options
+            :options="optSort"
+            v-model="selSort"
+            @input="fetchData"
+            label="Urutkan"
+            style="width: 230px;"
+          ></q-select>
+        </div>
+        
+      </q-card-section>
+      <!-- <q-card-section class="q-pa-md row justify-between items-center">
         <div class="q-gutter-md">
           <q-btn
             color="primary"
@@ -59,9 +105,90 @@
             @input="fetchData"
           ></q-select>
         </div>
-      </q-card-section>
+      </q-card-section> -->
       <!-- table header  -->
-      <q-markup-table bordered flat square dense>
+      <q-markup-table
+        v-if="sppList.length"
+        class="stickyTable"
+        style="height: calc(100vh - 275px);"
+      >
+        <!-- table head -->
+        <thead class="text-white">
+          <tr>
+            <th style="width:20px;">
+              <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
+            </th>
+            <th>User</th>
+            <th>Divisi</th>
+            <th>PIC</th>
+            <th>Tanggal Pengajuan</th>
+            <th>Deadline</th>
+            <th>Barang</th>
+            <th>Jumlah</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <!-- table body  -->
+        <tbody>
+          <tr v-for="(d, i) in sppList" :key="i">
+            <td>
+              <q-checkbox v-model="d.select" />
+            </td>
+            <td class="text-left">
+              {{ d.name }}
+            </td>
+            <td class="text-left">
+              {{ d.dept }}
+            </td>
+            <td class="text-left">
+              {{ d.handler_name }}
+            </td>
+            <td class="text-center" style="width:150px">
+              {{ d.create_at | moment("DD MMM YYYY") }}
+            </td>
+            <td class="text-center" style="width:150px">
+              {{ d.deadline | moment("DD MMM YYYY") }}
+            </td>
+            <td class="text-left">{{ d.item }}</td>
+            <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
+            <td class="text-center">
+              <q-btn-dropdown flat dense dropdown-icon="more_horiz">
+                <q-list>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="
+                      clearSelect(i);
+                      confirmApprove = true;
+                    "
+                  >
+                    Buat PO
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="
+                      clearSelect(i);
+                      toPreview();
+                      "
+                  >
+                    Print
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
+      <q-card-section
+        class="column items-center justify-center"
+        style="height: calc(100vh - 275px);"
+        v-else
+      >
+        <q-img width="400px" :src="`./empty.png`"></q-img>
+        <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
+      </q-card-section>
+      <!-- <q-markup-table bordered flat square dense>
         <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:10px;"></th>
@@ -98,416 +225,45 @@
             <td class="text-center text-grey" colspan="99">tidak ada data</td>
           </tr>
         </tbody>
-      </q-markup-table>
+      </q-markup-table> -->
       <q-card-section></q-card-section>
     </q-card>
 
-    <!-- form PO baru -->
-    <q-card flat bordered v-if="formPO">
-      <q-card-section class="q-pb-none text-bold text-h6"
-        >PO Baru</q-card-section
-      >
-      <div class="q-pa-md q-gutter-md">
-        <div class="row full-width q-gutter-x-md">
-          <q-select
-            outlined
-            dense
-            v-model="type"
-            :options="['PO', 'Non-PO']"
-            @input="changeType()"
-            style="width:150px"
-          />
-
-          <q-input
-            outlined
-            v-model="po.po_id"
-            label="Nomor PO"
-            stack-label
-            dense
-            v-if="type == 'PO'"
-            style="flex-grow: 99;"
-          />
-          <q-input
-            outlined
-            v-model="po.po_id"
-            label="Nomor non-PO"
-            readonly
-            stack-label
-            dense
-            v-else
-            style="flex-grow: 99;"
-          />
-        </div>
-        <div class="full-width q-pl-md">
-          <q-input
-            outlined
-            v-model="po.vendor"
-            label="Nama Vendor"
-            stack-label
-            dense
-            v-if="showInput"
-          >
-            <template v-slot:append>
-              <q-toggle
-                v-model="showInput"
-                color="green"
-                icon="add"
-                keep-color
-              />
-            </template>
-            <template v-slot:label>
-              Nama Vendor
-              <a class="q-px-sm bg-info text-white rounded-borders"
-                >input baru</a
-              >
-            </template>
-          </q-input>
-          <q-select
-            v-else
-            stack-label
-            outlined
-            dense
-            v-model="po.vendor"
-            map-options
-            emit-value
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            :options="filteredVD"
-            @filter="filterVD"
-            label="Nama Vendor"
-          >
-            <template v-slot:append>
-              <q-toggle
-                v-model="showInput"
-                color="green"
-                icon="add"
-                keep-color
-              />
-            </template>
-          </q-select>
-        </div>
-        <div class="row justify-between items-center">
-          <q-input
-            outlined
-            v-model="po.po_date"
-            mask="date"
-            label
-            dense
-            style="width:49%"
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy
-                  ref="qDateProxy"
-                  transition-show="scale"
-                  transition-hide="scale"
-                >
-                  <q-date minimal v-model="po.po_date" :options="limitDate">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Close" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-            <template v-slot:label>
-              Tanggal PO
-              <a class="q-px-sm bg-info text-white rounded-borders"
-                >tahun / bulan / tanggal</a
-              >
-            </template>
-          </q-input>
-          <q-select
-            outlined
-            v-model="curr"
-            dense
-            label="Currency"
-            :options="['IDR', 'USD']"
-            @input="chgCurrency"
-            style="width:49%"
-          />
-        </div>
-      </div>
-      <q-markup-table separator="cell" bordered flat square dense>
-        <thead class="bg-primary text-white">
-          <tr>
-            <th class="text-left">No</th>
-            <th class="text-left">Nama Barang</th>
-            <th class="text-left">Harga</th>
-            <th class="text-left">Est.Arrival</th>
-            <!-- <th class="text-left">RM Refrence</th> -->
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          <tr v-for="(x, i) in sppSelect" :key="i">
-            <td>{{ i + 1 }}</td>
-            <td style="width: 250px;">
-              {{ x.item }} ({{ x.qty }} {{ x.unit }})
-            </td>
-            <td style="padding: 0px;">
-              <money v-model="x.price" v-bind="money" class="q-mx-sm"></money>
-            </td>
-            <td>
-              <q-input
-                outlined
-                dense
-                bg-color="white"
-                v-model="x.est_arrival"
-                readonly
-              >
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date minimal v-model="x.est_arrival">
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </td>
-            <!-- <td>
-              <q-select
-                outlined
-                dense
-                bg-color="white"
-                :options="filtered_formulation_rm"
-                use-input
-                map-options
-                emit-value
-                hide-selected
-                fill-input
-                input-debounce="0"
-                v-model="x.id_rm"
-                @filter="filterRM"
-              >
-                <template v-slot:no-option>
-                  <q-item>
-                    <q-item-section class="text-grey"
-                      >No results</q-item-section
-                    >
-                  </q-item>
-                </template>
-                <template v-slot:append>
-                  <q-btn
-                    v-if="x.id_rm"
-                    icon="close"
-                    dense
-                    @click="x.id_rm = null"
-                    flat
-                    size="sm"
-                  ></q-btn>
-                </template>
-              </q-select>
-            </td> -->
-          </tr>
-        </tbody>
-      </q-markup-table>
-
-      <q-card-actions class="q-gutter-md row justify-end">
-        <q-btn flat color="primary" label="Kembali" @click="closeForm" />
-        <q-btn unelevated color="primary" label="Submit" @click="createPO()" />
-      </q-card-actions>
-    </q-card>
-
-    <q-dialog
-      v-model="show_detail"
-      persistent
-      transition-show="scale"
-      transition-hide="scale"
+    <q-footer
+      v-if="selectCount > 0"
+      style="max-width: 1440px;"
+      class="q-mx-auto atas-radius bg-white"
     >
-      <q-card style="min-width: 350px;">
-        <q-card-section class="bg-primary text-white row">
-          <div>NO SPP: {{ selected.spp_id }}</div>
-
-          <q-space />
-
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-card-section>
-        <q-list>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Requester</q-item-label>
-              <q-item-label>{{ selected.name }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Request Date</q-item-label>
-              <q-item-label>{{ selected.create_at }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>Deadline</q-item-label>
-              <q-item-label>{{ selected.deadline }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Item</q-item-label>
-              <q-item-label>{{ selected.item }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>Quantity</q-item-label>
-              <q-item-label
-                >{{ selected.qty }} {{ selected.unit }}</q-item-label
-              >
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Description</q-item-label>
-              <q-item-label>{{ selected.description }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Kategori Barang/Jasa</q-item-label>
-              <q-item-label>{{ selected.kategori }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-separator spaced />
-          <q-item v-if="selected.est_arrival">
-            <q-item-section>
-              <q-item-label caption>Arrival Estimation</q-item-label>
-              <q-item-label>{{ selected.est_arrival }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Status</q-item-label>
-              <q-item-label>{{ status_note }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card>
-    </q-dialog>
-
-    <q-dialog
-      v-model="show_history"
-      persistent
-      transition-show="scale"
-      transition-hide="scale"
-    >
-      <q-card style="min-width: 350px;">
-        <q-card-section class="bg-secondary text-white row">
-          <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
-          <q-space />
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-card-section>
-        <q-card-section
-          class="q-px-xl q-my-sm"
-          style="height: 450px; overflow: auto;"
-        >
-          <q-timeline>
-            <q-timeline-entry
-              v-for="x in history"
-              :key="x.id"
-              :title="x.status"
-              :subtitle="dateHistory(x.create_at)"
-              :color="getColor(x.status)"
-              :icon="getIcon(x.status)"
-            >
-              <div>{{ x.content }}</div>
-            </q-timeline-entry>
-          </q-timeline>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-
-    <q-dialog v-model="alert">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">PO Kosong</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none"
-          >Anda belum memilih SPP yang akan dijadikan PO.</q-card-section
-        >
-
-        <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
-    <q-dialog v-model="confirmCancel" persistent>
-      <q-card style="min-width: 350px;">
-        <q-card-section class="bg-negative text-white">
-          <div class="text-bold">Alasan Pembatalan SPP</div>
-        </q-card-section>
-
-        <q-card-section class>
-          <q-input
-            class="col-4"
-            outlined
-            dense
-            type="textarea"
-            v-model="content"
-          />
-        </q-card-section>
-
-        <q-card-actions align="between" class="text-primary">
-          <q-btn flat color="negative" label="Cancel" v-close-popup />
-          <q-btn
-            flat
-            color="positive"
-            label="OK"
-            @click="cancelSPP()"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
-    <q-dialog v-model="dialogConfirm" persistents>
-      <q-card>
-        <q-card-section class="bg-grey-2 row items-center justify-between ">
-          <div class="text-h6 text-bold">Konfirmasi Pembuatan PO</div>
-          <q-btn icon="close" flat v-close-popup></q-btn>
-        </q-card-section>
-        <q-card-section>
-          <div class="q-pb-sm">
-            Apa Anda yakin akan membuat PO untuk {{ sppSelect.length }} SPP
-            terpilih?
-          </div>
-          <div v-if="curr == 'USD'" class="row justify-between items-center">
-            <div>
-              Masukan Kurs Berlaku
-            </div>
-            <money v-model="kurs" v-bind="money_kurs"></money>
-          </div>
-        </q-card-section>
-        <q-card-actions align="right">
+      <q-card-section class="row justify-between items-center">
+        <div class="l-text-subtitle text-bold text-black">
+          {{ selectCount }} PO Dipilih
+        </div>
+        <div class="row justify-end items-center q-gutter-x-md">
           <q-btn
             unelevated
-            color="primary"
-            label="SIMPAN"
-            @click="
-              allowed = true;
-              createPO();
-            "
-            v-close-popup
-          ></q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+            label="Print"
+            color="white" 
+            text-color="black" 
+            outline style="color: black;"
+            @click="toPreview"
+            no-caps
+            icon="print"
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Buat PO"
+            color="blue"
+            @click="confirmApprove = true"
+            no-caps
+            icon="edit"
+          >
+          </q-btn>
+        </div>
+      </q-card-section>
+    </q-footer>
+
+    <!-- form PO baru -->
   </div>
 </template>
 
@@ -548,6 +304,23 @@ export default {
       history: [],
       show_history: false,
       selected: {},
+      option: [],
+
+      optSort: [
+        { label: "Deadline Terdekat", value: "deadline ASC" },
+        { label: "Deadline Terlama", value: "deadline DESC" },
+        { label: "Pengajuan Terdekat", value: "create_at ASC" },
+        { label: "Pengajuan Terlama", value: "create_at DESC" },
+      ],
+      selSort: "deadline ASC",
+
+      selDivisi: "",
+      optDept: [],
+
+      searchTerm: "",
+      check_all: false,
+
+
       curr: "IDR",
       type: "PO",
       money: {
@@ -584,7 +357,26 @@ export default {
   },
   async mounted() {
     await this.getVendor();
-    await this.fetchData();
+    this.fetchData();
+    this.getDept();
+  },
+  watch: {
+    sppList: {
+      deep: true,
+      handler(val) {
+        let rows = JSON.parse(JSON.stringify(this.sppList));
+        let checked = val.filter((el) => el.select);
+        let unchecked = val.filter((el) => !el.select);
+
+        if (checked.length == rows.length) {
+          this.check_all = true;
+        } else if (unchecked.length == rows.length) {
+          this.check_all = false;
+        } else {
+          this.check_all = null;
+        }
+      },
+    },
   },
   methods: {
     ...mapActions(["sendPrintData"]),
@@ -602,16 +394,34 @@ export default {
         this.filteredVD = result.data;
       });
     },
-    async fetchData() {
+    clearSelect(idx) {
+      let temp = JSON.parse(JSON.stringify(this.sppList));
+      for (let i in temp) {
+        if (i == idx) temp[i].select = true;
+        else temp[i].select = false;
+      }
+      this.sppList = temp;
+    },
+    checkAll(val) {
+      let temp = JSON.parse(JSON.stringify(this.sppList));
+      for (let item of temp) {
+        item.select = val;
+      }
+      this.sppList = temp;
+    },
+    fetchData() {
       this.sppList = [];
-      await this.$http
+      let q_filter = `?sort=${this.selSort}&search=${
+        this.searchTerm ? this.searchTerm : ""
+      }&dept=${this.selDivisi ? this.selDivisi : ""}`;
+
+      this.$http
         .get(
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
             "/" +
-            this.$store.state.currentUser.is_purch_manager +
-            "/" +
-            this.selOrder,
+            this.$store.state.currentUser.is_purch_manager
+            + q_filter,
 
           {}
         )
@@ -621,6 +431,13 @@ export default {
             this.sppList.push(result.data[i]);
           }
         });
+    },
+    async getDept() {
+      // let resp = this.$http.get("/dept")
+      this.$http.get("/dept").then((resp) => {
+        let dept = resp.data.map((a) => a.dept);
+        this.optDept = dept
+      });
     },
     async toPreview() {
       let temp = this.sppList.filter((val) => {
