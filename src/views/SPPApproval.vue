@@ -56,9 +56,6 @@
             </td>
             <td class="text-left">
               {{ d.name }}
-              <q-chip color="accent" text-color="white" dense size="sm">{{
-                d.dept
-              }}</q-chip>
             </td>
             <td class="text-center" style="width:150px">
               {{ d.create_at | moment("DD MMM YYYY") }}
