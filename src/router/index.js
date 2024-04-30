@@ -42,6 +42,7 @@ const routes = [
     path: "/approval/purchasing",
     name: "SPPApprovePM",
     component: () => import("../views/SPPApprovalPM.vue"),
+    meta: { title: "Persetujuan Manager Purchasing", path: ["Persetujuan"] },
   },
   {
     path: "/spp/approved",

@@ -1,204 +1,302 @@
 <template>
-  <div class="row relative q-px-lg q-pt-lg">
+  <div class="row relative q-px-lg ">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- toolbar  -->
-      <q-card-section class="q-pa-md row justify-between">
-        <div class="q-gutter-md">
-          <q-btn color="negative" label="Tolak" @click="promptReject=true" :disable="!selectCount" />
-          <q-btn
-            color="positive"
-            label="Setuju"
-            @click="promptApprove = true"
-            :disable="!selectCount"
-          />
-          <q-btn
-            flat
-            color="secondary"
-            class="q-ml-xl"
-            label="Detail"
-            :disabled="selectCount != 1"
-            @click="show_detail = true"
-          />
-          <q-btn
-            flat
-            color="secondary"
-            label="History"
-            :disabled="selectCount != 1"
-            @click="showHistory()"
-          />
+      <q-card-section class="row justify-between q-gutter-x-md">
+        <div>
+          <q-input
+            outlined
+            dense
+            v-model="searchTerm"
+            @input="fetchData"
+            clearable
+            @clear="searchTerm = ''"
+            placeholder="Cari Nama Barang"
+            style="width: 400px;"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search"></q-icon>
+            </template>
+          </q-input>
         </div>
-        <div></div>
+        
+        <div class="row items-center q-gutter-x-sm">
+          <q-select
+            outlined
+            dense
+            emit-value
+            map-options
+            :options="optDept"
+            v-model="selDivisi"
+            clearable
+            @clear="selDivisi = ''"
+            @input="fetchData"
+            label="Pilih Divisi"
+            style="width: 230px;"
+          ></q-select>
+          <q-select
+            outlined
+            dense
+            emit-value
+            map-options
+            :options="optSort"
+            v-model="selSort"
+            @input="fetchData"
+            label="Urutkan"
+            style="width: 230px;"
+          ></q-select>
+        </div>
+        
       </q-card-section>
-      <q-markup-table flat square dense>
-        <!-- table head  -->
-        <thead class="bg-blue-grey-14 text-white">
+      <q-markup-table
+        v-if="sppList.length"
+        class="stickyTable"
+        style="height: calc(100vh - 275px);"
+      >
+        <!-- table head -->
+        <thead class="text-white">
           <tr>
-            <th style="width:10px;"></th>
-            <th class="text-left">User</th>
-            <th class="text-left">Tanggal Pengajuan</th>
-            <th class="text-left">Deadline</th>
-            <th class="text-left">Barang</th>
-            <th class="text-right">Jumlah</th>
+            <th style="width:20px;">
+              <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
+            </th>
+            <th>User</th>
+            <th>Divisi</th>
+            <th>Tanggal Pengajuan</th>
+            <th>Deadline</th>
+            <th>Barang</th>
+            <th>Jumlah</th>
+            <th>Action</th>
           </tr>
         </thead>
         <!-- table body  -->
-        <tbody v-if="sppList.length" class="bg-blue-grey-1">
-          <tr v-for="d in sppList" :key="d.id">
+        <tbody>
+          <tr v-for="(d, i) in sppList" :key="i">
             <td>
               <q-checkbox v-model="d.select" />
             </td>
             <td class="text-left">
               {{ d.name }}
-              <q-chip color="accent" text-color="white" dense size="sm">{{ d.dept }}</q-chip>
             </td>
-            <td class="text-left">{{ d.create_at |moment('DD MMM YYYY') }}</td>
-            <td class="text-left">{{ d.deadline |moment('DD MMM YYYY')}}</td>
+            <td class="text-left">
+              {{ d.dept }}
+            </td>
+            <td class="text-center" style="width:150px">
+              {{ d.create_at | moment("DD MMM YYYY") }}
+            </td>
+            <td class="text-center" style="width:150px">
+              {{ d.deadline | moment("DD MMM YYYY") }}
+            </td>
             <td class="text-left">{{ d.item }}</td>
-            <td class="text-right">{{ d.qty }} {{d.unit}}</td>
+            <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
+            <td class="text-center">
+              <q-btn-dropdown flat dense dropdown-icon="more_horiz">
+                <q-list>
+                  <q-item
+                    :to="`/spp/detail/${d.spp_id}?approval=purchasing`"
+                    clickable
+                    v-close-popup
+                  >
+                    Detail
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="
+                      clearSelect(i);
+                      confirmApprove = true;
+                    "
+                  >
+                    Setujui
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    @click="
+                      clearSelect(i);
+                      confirmReject = true;
+                    "
+                  >
+                    Tolak
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+            </td>
           </tr>
         </tbody>
-        <tbody v-else class="bg-green-1">
-          <tr>
-            <td class="text-center text-grey" colspan="99">tidak ada data</td>
-          </tr>
-        </tbody>
-        <q-card-section></q-card-section>
       </q-markup-table>
+      <q-card-section
+        class="column items-center justify-center"
+        style="height: calc(100vh - 275px);"
+        v-else
+      >
+        <q-img width="400px" :src="`./empty.png`"></q-img>
+        <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
+      </q-card-section>
     </q-card>
 
-    <!-- detail  -->
-    <q-dialog v-model="show_detail" persistent transition-show="scale" transition-hide="scale">
-      <q-card style="min-width: 350px;">
-        <q-card-section class="bg-primary text-white row">
-          <div>NO SPP: {{ selected.spp_id }}</div>
+    <q-footer
+      v-if="selectCount > 0"
+      style="max-width: 1440px;"
+      class="q-mx-auto atas-radius bg-white"
+    >
+      <q-card-section class="row justify-between items-center">
+        <div class="l-text-subtitle text-bold text-black">
+          {{ selectCount }} PO Dipilih
+        </div>
+        <div class="row justify-end items-center q-gutter-x-md">
+          <q-btn
+            unelevated
+            label="Tolak"
+            color="negative"
+            @click="confirmReject = true"
+            no-caps
+          ></q-btn>
+          <q-btn
+            unelevated
+            label="Setujui"
+            color="positive"
+            @click="confirmApprove = true"
+            no-caps
+          ></q-btn>
+        </div>
+      </q-card-section>
+    </q-footer>
 
-          <q-space />
-
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-card-section>
-        <q-list>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Requester</q-item-label>
-              <q-item-label>{{selected.name}}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Request Date</q-item-label>
-              <q-item-label>{{selected.create_at}}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>Deadline</q-item-label>
-              <q-item-label>{{selected.deadline}}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Item</q-item-label>
-              <q-item-label>{{selected.item}}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>Quantity</q-item-label>
-              <q-item-label>{{selected.qty}} {{selected.unit}}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Description</q-item-label>
-              <q-item-label>{{selected.description}}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-separator spaced />
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>Status</q-item-label>
-              <q-item-label>{{status}}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-        <q-separator spaced />
-        <q-card-actions align="between">
-          <q-btn flat label="Tolak" color="negative" @click="promptReject=true" v-close-popup />
-          <q-btn flat label="Setuju" color="positive" @click="promptApprove = true" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <!-- history  -->
-    <q-dialog v-model="show_history" persistent transition-show="scale" transition-hide="scale">
-      <q-card style="min-width: 350px;">
-        <q-card-section class="bg-secondary text-white row">
-          <div>NO SPP: {{ history[0] ? history[0].spp_id : "" }}</div>
-          <q-space />
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>Close</q-tooltip>
-          </q-btn>
-        </q-card-section>
-        <q-card-section class="q-px-xl q-my-sm" style="height: 450px; overflow: auto;">
-          <q-timeline>
-            <q-timeline-entry
-              v-for="x in history"
-              :key="x.id"
-              :title="x.status"
-              :subtitle="dateHistory(x.create_at)"
-              :color="getColor(x.status)"
-              :icon="getIcon(x.status)"
-            >
-              <div>{{x.content}}</div>
-            </q-timeline-entry>
-          </q-timeline>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-    <q-dialog v-model="promptApprove" persistent>
-      <q-card style="min-width: 350px;">
-        <q-card-section class="bg-primary text-white">
-          <q-item-label class>Tugaskan Kepada</q-item-label>
+     <!-- persetujuan -->
+     <q-dialog v-model="confirmApprove" persistent>
+      <q-card style="max-width: 400px;">
+        <q-card-section class="column">
+          <div class="l-text-subtitle text-bold">Pilih PIC</div>
+          <div v-if="selectCount == 1">
+            Pilih Staff yang ditugaskan untuk melakukan Pembelian SPP
+            <span class="text-bold">{{ this.selected.item }}</span> sejumlah
+            <span class="text-bold"
+              >{{ this.selected.qty }} {{ this.selected.unit }}</span
+            >?
+          </div>
+          <div v-else>
+            Pilih Staff yang ditugaskan untuk melakukan Pembelian
+            <span class="text-bold">{{ selectCount }} SPP</span> terpilih?
+          </div>
         </q-card-section>
         <q-separator></q-separator>
 
         <q-card-section class="column q-gutter-y-sm">
-          <div class="row q-gutter-x-sm items-center">
-            <div style="width:150px">Staff</div>
-            <q-select class="col-4" outlined dense v-model="handleBy" :options="option" map-options style="flex-grow: 99;" />
+          <div class="column q-gutter-y-xs">
+            <div class="text-black">Staff</div>
+            <q-select
+              class="col-4"
+              outlined
+              dense
+              v-model="handleBy"
+              :options="option"
+              map-options
+            />
           </div>
-          <div class="row q-gutter-x-sm items-center">
-            <div style="width:150px">Kategori Barang/Jasa</div>
-            <q-select class="col-4" outlined dense v-model="selKategori" :options="optionKategori" style="flex-grow: 99;" />
+          <div class="column q-gutter-y-xs">
+            <div class="text-black">Kategori</div>
+            <q-select
+              class="col-4"
+              outlined
+              dense
+              v-model="selKategori"
+              :options="optionKategori"
+            />
           </div>
         </q-card-section>
 
-        <q-card-actions align="between" class="text-primary">
-          <q-btn flat color="negative" label="Cancel" v-close-popup />
-          <q-btn flat color="positive" label="OK" @click="approveSelected()" v-close-popup />
+        <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
+          <q-btn
+            outline
+            label="Batal"
+            dense
+            class="l-grow"
+            color="grey-8"
+            no-caps
+            v-close-popup
+            style="width: calc(50% - 16px)"
+          />
+          <q-btn
+            dense
+            unelevated
+            no-caps
+            color="primary"
+            label="Ya, Setujui SPP"
+            class=" l-grow"
+            @click="approveSelected()"
+            v-close-popup
+            style="width: calc(50% - 16px)"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="promptReject" persistent>
+
+    <!-- penolakan  -->
+    <q-dialog v-model="confirmReject" persistent>
       <q-card style="min-width: 350px;">
-        <q-card-section class="bg-primary text-white">
-          <div>Penolakan SPP</div>
+        <q-card-section class="row justify-center q-pb-none">
+          <q-avatar
+            color="grey-3"
+            text-color="negative"
+            size="75px"
+            font-size="35px"
+            icon="priority_high"
+          ></q-avatar>
+        </q-card-section>
+        <q-card-section class="q-pt-none text-center">
+          <div class="l-text-subtitle text-bold">Tolak SPP</div>
+          <div v-if="selectCount == 1">
+            Apakah Anda yakin ingin menolak SPP untuk
+            <span class="text-bold">{{ this.selected.item }}</span> sejumlah
+            <span class="text-bold"
+              >{{ this.selected.qty }} {{ this.selected.unit }}</span
+            >? Berikan Alasan Anda!
+          </div>
+          <div v-else>
+            Apakah Anda yakin ingin menolak
+            <span class="text-bold">{{ selectCount }} SPP</span> terpilih?
+            Beikan Alasan Anda!
+          </div>
         </q-card-section>
 
-        <q-card-section>
+        <q-separator></q-separator>
+        <q-card-section class="column q-gutter-y-xs">
+          <div class="text-black">Alasan</div>
           <q-input
-            class="col-4"
             outlined
             stack-label
             v-model="content"
             type="textarea"
-            label="Alasan Penolakan"
+            placeholder="e.g. Stok Barang Masih Ada"
           />
         </q-card-section>
 
-        <q-card-actions align="between" class="text-primary">
-          <q-btn flat color="negative" label="Cancel" v-close-popup />
-          <q-btn flat color="positive" label="OK" @click="rejectSelected()" v-close-popup />
+        <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
+          <q-btn
+            outline
+            label="Batal"
+            dense
+            class="l-grow"
+            color="grey-8"
+            no-caps
+            v-close-popup
+            style="width: calc(50% - 16px)"
+          />
+          <q-btn
+            dense
+            unelevated
+            no-caps
+            color="primary"
+            label="Ya, Tolak SPP"
+            class=" l-grow"
+            @click="rejectSelected()"
+            v-close-popup
+            style="width: calc(50% - 16px)"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
+
   </div>
 </template>
 
@@ -210,13 +308,27 @@ export default {
       show_detail: false,
       history: [],
       show_history: false,
-      promptApprove: false,
+      confirmApprove: false,
+      confirmReject: false,
       handleBy: {},
-      promptReject: false,
       content: "",
       sppList: [],
       selected: {},
       option: [],
+
+      optSort: [
+        { label: "Deadline Terdekat", value: "deadline ASC" },
+        { label: "Deadline Terlama", value: "deadline DESC" },
+        { label: "Pengajuan Terdekat", value: "create_at ASC" },
+        { label: "Pengajuan Terlama", value: "create_at DESC" },
+      ],
+      selSort: "deadline ASC",
+
+      selDivisi: "",
+      optDept: [],
+
+      searchTerm: "",
+      check_all: false,
       
       optionKategori:[
         "Keperluan & Peralatan Produksi",
@@ -242,11 +354,49 @@ export default {
   },
   mounted() {
     this.fetchData();
+    this.getDept();
+  },
+  watch: {
+    sppList: {
+      deep: true,
+      handler(val) {
+        let rows = JSON.parse(JSON.stringify(this.sppList));
+        let checked = val.filter((el) => el.select);
+        let unchecked = val.filter((el) => !el.select);
+
+        if (checked.length == rows.length) {
+          this.check_all = true;
+        } else if (unchecked.length == rows.length) {
+          this.check_all = false;
+        } else {
+          this.check_all = null;
+        }
+      },
+    },
   },
   methods: {
+    clearSelect(idx) {
+      let temp = JSON.parse(JSON.stringify(this.sppList));
+      for (let i in temp) {
+        if (i == idx) temp[i].select = true;
+        else temp[i].select = false;
+      }
+      this.sppList = temp;
+    },
+    checkAll(val) {
+      let temp = JSON.parse(JSON.stringify(this.sppList));
+      for (let item of temp) {
+        item.select = val;
+      }
+      this.sppList = temp;
+    },
     fetchData() {
       this.sppList = [];
-      this.$http.get("/spp-approval", {}).then(result => {
+      console.log(this.selDivisi)
+      let q_filter = `?sort=${this.selSort}&search=${
+        this.searchTerm ? this.searchTerm : ""
+      }&dept=${this.selDivisi ? this.selDivisi : ""}`;
+      this.$http.get(`/spp-approval${q_filter}`, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
           if (
             result.data[i].manager_approve == 1 &&
@@ -262,6 +412,14 @@ export default {
         this.handleBy = result.data[0];
       });
     },
+    async getDept() {
+      // let resp = this.$http.get("/dept")
+      this.$http.get("/dept").then((resp) => {
+        let dept = resp.data.map((a) => a.dept);
+        this.optDept = dept
+      });
+    },
+
     async approve(val) {
       var data = {
         purch_manager_approve: 1,
@@ -297,6 +455,7 @@ export default {
 
       this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
     },
+
     async reject(val) {
       var data = {
         purch_manager_approve: -1,
@@ -322,6 +481,7 @@ export default {
       };
       this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
     },
+
     async approveSelected() {
       this.show_detail = false;
       var data = this.sppList.filter(e => e.select === true);
@@ -334,6 +494,7 @@ export default {
       this.selKategori = null
       this.$q.notify("SPP berhasil disetujui!");
     },
+
     async rejectSelected() {
       var data = this.sppList.filter(e => e.select === true);
       for (var i = 0; i < data.length; i++) {
@@ -343,6 +504,7 @@ export default {
       await this.$root.$emit("refresh");
       this.$q.notify("SPP ditolak!");
     },
+
     showHistory() {
       this.$http
         .get("/spp_history/" + this.selected.spp_id, {})
