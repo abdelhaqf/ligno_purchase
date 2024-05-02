@@ -6,30 +6,42 @@
                 <div class="row items-center" >
                     <div class="col-2">Jenis PO</div>
                     <div class="q-gutter-sm">
-                        <q-radio v-model="jenisPO" val="po" label="PO" />
-                        <q-radio v-model="jenisPO" val="nonpo" label="Non-PO" />
+                        <q-radio v-model="type" val="po" label="PO" />
+                        <q-radio v-model="type" val="nonpo" label="Non-PO" />
                     </div>
                 </div>
                 <div class="row items-center" >
-                    <div class="col-2">Nama PO</div>
+                    <div class="col-2">Nomor PO</div>
                     <q-input
                         outlined
+                        v-model="po.po_id"
+                        label="Nomor PO"
+                        stack-label
                         dense
-                        placeholder="Input Nama"
+                        v-if="type == 'po'"
                         class="l-grow border-card"
-                        v-model="namaPO"
-                    ></q-input>
+                    />
+                    <q-input
+                        outlined
+                        v-model="po.po_id"
+                        label="Nomor non-PO"
+                        readonly
+                        stack-label
+                        dense
+                        v-else
+                        class="l-grow border-card"
+                    />
                 </div>
                 <div class="row items-center" >
                     <div class="col-2">Nama Vendor</div>   
                     <div class="l-grow">
                         <q-input
                             outlined
-                            v-model="spp.item"
-                            v-if="showInput"
+                            v-model="po.vendor"
+                            label="Nama Vendor"
+                            stack-label
                             dense
-                            class="l-grow"
-                            placeholder="Pilih Nama Vendor"
+                            v-if="showInput"
                         >
                             <template v-slot:append>
                             <q-toggle
@@ -40,7 +52,7 @@
                             />
                             </template>
                             <template v-slot:label>
-                            1. Nama Barang
+                            Nama Vendor
                             <a class="q-px-sm bg-info text-white rounded-borders"
                                 >input baru</a
                             >
@@ -48,19 +60,19 @@
                         </q-input>
                         <q-select
                             v-else
+                            stack-label
                             outlined
                             dense
-                            v-model="spp.item"
+                            v-model="po.vendor"
                             map-options
                             emit-value
                             use-input
                             hide-selected
                             fill-input
                             input-debounce="0"
-                            :options="filtered"
-                            @filter="filterOP"
-                            class="l-grow"
-                            placeholder="Pilih Nama Barang"
+                            :options="filteredVD"
+                            @filter="filterVD"
+                            label="Nama Vendor"
                         >
                             <template v-slot:append>
                             <q-toggle
@@ -176,12 +188,98 @@
                         </thead>
                         <!-- table body  -->
                         <tbody>
+                            <tr v-for="(x, i) in sppSelect" :key="i">
+                                <td>
+                                    <q-checkbox v-model="x.select" />
+                                </td>
+                                <td class="text-center">{{ i + 1 }}</td>
+                                <td style="width: 250px;">
+                                {{ x.item }} ({{ x.qty }} {{ x.unit }})
+                                </td>
+                                <td style="padding: 0px;">
+                                    <money v-model="x.price" v-bind="money" class="q-mx-sm"></money>
+                                </td>
+                                <td>
+                                    <q-input
+                                        outlined
+                                        dense
+                                        bg-color="white"
+                                        v-model="x.est_arrival"
+                                        readonly
+                                    >
+                                        <template v-slot:append>
+                                        <q-icon name="event" class="cursor-pointer">
+                                            <q-popup-proxy
+                                            ref="qDateProxy"
+                                            transition-show="scale"
+                                            transition-hide="scale"
+                                            >
+                                            <q-date minimal v-model="x.est_arrival">
+                                                <div class="row items-center justify-end">
+                                                <q-btn
+                                                    v-close-popup
+                                                    label="Close"
+                                                    color="primary"
+                                                    flat
+                                                />
+                                                </div>
+                                            </q-date>
+                                            </q-popup-proxy>
+                                        </q-icon>
+                                        </template>
+                                    </q-input>
+                                </td>
+                                <td class="text-center">
+                                    <q-btn
+                                    label="Hapus"
+                                    flat
+                                    no-caps
+                                    color="blue"
+                                    dense
+                                    @click="deleteSPPItem(i)"
+                                    />
+                                </td>
+                            </tr>
                         </tbody>
                     </q-markup-table>
                 </div>
 
             </q-card-section>
         </q-card>
+
+        <q-dialog v-model="dialogConfirm" persistents>
+            <q-card>
+                <q-card-section class="bg-grey-2 row items-center justify-between ">
+                <div class="text-h6 text-bold">Konfirmasi Pembuatan PO</div>
+                <q-btn icon="close" flat v-close-popup></q-btn>
+                </q-card-section>
+                <q-card-section>
+                <div class="q-pb-sm">
+                    Apa Anda yakin akan membuat PO untuk {{ sppSelect.length }} SPP
+                    terpilih?
+                </div>
+                <div v-if="curr == 'USD'" class="row justify-between items-center">
+                    <div>
+                    Masukan Kurs Berlaku
+                    </div>
+                    <money v-model="kurs" v-bind="money_kurs"></money>
+                </div>
+                </q-card-section>
+                <q-card-actions align="right">
+                <q-btn
+                    unelevated
+                    color="primary"
+                    label="SIMPAN"
+                    @click="
+                    allowed = true;
+                    createPO();
+                    "
+                    v-close-popup
+                ></q-btn>
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+
         <q-footer
             style="max-width: 1440px;"
             class="q-mx-xl atas-radius bg-white"
@@ -194,7 +292,7 @@
                     color="white" 
                     text-color="black" 
                     outline style="color: black;"
-                    @click="toPreview"
+                    @click="$router.go(-1)"
                     no-caps
                 >
                 </q-btn>
@@ -202,8 +300,8 @@
                     unelevated
                     label="Submit"
                     color="blue"
-                    @click="confirmApprove = true"
                     no-caps
+                    @click="createPO()"
                 >
                 </q-btn>
                 </div>
@@ -227,12 +325,12 @@ export default {
       },
       po: {
         po_date: moment().format("YYYY/MM/DD"),
-        po_id: "",
+        po_id: `OP/CM/${moment().format("YY")}/${moment().format("MM")}/`,
       },
       showInput: false,
       namaPO : "",
       namaVendor : "",
-      jenisPO : "po",
+      type : "po",
       curr: "IDR",
       money: {
         decimal: ",",
@@ -244,10 +342,46 @@ export default {
       },
       price: 0,
       check_all: false,
+      selected: {},
+      sppSelect: [],
+      sppSelectID: [],
+      optVendor: [],
+      filteredVD: [],
+      allowed: false,
+      dialogConfirm: false,
     };
   },
-  mounted() {
-    
+  async mounted() {
+    await this.fetchData();
+    await this.getVendor();
+  },
+  watch: {
+    sppSelect: {
+      deep: true,
+      handler(val) {
+        let rows = JSON.parse(JSON.stringify(this.sppSelect));
+        let checked = val.filter((el) => el.select);
+        let unchecked = val.filter((el) => !el.select);
+
+        if (checked.length == rows.length) {
+          this.check_all = true;
+        } else if (unchecked.length == rows.length) {
+          this.check_all = false;
+        } else {
+          this.check_all = null;
+        }
+      },
+    },
+    type: {
+        deep: true,
+        handler(val) {
+            if (this.type == "po")
+                this.po.po_id = `OP/CM/${moment().format("YY")}/${moment().format(
+                "MM"
+                )}/`;
+            else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
+        }
+    }
   },
   computed: {
     date_model() {
@@ -257,6 +391,65 @@ export default {
     },
   },
   methods: {
+    async fetchData() {
+        this.sppSelectID = this.$route.query.ids.split(",");
+        for (var i = 0; i < this.sppSelectID.length; i++) {
+            let result = await this.$http.get(
+                `/spp/detail/${this.sppSelectID[i]}`,
+                {}
+            );
+            // console.log(result.data);
+            result.data.select = false;
+            this.sppSelect.push(result.data);
+        }
+        console.log(this.sppSelect);
+    },
+    deleteSPPItem(index) {
+      this.sppSelect.splice(index, 1);
+    },
+    hasHistory () { return window.history.length > 2 },
+    chgCurrency() {
+      for (var i = 0; i < this.sppSelect.length; i++) {
+        this.sppSelect[i].currency = this.curr;
+      }
+
+      if (this.curr == "IDR") {
+        this.money.precision = 0;
+        this.money.prefix = "Rp ";
+      } else {
+        this.money.precision = 2;
+        this.money.prefix = "$ ";
+      }
+    },
+    clearSelect(idx) {
+      let temp = JSON.parse(JSON.stringify(this.sppSelect));
+      for (let i in temp) {
+        if (i == idx) temp[i].select = true;
+        else temp[i].select = false;
+      }
+      this.sppSelect = temp;
+    },
+    checkAll(val) {
+      let temp = JSON.parse(JSON.stringify(this.sppSelect));
+      for (let item of temp) {
+        item.select = val;
+      }
+      this.sppSelect = temp;
+    },
+    filterVD(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filteredVD = this.optVendor.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    async getVendor() {
+      await this.$http.get("/list_vendor", {}).then((result) => {
+        this.optVendor = result.data;
+        this.filteredVD = result.data;
+      });
+    },
     filterOP(val, update, abort) {
       update(() => {
         const needle = val.toLowerCase();
@@ -265,20 +458,111 @@ export default {
         );
       });
     },
+    async createPO() {
+      if (!this.allowed) {
+        this.dialogConfirm = true;
+        return;
+      }
+
+      this.po.user_id = this.$store.state.currentUser.user_id;
+      try {
+        this.$q.loading.show();
+
+        await this.$http.post("/new_po", this.po, {}).then(async (result) => {
+          for (var i = 0; i < this.sppSelect.length; i++) {
+            this.sppSelect[i].po_id = this.po.po_id;
+
+            let temp = JSON.parse(JSON.stringify(this.sppSelect[i]));
+            if (temp.id_rm) {
+              delete temp.id_rm;
+            }
+
+            await this.$http
+              .put("/update_spp/" + this.sppSelect[i].spp_id, temp, {})
+              .then((result) => {});
+
+            var history = {
+              spp_id: this.sppSelect[i].spp_id,
+              status: "process",
+              content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+            };
+            this.$http.post("/new_history", history, {}).then((result) => {});
+
+            var notifikasi = {
+              from_id: this.$store.state.currentUser.user_id,
+              to_id: this.sppSelect[i].user_id,
+              notif: "PO telah dibuat",
+              note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
+              spp_id: this.sppSelect[i].spp_id,
+              reference_page: "/spp/list",
+            };
+            this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+          }
+
+          this.formPO = false;
+          this.po = {
+            po_date: moment().format("YYYY/MM/DD"),
+          };
+          this.fetchData();
+        });
+
+        await this.sync_formula();
+
+        await this.$root.$emit("refresh");
+        this.sppSelect = [];
+        this.allowed = false;
+        this.$q.loading.hide();
+        this.$q.notify("Berhasil membuat PO!");
+      } catch (err) {
+        console.log(err);
+        this.$q.loading.hide();
+      }
+    },
+    async sync_formula() {
+      let temp = this.sppSelect.filter((val) => {
+        return val.id_rm;
+      });
+
+      if (temp.length > 0) {
+        for (let i = 0; i < temp.length; i++) {
+          let item = temp[i];
+          let payload = {
+            id: item.id_rm,
+            new_price: item.price,
+          };
+
+          if (item.currency == "USD") {
+            payload.new_price = parseFloat(this.kurs * item.price).toFixed(2);
+          }
+
+          payload.new_price =
+            parseFloat(payload.new_price) / parseFloat(item.qty);
+
+          // await this.$http_formulation.put("/purchase/rm/price", payload);
+        }
+      }
+    },
+    limitDate(date) {
+      return date >= moment().format("YYYY/MM/DD");
+    },
+    formatDate(dt) {
+      return moment(dt).format("YYYY-MM-DD");
+    },
+    dateHistory(dt) {
+      return moment(dt).format("DD MMMM YYYY");
+    },
+    changeType() {
+      if (this.type == "PO")
+        this.po.po_id = `OP/CM/${moment().format("YY")}/${moment().format(
+          "MM"
+        )}/`;
+      else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.container {
-  width: 100%;
-  height: 100%;
-  background-color: white;
-  position: absolute;
-  z-index: 1000;
-  left: 0px;
-  top: 0px;
-}
 
 .v-money {
   line-height: 1;

@@ -3,7 +3,6 @@
     <q-card
       flat
       bordered
-      v-if="!formPO"
       class="col-12 bg-white rounded-borders"
     >
       <!-- table control -->
@@ -53,59 +52,7 @@
         </div>
         
       </q-card-section>
-      <!-- <q-card-section class="q-pa-md row justify-between items-center">
-        <div class="q-gutter-md">
-          <q-btn
-            color="primary"
-            label="Buat PO"
-            @click="openForm"
-            :disable="!selectCount"
-          />
-          <q-btn
-            flat
-            color="secondary"
-            label="Detail"
-            :disabled="selectCount != 1"
-            @click="show_detail = true"
-          />
-          <q-btn
-            flat
-            color="secondary"
-            label="History"
-            :disabled="selectCount != 1"
-            @click="showHistory()"
-          />
-          <q-btn
-            class="q-ml-xl"
-            color="negative"
-            label="Batalkan"
-            :disabled="selectCount != 1"
-            @click="confirmCancel = true"
-          />
-        </div>
-        <div class="row q-gutter-sm">
-          <q-btn
-            outline
-            label="print"
-            icon="print"
-            color="secondary"
-            @click="toPreview"
-            :disable="!selectCount"
-          ></q-btn>
-          <q-select
-            outlined
-            label="Urut Per-"
-            map-options
-            emit-value
-            :options="[
-              { label: 'Pengajuan', value: 'create_at' },
-              { label: 'Deadline', value: 'deadline' },
-            ]"
-            v-model="selOrder"
-            @input="fetchData"
-          ></q-select>
-        </div>
-      </q-card-section> -->
+  
       <!-- table header  -->
       <q-markup-table
         v-if="sppList.length"
@@ -159,7 +106,7 @@
                     v-close-popup
                     @click="
                       clearSelect(i);
-                      confirmApprove = true;
+                      createPO();
                     "
                   >
                     Buat PO
@@ -188,44 +135,7 @@
         <q-img width="400px" :src="`./empty.png`"></q-img>
         <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
       </q-card-section>
-      <!-- <q-markup-table bordered flat square dense>
-        <thead class="bg-blue-grey-14 text-white">
-          <tr>
-            <th style="width:10px;"></th>
-            <th class="text-left">User</th>
-            <th class="text-left">Tanggal Pengajuan</th>
-            <th class="text-left">Pelaksana</th>
-            <th class="text-left">Deadline</th>
-            <th class="text-left">Barang</th>
-            <th class="text-right">Jumlah</th>
-          </tr>
-        </thead>
-        <tbody v-if="sppList.length" class="bg-blue-grey-1">
-          <tr v-for="d in sppList" :key="d.spp_id">
-            <td>
-              <q-checkbox v-model="d.select" />
-            </td>
-            <td class="text-left">
-              {{ d.name }}
-              <q-chip color="accent" text-color="white" dense size="sm">{{
-                d.dept
-              }}</q-chip>
-            </td>
-            <td class="text-left">{{ d.create_at | moment("DD MMM YYYY") }}</td>
-            <td class="text-left">{{ d.handler_name }}</td>
-            <td class="text-left" style="width: 100px;">
-              {{ d.deadline | moment("DD MMM YYYY") }}
-            </td>
-            <td class="text-left">{{ d.item }}</td>
-            <td class="text-right">{{ d.qty }} {{ d.unit }}</td>
-          </tr>
-        </tbody>
-        <tbody v-else class="bg-green-1">
-          <tr>
-            <td class="text-center text-grey" colspan="99">tidak ada data</td>
-          </tr>
-        </tbody>
-      </q-markup-table> -->
+
       <q-card-section></q-card-section>
     </q-card>
 
@@ -254,7 +164,7 @@
             unelevated
             label="Buat PO"
             color="blue"
-            @click="confirmApprove = true"
+            @click="createPO"
             no-caps
             icon="edit"
           >
@@ -262,8 +172,6 @@
         </div>
       </q-card-section>
     </q-footer>
-
-    <!-- form PO baru -->
   </div>
 </template>
 
@@ -276,34 +184,20 @@ export default {
   components: { Money },
   data() {
     return {
-      roman: [
-        "",
-        "I",
-        "II",
-        "III",
-        "IV",
-        "V",
-        "VI",
-        "VII",
-        "VIII",
-        "IX",
-        "X",
-        "XI",
-        "XII",
-      ],
       sppList: [],
       sppSelect: [],
-      po: {
-        po_date: moment().format("YYYY/MM/DD"),
-        po_id: "",
-      },
-      formPO: false,
-      alert: false,
+      sppSelectID: [],
 
       show_detail: false,
       history: [],
       show_history: false,
       selected: {},
+
+      po: {
+        po_date: moment().format("YYYY/MM/DD"),
+        po_id: "",
+      },
+
       option: [],
 
       optSort: [
@@ -356,9 +250,7 @@ export default {
     };
   },
   async mounted() {
-    await this.getVendor();
     this.fetchData();
-    this.getDept();
   },
   watch: {
     sppList: {
@@ -380,20 +272,6 @@ export default {
   },
   methods: {
     ...mapActions(["sendPrintData"]),
-    filterVD(val, update, abort) {
-      update(() => {
-        const needle = val.toLowerCase();
-        this.filteredVD = this.optVendor.filter(
-          (v) => v.label.toLowerCase().indexOf(needle) > -1
-        );
-      });
-    },
-    async getVendor() {
-      await this.$http.get("/list_vendor", {}).then((result) => {
-        this.optVendor = result.data;
-        this.filteredVD = result.data;
-      });
-    },
     clearSelect(idx) {
       let temp = JSON.parse(JSON.stringify(this.sppList));
       for (let i in temp) {
@@ -432,13 +310,6 @@ export default {
           }
         });
     },
-    async getDept() {
-      // let resp = this.$http.get("/dept")
-      this.$http.get("/dept").then((resp) => {
-        let dept = resp.data.map((a) => a.dept);
-        this.optDept = dept
-      });
-    },
     async toPreview() {
       let temp = this.sppList.filter((val) => {
         return val.select;
@@ -451,157 +322,12 @@ export default {
       let route = this.$router.resolve({ path: "/print" });
       window.open(`${route.href}/${JSON.stringify(result)}`);
     },
-    openForm() {
-      for (var i = 0; i < this.sppList.length; i++) {
-        if (this.sppList[i].select == true) {
-          let data = {
-            spp_id: this.sppList[i].spp_id,
-            item: this.sppList[i].item,
-            qty: this.sppList[i].qty,
-            unit: this.sppList[i].unit,
-            price: 0,
-            currency: "IDR",
-            est_arrival: moment()
-              .add(1, "days")
-              .format("YYYY/MM/DD"),
-          };
-          this.sppSelect.push(data);
-        }
-      }
-
-      if (this.sppSelect.length > 0) {
-        // this.po.po_id = this.sppSelect[0].spp_id;
-        this.changeType();
-
-        this.formPO = true;
-        this.curr = "IDR";
-        this.chgCurrency();
-      } else {
-        this.alert = true;
-      }
-    },
-    closeForm() {
-      this.formPO = false;
-      this.sppSelect = [];
-    },
-    async createPO() {
-      if (!this.allowed) {
-        this.dialogConfirm = true;
-        return;
-      }
-
-      this.po.user_id = this.$store.state.currentUser.user_id;
-      try {
-        this.$q.loading.show();
-
-        await this.$http.post("/new_po", this.po, {}).then(async (result) => {
-          for (var i = 0; i < this.sppSelect.length; i++) {
-            this.sppSelect[i].po_id = this.po.po_id;
-
-            let temp = JSON.parse(JSON.stringify(this.sppSelect[i]));
-            if (temp.id_rm) {
-              delete temp.id_rm;
-            }
-
-            await this.$http
-              .put("/update_spp/" + this.sppSelect[i].spp_id, temp, {})
-              .then((result) => {});
-
-            var history = {
-              spp_id: this.sppSelect[i].spp_id,
-              status: "process",
-              content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
-            };
-            this.$http.post("/new_history", history, {}).then((result) => {});
-
-            var notifikasi = {
-              from_id: this.$store.state.currentUser.user_id,
-              to_id: this.sppSelect[i].user_id,
-              notif: "PO telah dibuat",
-              note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
-              spp_id: this.sppSelect[i].spp_id,
-              reference_page: "/spp/list",
-            };
-            this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-          }
-
-          this.formPO = false;
-          this.po = {
-            po_date: moment().format("YYYY/MM/DD"),
-          };
-          this.fetchData();
-        });
-
-        await this.sync_formula();
-
-        await this.$root.$emit("refresh");
-        this.sppSelect = [];
-        this.allowed = false;
-        this.$q.loading.hide();
-        this.$q.notify("Berhasil membuat PO!");
-      } catch (err) {
-        console.log(err);
-        this.$q.loading.hide();
-      }
-    },
-    async sync_formula() {
-      let temp = this.sppSelect.filter((val) => {
-        return val.id_rm;
-      });
-
-      if (temp.length > 0) {
-        for (let i = 0; i < temp.length; i++) {
-          let item = temp[i];
-          let payload = {
-            id: item.id_rm,
-            new_price: item.price,
-          };
-
-          if (item.currency == "USD") {
-            payload.new_price = parseFloat(this.kurs * item.price).toFixed(2);
-          }
-
-          payload.new_price =
-            parseFloat(payload.new_price) / parseFloat(item.qty);
-
-          // await this.$http_formulation.put("/purchase/rm/price", payload);
-        }
-      }
-    },
     changeType() {
       if (this.type == "PO")
         this.po.po_id = `OP/CM/${moment().format("YY")}/${moment().format(
           "MM"
         )}/`;
       else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
-    },
-    cancelSPP() {
-      var data = {
-        purch_manager_cancel: 1,
-        note: this.content,
-      };
-      this.$http
-        .put("/update_spp/" + this.selected.spp_id, data, {})
-        .then((result) => {
-          this.$root.$emit("refresh");
-          this.fetchData();
-        });
-
-      var history = {
-        spp_id: this.selected.spp_id,
-        status: "canceled",
-        content: this.content,
-      };
-      this.$http.post("/new_history", history, {}).then((result) => {});
-      this.$q.notify("SPP berhasil dibatalkan!");
-    },
-    showHistory() {
-      this.$http
-        .get("/spp_history/" + this.selected.spp_id, {})
-        .then((result) => {
-          this.history = result.data;
-        });
-      this.show_history = true;
     },
     chgCurrency() {
       for (var i = 0; i < this.sppSelect.length; i++) {
@@ -616,36 +342,21 @@ export default {
         this.money.prefix = "$ ";
       }
     },
-    limitDate(date) {
-      return date >= moment().format("YYYY/MM/DD");
-    },
-    formatDate(dt) {
-      return moment(dt).format("YYYY-MM-DD");
-    },
-    dateHistory(dt) {
-      return moment(dt).format("DD MMMM YYYY");
-    },
-    getColor(val) {
-      if (val == "done") return "positive";
-      else if (val == "rejected" || val == "canceled") return "red-7";
-      else if (val == "process") return "primary";
-      else return "orange";
-    },
-    getIcon(val) {
-      if (val == "done") return "done_all";
-      else if (val == "rejected") return "error_outline";
-      else if (val == "process") return "hourglass_bottom";
-      else if (val == "created") return "library_add";
-      else if (val == "canceled") return "close";
-      else return "pending_actions";
-    },
-    filterRM(val, update, abort) {
-      update(() => {
-        const needle = val.toLowerCase();
-        this.filtered_formulation_rm = this.formulation_rm.filter(
-          (v) => v.label.toLowerCase().indexOf(needle) > -1
-        );
-      });
+    createPO() {
+      for (var i = 0; i < this.sppList.length; i++) {
+        if (this.sppList[i].select == true) {
+          this.sppSelectID.push(this.sppList[i].spp_id);
+        }
+      }
+
+      if (this.sppSelect.length > 0) {
+        this.changeType();
+
+        this.curr = "IDR";
+        this.chgCurrency();
+      }
+
+      this.$router.push(`/po/create?ids=${this.sppSelectID.join(",")}`);
     },
   },
   computed: {
@@ -656,23 +367,6 @@ export default {
       if (data[0]) this.selected = data[0];
 
       return count;
-    },
-    status_note() {
-      if (this.selected.manager_approve == 0) {
-        return "Menunggu persetujuan manager";
-      } else if (this.selected.manager_approve == -1) {
-        return "Ditolak oleh manager";
-      } else if (this.selected.purch_manager_approve == 0) {
-        return "Menunggu persetujuan manager purchasing";
-      } else if (this.selected.purch_manager_approve == -1) {
-        return "Ditolak oleh manager purchasing";
-      } else if (this.selected.is_received == 0) {
-        return "Sedang diproses oleh " + this.selected.handler_name;
-      } else if (this.selected.is_received == 1) {
-        return "Barang sudah diterima sebagian";
-      } else if (this.selected.is_received == 2) {
-        return "Barang sudah diterima";
-      }
     },
   },
 };
