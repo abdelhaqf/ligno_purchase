@@ -1,5 +1,5 @@
 <template>
-  <div class="row relative q-px-lg " style="min-height: 550px">
+  <div class="row relative q-px-lg" style="min-height: 550px">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- table control -->
       <q-card-section class="column q-gutter-y-sm">
@@ -291,7 +291,7 @@
       </q-card>
     </q-dialog>
 
-    <q-footer style="max-width: 1440px;" class="q-mx-xl atas-radius bg-white">
+    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
       <q-card-section class="row justify-end items-center">
         <div class="row justify-end items-center q-gutter-x-md">
           <q-btn
@@ -311,6 +311,7 @@
             color="blue"
             no-caps
             @click="createPO()"
+            :disable="!isValid"
           >
           </q-btn>
         </div>
@@ -337,10 +338,9 @@ export default {
           .add(1, "days")
           .format("YYYY/MM/DD"),
         po_id: `OP/CM/${moment().format("YY")}/${moment().format("MM")}/`,
+        vendor: "",
       },
       showInput: false,
-      namaPO: "",
-      namaVendor: "",
       type: "po",
       curr: "IDR",
       money: {
@@ -382,6 +382,15 @@ export default {
       if (!this.spp.deadline) return "Pilih Tanggal Dibutuhkan";
 
       return moment(this.spp.deadline).format("DD MMMM YYYY");
+    },
+
+    isValid () {
+      if (this.po.po_id == "" || this.po.vendor == "") {
+        return false;
+      } else {
+        return true;
+      }
+      return true;
     },
   },
   methods: {
@@ -492,23 +501,25 @@ export default {
             this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
           }
 
-          this.formPO = false;
-          this.po = {
-            po_date: moment().format("YYYY/MM/DD"),
-          };
-          this.fetchData();
+          // this.formPO = false;
+          // this.po = {
+          //   po_date: moment().format("YYYY/MM/DD"),
+          // };
+          // this.fetchData();
         });
 
-        await this.sync_formula();
+        // await this.sync_formula();
 
-        await this.$root.$emit("refresh");
-        this.sppSelect = [];
-        this.allowed = false;
+        // await this.$root.$emit("refresh");
+        // this.sppSelect = [];
+        // this.allowed = false;
         this.$q.loading.hide();
         this.$q.notify({ message: "Berhasil membuat PO!", color: "positive" });
+        this.$router.push("/spp/approved")
       } catch (err) {
         console.log(err);
         this.$q.loading.hide();
+        this.$q.notify({ message: "Gagal membuat PO!", color: "negative" });
       }
     },
     async sync_formula() {

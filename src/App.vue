@@ -410,15 +410,15 @@
     </q-drawer>
 
     <q-page-container
-      class="q-mx-auto q-py-md "
-      style="max-width: 1440px; padding-left: 0 !important"
+      class="q-mx-auto q-py-md"
+      style="max-width: 1440px;"
     >
       <q-card-section class="q-px-lg">
         <div>
           <q-breadcrumbs>
             <q-breadcrumbs-el
               class="text-grey-8"
-              v-for="(el, i) in routeMeta ? routeMeta.path : []"
+              v-for="(el, i) in routeMeta ? routeMeta.path : []" :key="i"
               :label="el"
             />
             <q-breadcrumbs-el

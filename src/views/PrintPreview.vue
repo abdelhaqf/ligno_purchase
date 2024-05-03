@@ -58,7 +58,7 @@
         <q-markup-table flal separator="none" class="q-mt-md" dense>
           <thead>
             <tr>
-              <th class="text-center trow" style="font-weight: 600;width:;">
+              <th class="text-center trow" style="font-weight: 600;">
                 Nama Barang
               </th>
               <th
@@ -73,10 +73,10 @@
               >
                 Qty
               </th>
-              <th class="text-center trow" style="font-weight: 600;width:;">
+              <th class="text-center trow" style="font-weight: 600;">
                 Diproses Oleh
               </th>
-              <th class="text-center trow" style="font-weight: 600;width:;">
+              <th class="text-center trow" style="font-weight: 600;">
                 Kategori Barang/Jasa
               </th>
             </tr>
@@ -218,6 +218,10 @@ export default {
   .toprint {
     visibility: visible;
     display: block;
+  }
+  header {
+    visibility: hidden;
+    display: none;
   }
 }
 </style>
