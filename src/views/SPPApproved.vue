@@ -251,6 +251,7 @@ export default {
   },
   async mounted() {
     this.fetchData();
+    this.getDept();
   },
   watch: {
     sppList: {
@@ -286,6 +287,13 @@ export default {
         item.select = val;
       }
       this.sppList = temp;
+    },
+    async getDept() {
+      // let resp = this.$http.get("/dept")
+      this.$http.get("/dept").then((resp) => {
+        let dept = resp.data.map((a) => a.dept);
+        this.optDept = dept
+      });
     },
     fetchData() {
       this.sppList = [];

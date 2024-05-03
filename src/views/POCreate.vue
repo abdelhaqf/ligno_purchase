@@ -1,5 +1,6 @@
 <template>
-    <div class="row relative q-px-lg ">
+    <div class="row relative q-px-lg "
+        style="min-height: 550px">
         <q-card flat bordered class="col-12 bg-white rounded-borders">
             <!-- table control -->
             <q-card-section class="column q-gutter-y-sm">
@@ -86,33 +87,33 @@
                     </div>
                 </div>
                 <div class="row l-grow items-center q-gutter-x-xl" >
-                    <div class="l-grow row">
+                    <div class="l-grow row items-center">
                         <div class="col-4">Tanggal PO</div>
-                        <q-field dense outlined class="l-grow">
-                            <template v-slot:prepend>
-                                <q-icon name="date_range" />
-                            </template>
+                          <q-field dense outlined class="l-grow">
+                              <template v-slot:prepend>
+                                  <q-icon name="date_range" />
+                              </template>
 
-                            <template v-slot:control>
-                                <div class="self-center full-width no-outline" tabindex="0">
-                                {{ date_model }}
-                                </div>
-                            </template>
-                            <q-popup-proxy
-                                style="width:fit-content"
-                                transition-show="scale"
-                                transition-hide="scale"
-                            >
-                                <q-date v-model="spp.deadline" :options="limitDate">
-                                <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                </div>
-                                </q-date>
-                            </q-popup-proxy>
+                              <template v-slot:control>
+                                  <div class="self-center full-width no-outline" tabindex="0">
+                                  {{ date_model }}
+                                  </div>
+                              </template>
+                              <q-popup-proxy
+                                  style="width:fit-content"
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                              >
+                                  <q-date v-model="spp.deadline" :options="limitDate">
+                                  <div class="row items-center justify-end">
+                                      <q-btn v-close-popup label="Close" color="primary" flat />
+                                  </div>
+                                  </q-date>
+                              </q-popup-proxy>
                         </q-field>
                     </div>
-                    <div class="l-grow row q-pl-lg">
-                        <div class="col-2">Currency</div>
+                    <div class="l-grow row q-pl-lg item-center">
+                        <div class="col-2 q-py-sm">Currency</div>
                         <q-select
                             outlined
                             v-model="curr"
@@ -134,7 +135,7 @@
                             mask="date"
                             label
                             dense
-                            style="width:49%"
+                            style="width:40%"
                         >
                             <template v-slot:append>
                             <q-icon name="event" class="cursor-pointer">
@@ -153,7 +154,9 @@
                             </template>
                             <template v-slot:label>
                             Tanggal PO
-                            <a class="q-px-sm bg-info text-white rounded-borders"
+                            <a 
+                            v-if="po.po_date"
+                            class="q-px-sm bg-info text-white rounded-borders"
                                 >tahun / bulan / tanggal</a
                             >
                             </template>
@@ -163,6 +166,7 @@
                             label="Ubah Massal"
                             color="blue"
                             no-caps
+                            @click="changeAll()"
                         >
                         </q-btn>
                     </div>
@@ -171,14 +175,13 @@
                     <div class="col-2"></div>
                     <q-markup-table
                         class="stickyTable l-grow"
-                        style="height: calc(100vh - 275px);"
+                        style="max-height: calc(100vh - 375px);"
+                        flat
+                        bordered
                     >
                         <!-- table head -->
                         <thead class="text-white">
                         <tr>
-                            <th style="width:20px;">
-                            <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
-                            </th>
                             <th>No</th>
                             <th>Deadline</th>
                             <th>Harga</th>
@@ -189,9 +192,6 @@
                         <!-- table body  -->
                         <tbody>
                             <tr v-for="(x, i) in sppSelect" :key="i">
-                                <td>
-                                    <q-checkbox v-model="x.select" />
-                                </td>
                                 <td class="text-center">{{ i + 1 }}</td>
                                 <td style="width: 250px;">
                                 {{ x.item }} ({{ x.qty }} {{ x.unit }})
@@ -324,7 +324,7 @@ export default {
         item: "",
       },
       po: {
-        po_date: moment().format("YYYY/MM/DD"),
+        po_date: "",
         po_id: `OP/CM/${moment().format("YY")}/${moment().format("MM")}/`,
       },
       showInput: false,
@@ -341,7 +341,6 @@ export default {
         masked: false,
       },
       price: 0,
-      check_all: false,
       selected: {},
       sppSelect: [],
       sppSelectID: [],
@@ -356,22 +355,6 @@ export default {
     await this.getVendor();
   },
   watch: {
-    sppSelect: {
-      deep: true,
-      handler(val) {
-        let rows = JSON.parse(JSON.stringify(this.sppSelect));
-        let checked = val.filter((el) => el.select);
-        let unchecked = val.filter((el) => !el.select);
-
-        if (checked.length == rows.length) {
-          this.check_all = true;
-        } else if (unchecked.length == rows.length) {
-          this.check_all = false;
-        } else {
-          this.check_all = null;
-        }
-      },
-    },
     type: {
         deep: true,
         handler(val) {
@@ -398,8 +381,6 @@ export default {
                 `/spp/detail/${this.sppSelectID[i]}`,
                 {}
             );
-            // console.log(result.data);
-            result.data.select = false;
             this.sppSelect.push(result.data);
         }
         console.log(this.sppSelect);
@@ -420,21 +401,6 @@ export default {
         this.money.precision = 2;
         this.money.prefix = "$ ";
       }
-    },
-    clearSelect(idx) {
-      let temp = JSON.parse(JSON.stringify(this.sppSelect));
-      for (let i in temp) {
-        if (i == idx) temp[i].select = true;
-        else temp[i].select = false;
-      }
-      this.sppSelect = temp;
-    },
-    checkAll(val) {
-      let temp = JSON.parse(JSON.stringify(this.sppSelect));
-      for (let item of temp) {
-        item.select = val;
-      }
-      this.sppSelect = temp;
     },
     filterVD(val, update, abort) {
       update(() => {
@@ -458,12 +424,15 @@ export default {
         );
       });
     },
-    async createPO() {
-      if (!this.allowed) {
-        this.dialogConfirm = true;
-        return;
-      }
+    changeAll() {
+      for (var i = 0; i < this.sppSelect.length; i++) {
+            this.sppSelect[i].est_arrival = this.po.po_date;
+            this.sppSelect[i].price = this.price;
+        }
 
+        console.log(this.sppSelect);
+    },
+    async createPO() {
       this.po.user_id = this.$store.state.currentUser.user_id;
       try {
         this.$q.loading.show();
