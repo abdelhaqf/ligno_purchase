@@ -194,6 +194,10 @@ Flight::route('POST /po', function () {
   $category = $data["cat"];
   $kategori = $data["kategori"];
 
+  $query = Flight::request()->query;
+  $w_search = "";
+  if ($query->search) $w_search = "AND item LIKE '%{$query['search']}%'";
+
   $w_src = "";
   if ($is_rcv != "null") {
     $w_src = "AND is_received LIKE '%$is_rcv%'";
@@ -237,7 +241,7 @@ Flight::route('POST /po', function () {
             FROM po INNER JOIN spp on po.po_id = spp.po_id 
             INNER JOIN `user` usr on usr.user_id = po.user_id
             GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-          WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori
+          WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search
           HAVING CONCAT(YEAR(po_date),'-',MONTH(po_date)) LIKE '%$filter%'
           ";
   //  echo $q;

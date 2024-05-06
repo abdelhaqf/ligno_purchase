@@ -348,7 +348,7 @@
           :active-class="
             miniState ? 'text-primary' : 'text-primary active-menu'
           "
-          to="/po/list/not/null/null/null"
+          to="/po/list/null/null/null/null"
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
@@ -665,7 +665,7 @@ export default {
             this.menu.push({
               icon: "ballot",
               title: "PO",
-              link: "/po/list/not/null/null/null",
+              link: "/po/list/null/null/null/null",
               count: result.data.count_po,
             });
             this.menu.push({
