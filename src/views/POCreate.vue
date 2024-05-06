@@ -120,19 +120,19 @@
         <div class="l-grow row items-center no-wrap">
           <div class="col-2">Daftar SPP</div>
           <div class="l-grow row justify-end items-center q-py-md bg-grey-2">
-            <div class="text-weight-thin l-grow q-mx-md">Atur dan terapkan ke semua</div>
-            <div class="row q-gutter-x-md no-wrap">
-              <money
-                v-model="price"
-                v-bind="money"
-              ></money>
+            <div class="text-weight-thin l-grow q-mx-md">
+              Atur dan terapkan ke semua
+            </div>
+            <div class="q-px-md no-wrap q-mr-md" style="width:200px">
+              <money v-model="price" v-bind="money"></money>
+            </div>
+            <div class="q-px-md no-wrap" style="width:200px">
               <q-input
                 outlined
                 v-model="po.po_date"
                 mask="date"
                 dense
-                style="width:200px"
-                class="bg-white"
+                class="bg-white l-grow"
               >
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
@@ -164,27 +164,21 @@
                 </template> -->
               </q-input>
             </div>
-            <div class="q-mx-md">
+            <div class="q-px-md" style="width: 175px;">
               <q-btn
                 unelevated
                 label="Ubah Massal"
                 color="blue"
                 no-caps
                 @click="changeAll()"
-                style="width: 130px;"
               >
               </q-btn>
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row no-wrap">
           <div class="col-2"></div>
-          <q-markup-table
-            class="stickyTable l-grow"
-            style="max-height: calc(100vh - 375px);"
-            flat
-            bordered
-          >
+          <q-markup-table class="stickyTable l-grow" flat bordered wrap-cells>
             <!-- table head -->
             <thead class="text-white">
               <tr>
@@ -199,24 +193,25 @@
             <tbody>
               <tr v-for="(x, i) in sppSelect" :key="i">
                 <td class="text-center">{{ i + 1 }}</td>
-                <td style="width: 250px;">
-                  {{ x.item }} ({{ x.qty }} {{ x.unit }})
-                </td>
-                <td style="width:250px;" class="items-center">
+                <td class="l-grow">{{ x.item }} ({{ x.qty }} {{ x.unit }})</td>
+                <td style="width:200px;" class="items-center">
                   <money
                     v-model="x.price"
                     v-bind="money"
                     class="l-grow"
                   ></money>
                 </td>
-                <td style="padding: 0px;" class="q-mx-md text-center items-center">
+                <td
+                  class="text-center items-center q-px-none"
+                  style="width:200px;"
+                >
                   <q-input
                     outlined
                     dense
                     bg-color="white"
                     v-model="x.est_arrival"
                     readonly
-                    style="width:200px;" 
+                    class="l-grow"
                   >
                     <template v-slot:append>
                       <q-icon name="event" class="cursor-pointer">
@@ -240,7 +235,7 @@
                     </template>
                   </q-input>
                 </td>
-                <td class="text-center" style="width: 140px;">
+                <td class="text-center" style="width: 175px;">
                   <q-btn
                     label="Hapus"
                     flat
@@ -375,7 +370,7 @@ export default {
         else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
       },
     },
-    curr : {
+    curr: {
       deep: true,
       handler(val) {
         for (var i = 0; i < this.sppSelect.length; i++) {
@@ -399,7 +394,7 @@ export default {
       return moment(this.spp.deadline).format("DD MMMM YYYY");
     },
 
-    isValid () {
+    isValid() {
       if (this.po.po_id == "" || this.po.vendor == "") {
         return false;
       } else {
@@ -530,7 +525,7 @@ export default {
         // this.allowed = false;
         this.$q.loading.hide();
         this.$q.notify({ message: "Berhasil membuat PO!", color: "positive" });
-        this.$router.push("/spp/approved")
+        this.$router.push("/spp/approved");
       } catch (err) {
         console.log(err);
         this.$q.loading.hide();
@@ -587,9 +582,8 @@ export default {
   font-size: 14px;
   border: 1px solid silver;
   border-radius: 5px;
-  padding: 10px 10px;
+  padding: 10px;
   box-sizing: border-box;
-  width: 250px;
 }
 .v-money:focus {
   outline: none;
