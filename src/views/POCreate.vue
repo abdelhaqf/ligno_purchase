@@ -4,14 +4,14 @@
       <!-- table control -->
       <q-card-section class="column q-gutter-y-sm">
         <div class="row items-center">
-          <div class="col-2">Jenis PO</div>
+          <div class="col-2">Jenis SPP</div>
           <div class="q-gutter-sm">
             <q-radio v-model="type" val="po" label="PO" />
             <q-radio v-model="type" val="nonpo" label="Non-PO" />
           </div>
         </div>
         <div class="row items-center">
-          <div class="col-2">Nomor PO</div>
+          <div class="col-2">Nomor SPP</div>
           <q-input
             outlined
             v-model="po.po_id"
@@ -85,98 +85,96 @@
             </q-select>
           </div>
         </div>
-        <div class="row l-grow items-center q-gutter-x-xl">
-          <div class="l-grow row items-center">
-            <div class="col-4">Tanggal PO</div>
-            <q-field dense outlined class="l-grow">
-              <template v-slot:prepend>
-                <q-icon name="date_range" />
-              </template>
+        <div class="l-grow row items-center">
+          <div class="col-2">Tanggal SPP</div>
+          <q-field dense outlined class="l-grow">
+            <template v-slot:prepend>
+              <q-icon name="date_range" />
+            </template>
 
-              <template v-slot:control>
-                <div class="self-center full-width no-outline" tabindex="0">
-                  {{ date_model }}
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="0">
+                {{ date_model }}
+              </div>
+            </template>
+            <q-popup-proxy
+              style="width:fit-content"
+              transition-show="scale"
+              transition-hide="scale"
+            >
+              <q-date v-model="spp.deadline" :options="limitDate">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Close" color="primary" flat />
                 </div>
-              </template>
-              <q-popup-proxy
-                style="width:fit-content"
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date v-model="spp.deadline" :options="limitDate">
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-field>
-          </div>
-          <div class="l-grow row q-pl-lg item-center">
-            <div class="col-2 q-py-sm">Currency</div>
-            <q-select
-              outlined
-              v-model="curr"
-              dense
-              label="Currency"
-              :options="['IDR', 'USD']"
-              @input="chgCurrency"
-              class="l-grow"
-            />
+              </q-date>
+            </q-popup-proxy>
+          </q-field>
+        </div>
+        <div class="l-grow row items-center">
+          <div class="col-2">Currency</div>
+          <div class="q-gutter-sm">
+            <q-radio v-model="curr" val="IDR" label="IDR" />
+            <q-radio v-model="curr" val="USD" label="USD" />
           </div>
         </div>
-        <div class="row items-center">
-          <div class="col-2">Daftar PO</div>
-          <div class="l-grow row justify-end items-center q-gutter-x-md">
-            <money
-              v-model="price"
-              v-bind="money"
-              class="q-mx-md l-grow"
-            ></money>
-            <q-input
-              outlined
-              v-model="po.po_date"
-              mask="date"
-              label
-              dense
-              style="width:40%"
-            >
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy
-                    ref="qDateProxy"
-                    transition-show="scale"
-                    transition-hide="scale"
+        <div class="l-grow row items-center no-wrap">
+          <div class="col-2">Daftar SPP</div>
+          <div class="l-grow row justify-end items-center q-py-md bg-grey-2">
+            <div class="text-weight-thin l-grow q-mx-md">Atur dan terapkan ke semua</div>
+            <div class="row q-gutter-x-md no-wrap">
+              <money
+                v-model="price"
+                v-bind="money"
+              ></money>
+              <q-input
+                outlined
+                v-model="po.po_date"
+                mask="date"
+                dense
+                style="width:200px"
+                class="bg-white"
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy
+                      ref="qDateProxy"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date minimal v-model="po.po_date" :options="limitDate">
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+                <!-- <template v-slot:label>
+                  Tanggal PO
+                  <a
+                    v-if="po.po_date"
+                    class="q-px-sm bg-info text-white rounded-borders"
+                    >tahun / bulan / tanggal</a
                   >
-                    <q-date minimal v-model="po.po_date" :options="limitDate">
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-              <template v-slot:label>
-                Tanggal PO
-                <a
-                  v-if="po.po_date"
-                  class="q-px-sm bg-info text-white rounded-borders"
-                  >tahun / bulan / tanggal</a
-                >
-              </template>
-            </q-input>
-            <q-btn
-              unelevated
-              label="Ubah Massal"
-              color="blue"
-              no-caps
-              @click="changeAll()"
-            >
-            </q-btn>
+                </template> -->
+              </q-input>
+            </div>
+            <div class="q-mx-md">
+              <q-btn
+                unelevated
+                label="Ubah Massal"
+                color="blue"
+                no-caps
+                @click="changeAll()"
+                style="width: 130px;"
+              >
+              </q-btn>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -204,20 +202,21 @@
                 <td style="width: 250px;">
                   {{ x.item }} ({{ x.qty }} {{ x.unit }})
                 </td>
-                <td style="padding: 0px;">
+                <td style="width:250px;" class="items-center">
                   <money
                     v-model="x.price"
                     v-bind="money"
-                    class="q-mx-sm"
+                    class="l-grow"
                   ></money>
                 </td>
-                <td>
+                <td style="padding: 0px;" class="q-mx-md text-center items-center">
                   <q-input
                     outlined
                     dense
                     bg-color="white"
                     v-model="x.est_arrival"
                     readonly
+                    style="width:200px;" 
                   >
                     <template v-slot:append>
                       <q-icon name="event" class="cursor-pointer">
@@ -241,7 +240,7 @@
                     </template>
                   </q-input>
                 </td>
-                <td class="text-center">
+                <td class="text-center" style="width: 140px;">
                   <q-btn
                     label="Hapus"
                     flat
@@ -376,6 +375,22 @@ export default {
         else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
       },
     },
+    curr : {
+      deep: true,
+      handler(val) {
+        for (var i = 0; i < this.sppSelect.length; i++) {
+          this.sppSelect[i].currency = this.curr;
+        }
+
+        if (this.curr == "IDR") {
+          this.money.precision = 0;
+          this.money.prefix = "Rp ";
+        } else {
+          this.money.precision = 2;
+          this.money.prefix = "$ ";
+        }
+      },
+    },
   },
   computed: {
     date_model() {
@@ -422,19 +437,19 @@ export default {
     hasHistory() {
       return window.history.length > 2;
     },
-    chgCurrency() {
-      for (var i = 0; i < this.sppSelect.length; i++) {
-        this.sppSelect[i].currency = this.curr;
-      }
+    // chgCurrency() {
+    //   for (var i = 0; i < this.sppSelect.length; i++) {
+    //     this.sppSelect[i].currency = this.curr;
+    //   }
 
-      if (this.curr == "IDR") {
-        this.money.precision = 0;
-        this.money.prefix = "Rp ";
-      } else {
-        this.money.precision = 2;
-        this.money.prefix = "$ ";
-      }
-    },
+    //   if (this.curr == "IDR") {
+    //     this.money.precision = 0;
+    //     this.money.prefix = "Rp ";
+    //   } else {
+    //     this.money.precision = 2;
+    //     this.money.prefix = "$ ";
+    //   }
+    // },
     filterVD(val, update, abort) {
       update(() => {
         const needle = val.toLowerCase();
@@ -574,6 +589,7 @@ export default {
   border-radius: 5px;
   padding: 10px 10px;
   box-sizing: border-box;
+  width: 250px;
 }
 .v-money:focus {
   outline: none;
