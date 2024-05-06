@@ -60,6 +60,7 @@ const routes = [
     path: "/po/list/:status/:vendor/:category/:kategori",
     name: "POList",
     component: () => import("../views/POList.vue"),
+    meta: { title: "Daftar PO", path: ["PO"] },
   },
   {
     path: "/price/list",
