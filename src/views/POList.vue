@@ -14,6 +14,7 @@
         align="left"
         narrow-indicator
         @input="
+                  pagination.current = 1;
                   replaceRoute();
                   fetchData();"
       >
@@ -30,7 +31,9 @@
             outlined
             dense
             v-model="searchTerm"
-            @input="fetchData"
+            @input="
+            pagination.current = 1;
+            fetchData();"
             clearable
             @clear="searchTerm = ''"
             placeholder="Cari Nama Barang"
@@ -41,7 +44,9 @@
             </template>
           </q-input>
 
-          <q-field v-model="date" clearable dense outlined style="width: 30%;" @clear="replaceRoute();
+          <q-field v-model="date" clearable dense outlined style="width: 30%;" @clear="
+                                                                                        pagination.current = 1;
+                                                                                        replaceRoute();
                                                                                         fetchData();">
               <template v-slot:prepend>
                 <q-icon name="date_range" />
@@ -58,6 +63,7 @@
                 transition-hide="scale"
               >
                 <q-date v-model="date" @input="
+                  pagination.current = 1;
                   replaceRoute();
                   fetchData();">
                   <div class="row items-center justify-end">
@@ -238,21 +244,14 @@
           <q-select
             use-chips
             multiple
+            clearable
+            @clear="selCat = null"
             label="Pilih Kategori Biaya"
             outlined
             v-model="selCat"
             :options="cost_ctg"
             class="bg-white"
           >
-            <template v-slot:append>
-              <q-btn
-                v-if="selCat != null"
-                icon="close"
-                dense
-                flat
-                size="sm"
-              ></q-btn>
-            </template>
           </q-select>
           <div>Nama Vendor</div>
           <q-select
