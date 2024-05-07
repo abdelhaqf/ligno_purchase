@@ -57,7 +57,7 @@ const routes = [
     meta: { title: "Form PO Baru", path: ["SPP Disetujui"] },
   },
   {
-    path: "/po/list/:status/:vendor/:category/:kategori",
+    path: "/po/list",
     name: "POList",
     component: () => import("../views/POList.vue"),
     meta: { title: "Daftar PO", path: ["PO"] },

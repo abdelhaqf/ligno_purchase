@@ -41,7 +41,8 @@
             </template>
           </q-input>
 
-          <q-field dense outlined style="width: 30%;">
+          <q-field v-model="date" clearable dense outlined style="width: 30%;" @clear="replaceRoute();
+                                                                                        fetchData();">
               <template v-slot:prepend>
                 <q-icon name="date_range" />
               </template>
@@ -56,7 +57,9 @@
                 transition-show="scale"
                 transition-hide="scale"
               >
-                <q-date v-model="date">
+                <q-date v-model="date" @input="
+                  replaceRoute();
+                  fetchData();">
                   <div class="row items-center justify-end">
                     <q-btn v-close-popup label="Close" color="primary" flat />
                   </div>
@@ -75,114 +78,130 @@
               @click="dialogFilter = true"
             ></q-btn>
       </div>
-      <q-markup-table
-        v-if="poList.length"
-        class="stickyTable"
-      >
-      <!-- table head -->
-      <thead class="text-white">
-        <tr>
-          <th class="q-px-xs">No</th>
-          <th>No PO</th>
-          <th>Tanggal PO</th>
-          <th>PIC</th>
-          <th>Vendor</th>
-          <th>Items</th>
-          <th>Kategori Biaya</th>
-          <th>Est. Arrival</th>
-          <th>Status</th>
-          <th class="q-mx-sm">Action</th>
-        </tr>
-      </thead>
-      <!-- table body  -->
-      <tbody>
-        <tr v-for="(d, i) in poList" :key="i">
-          <td class="text-center q-px-xs">{{ i + 1 }}</td>
-          <td class="text-center">
-              {{ d.po_id }}
-          </td>
-          <td class="text-center">
-              {{ d.po_date }}
-          </td>
-          <td class="text-left">
-              {{ d.handler_name }}
-          </td>
-          <td class="text-left">
-              {{ d.vendor }}
-          </td>
-          <td class="text-center">
-              {{ d.item }}
-          </td>
-          <td class="text-center">
-              {{ d.cost_category }}
-          </td>
-          <td class="text-center">
-              {{ d.est_arrival }}
-          </td>
-          <td class="text-center">
-              <!-- <q-btn
-                v-if="d.is_received == 'not received'"
-                unelevated
-                label="NOT"
-                color="negative"
-                disable
-                no-caps
-                rounded
-              >
-              </q-btn>
+      <div v-if="poList.length">      
+        <q-markup-table
+          flat
+          class="stickyTable"
+          style="height: calc(100vh - 375px);"
+        >
+        <!-- table head -->
+        <thead class="text-white">
+          <tr>
+            <th class="q-px-xs">No</th>
+            <th>No PO</th>
+            <th>Tanggal PO</th>
+            <th>PIC</th>
+            <th>Vendor</th>
+            <th>Items</th>
+            <th>Kategori Biaya</th>
+            <th>Est. Arrival</th>
+            <th>Status</th>
+            <th class="q-mx-sm">Action</th>
+          </tr>
+        </thead>
+        <!-- table body  -->
+        <tbody>
+          <tr v-for="(d, i) in poList" :key="i">
+            <td class="text-center q-px-xs">
+              {{ (pagination.current - 1) * pagination.limit + i + 1 }}
+            </td>
+            <td class="text-center">
+                {{ d.po_id }}
+            </td>
+            <td class="text-center">
+                {{ d.po_date }}
+            </td>
+            <td class="text-left">
+                {{ d.handler_name }}
+            </td>
+            <td class="text-left">
+                {{ d.vendor }}
+            </td>
+            <td class="text-center">
+                {{ d.item }}
+            </td>
+            <td class="text-center">
+                {{ d.cost_category }}
+            </td>
+            <td class="text-center">
+                {{ d.est_arrival }}
+            </td>
+            <td class="text-center">
+                <!-- <q-btn
+                  v-if="d.is_received == 'not received'"
+                  unelevated
+                  label="NOT"
+                  color="negative"
+                  disable
+                  no-caps
+                  rounded
+                >
+                </q-btn>
+                <q-btn
+                  v-else
+                  unelevated
+                  label="RECEIVED"
+                  color="positive"
+                  disable
+                  no-caps
+                  rounded
+                >
+                </q-btn> -->
+                <div  v-if="d.is_received == 'not received'" 
+                      class="bg-red-2 items-center text-center q-py-xs" 
+                      style="border-radius: 1000px; width: 80px; height: 32px; color: red;">
+                    NOT
+                </div>
+                <div  v-else-if="d.is_received == 'suspended'" 
+                      class="bg-yellow-2 items-center text-center q-py-xs" 
+                      style="border-radius: 1000px; width: 100px; height: 32px; color: orange;">
+                    SUSPENDED
+                </div>
+                <div  v-else-if="d.is_received == 'closed'" 
+                      class="bg-grey-2 items-center text-center q-py-xs" 
+                      style="border-radius: 1000px; width: 100px; height: 32px; color: dark;">
+                    CLOSED
+                </div>
+                <div  v-else-if="d.is_received == 'fully received'" 
+                      class="bg-green-2 items-center text-center q-py-xs" 
+                      style="border-radius: 1000px; width: 100px; height: 32px; color: green;">
+                    RECEIVED
+                </div>
+            </td>
+            <td class="text-center q-mx-lg">
               <q-btn
-                v-else
-                unelevated
-                label="RECEIVED"
-                color="positive"
-                disable
+                label="Detail"
+                flat
                 no-caps
-                rounded
-              >
-              </q-btn> -->
-              <div  v-if="d.is_received == 'not received'" 
-                    class="bg-red-2 items-center text-center q-py-xs" 
-                    style="border-radius: 1000px; width: 80px; height: 32px; color: red;">
-                  NOT
-              </div>
-              <div  v-else-if="d.is_received == 'suspended'" 
-                    class="bg-yellow-2 items-center text-center q-py-xs" 
-                    style="border-radius: 1000px; width: 100px; height: 32px; color: orange;">
-                  SUSPENDED
-              </div>
-              <div  v-else-if="d.is_received == 'closed'" 
-                    class="bg-grey-2 items-center text-center q-py-xs" 
-                    style="border-radius: 1000px; width: 100px; height: 32px; color: dark;">
-                  CLOSED
-              </div>
-              <div  v-else-if="d.is_received == 'fully received'" 
-                    class="bg-green-2 items-center text-center q-py-xs" 
-                    style="border-radius: 1000px; width: 100px; height: 32px; color: green;">
-                  RECEIVED
-              </div>
-          </td>
-          <td class="text-center q-mx-lg">
-            <q-btn
-              label="Detail"
-              flat
-              no-caps
-              color="blue"
-              dense
-            />
-          </td>
-        </tr>
-      </tbody>
-    </q-markup-table>
+                color="blue"
+                dense
+              />
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
 
-    <q-separator />
+      <q-separator />
 
-    <div class="flex flex-center">
-      <q-pagination
-        v-model="pagination.current"
-        :max="pagination.max"
-        input
-      />
-    </div>
+      <q-card-section class="flex flex-center q-py-md">
+        <q-pagination
+          input
+          :max="pagination.max"
+          v-model="pagination.current"
+          @input="fetchData"
+        ></q-pagination>
+      </q-card-section>
+      </div>
+
+      <q-card-section
+        class="column items-center justify-center"
+        style="height: calc(100vh - 275px);"
+        v-else
+      >
+        <q-img width="400px" :src="`./empty.png`"></q-img>
+        <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
+      </q-card-section>
+
     </q-card>
 
     <q-dialog v-model="dialogFilter" position="bottom">
@@ -327,7 +346,7 @@ export default {
         { label: "suspended", value: "300" },
         { label: "closed", value: "40000" },
       ],
-      is_received: "null",
+      
       receivedOption: [
         { label: "show all", value: "null" },
         { label: "fully received", value: "fully" },
@@ -390,35 +409,47 @@ export default {
         "Raw Material",
         "Perbaikan Gudang",
       ],
-      selKategori: null,
-
+      
       optVendor: [],
       filVendor: [],
-      selVendor: null,
 
+      selVendor: null,
+      is_received: "null",
       selCat: null,
+      selKategori: null,
 
       pagination: {
+        max: 2,
         current: 1,
-        max: 1,
-        limit: 10,
+        limit: 25,
       },
     };
   },
   async created() {
-    if (this.$route.params.category != "null") {
-      this.selCat = this.$route.params.category;
+    if (this.$route.query.category) {
+      this.selCat = this.$route.query.category == 'null' ? null : this.$route.query.category.split(",");
     }
 
-    if (this.$route.params?.vendor != "null") {
-      this.selVendor = this.$route.params.vendor;
+    if (this.$route.query?.vendor) {
+      this.selVendor = this.$route.query.vendor == 'null' ? null : this.$route.query.vendor;
     }
 
-    if (this.$route.params?.kategori != "null") {
-      this.selKategori = this.$route.params.kategori;
+    if (this.$route.query?.kategori) {
+      this.selKategori = this.$route.query.kategori == 'null' ? null : this.$route.query.kategori;
     }
 
-    this.is_received = this.$route.params.status;
+    if (this.$route.query?.status) {
+      this.is_received = this.$route.query.status;
+    }
+
+    if (this.$route.query?.search) {
+      this.searchTerm = this.$route.query.search;
+    }
+
+    if (this.$route.query?.date) {
+      this.date = this.$route.query.date;
+    }
+    
     await this.$http
       .get("/list_month_po", {
         headers: {
@@ -444,36 +475,58 @@ export default {
     await this.fetchData();
   },
   methods: {
-    getLabelColor(label) {
-      if (label == "fully received") return "positive";
-      else if (label == "half received") return "warning";
-      else if (label == "not received") return "negative";
-      else if (label == "suspended") return "accent";
-      else if (label == "closed") return "dark";
-      else return "primary";
-    },
+    // getLabelColor(label) {
+    //   if (label == "fully received") return "positive";
+    //   else if (label == "half received") return "warning";
+    //   else if (label == "not received") return "negative";
+    //   else if (label == "suspended") return "accent";
+    //   else if (label == "closed") return "dark";
+    //   else return "primary";
+    // },
     async fetchData() {
       this.poList = [];
 
-      let q_filter = `search=${
-        this.searchTerm ? this.searchTerm : ""}`;
+      // let q_filter = `?search=${this.searchTerm ? this.searchTerm : ""}&date=${this.date ? moment(this.date).format("YYYY-MM-DD") : ""}`;
+      // console.log(q_filter);
+      // let q_filter = `?search=${
+      //   this.searchTerm ? this.searchTerm : ""}`;
+
+      let category = []
+      if (this.selCat) {
+        for (var i = 0; i < this.selCat.length; i++) {
+          category.push(encodeURI(this.selCat[i]));
+        }
+
+        category = category.join(",")
+        console.log(category);
+      }
+      
 
       let payload = {
-        is_rcv: this.is_received,
-        filter: this.filter,
-        vendor: this.selVendor,
-        cat: this.selCat,
+        is_rcv: this.is_received == "null" ? "" : this.is_received,
+        vendor: this.selVendor == null ? "" : this.selVendor,
+        cat: this.selCat ? category : "",
         kategori: this.selKategori == null ? "" : this.selKategori,
+        search: this.searchTerm ? this.searchTerm : "",
+        date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
+        current: this.pagination.current,
+        limit: this.pagination.limit,
       };
 
       await this.$http
-        .post(`/po?`+ q_filter, payload, {
+        .post(`/po`, payload, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token-purchase"),
           },
         })
         .then((result) => {
           for (var i = 0; i < result.data.length; i++) {
+            if (i == 0) {
+              let total_count = parseInt(result.data[i].total_count);
+              this.pagination.max = Math.ceil(
+                total_count / this.pagination.limit
+              );
+            }
             this.poList.push(result.data[i]);
           }
         });
@@ -503,25 +556,41 @@ export default {
       });
     },
     replaceRoute() {
-      let the_cat = null;
+      // let the_cat = null;
+      // if (this.selCat) {
+        // the_cat = this.selCat.split("/");
+        // if (the_cat.length > 1) {
+        //   the_cat = the_cat.join("%2F");
+        // } else {
+        //   the_cat = the_cat.join("");
+        // }
+        
+      // }
+
+      let category = []
       if (this.selCat) {
-        the_cat = this.selCat.split("/");
-        if (the_cat.length > 1) {
-          the_cat = the_cat.join("%2F");
-        } else {
-          the_cat = the_cat.join("");
+        for (var i = 0; i < this.selCat.length; i++) {
+          category.push(encodeURI(this.selCat[i]));
         }
+
+        category = category.join(",")
+        console.log(category);
       }
 
       this.$router.replace({
-        path: `/po/list/${this.is_received}/${this.selVendor}/${the_cat}/${this.selKategori}`,
+        path: `/po/list?status=${this.is_received}&vendor=${
+                                 this.selVendor}&category=${
+                                  this.selCat ? category : null}&kategori=${
+                                    this.selKategori}&search=${
+                                      this.searchTerm ? this.searchTerm : ""}&date=${
+                                        this.date ? moment(this.date).format("YYYY-MM-DD") : ""}`,
       });
     },
     FilterButtonProps () {
       const props = {
         color: 'primary',
         noCaps: true,
-        label: this.selCat ? `Pilih Filter ${this.selectCount()}` : `Pilih Filter`,
+        label: this.selCat ? `Pilih Filter (${this.selCat.length})` : `Pilih Filter`,
       }
 
       return props
