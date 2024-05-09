@@ -1,77 +1,45 @@
 <template>
   <div class="row relative q-px-lg ">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
-      <q-card-section class="row justify-between">
-        <!-- <q-select
-          outlined
-          dense
-          v-model="selectOption"
-          map-options
-          emit-value
-          use-input
-          hide-selected
-          fill-input
-          input-debounce="0"
-          :options="filtered"
-          @filter="filterOP"
-          label="Nama Barang"
-          style="width:49%"
-          @input="change()"
-        >
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey">No results</q-item-section>
-            </q-item>
-          </template>
-          <template v-slot:append>
-            <q-btn
-              v-if="selectOption != null"
-              icon="close"
-              dense
-              @click="
-                selectOption = null;
-                change();
-              "
-              flat
-              size="sm"
-            ></q-btn>
-          </template>
-        </q-select> -->
+      <q-card-section class="row justify-between no-wrap">
         <q-input
           outlined
           dense
           v-model="searchTerm"
           clearable
           @clear="searchTerm = ''"
-          placeholder="Cari Nama Barang"
+          placeholder="Cari Nomor PO"
           style="width: 30%;"
+          @input="change()"
         >
           <template v-slot:prepend>
             <q-icon name="search"></q-icon>
           </template>
         </q-input>
-        <q-field v-model="date" clearable dense outlined style="width: 30%;">
-            <template v-slot:prepend>
-              <q-icon name="date_range" />
-            </template>
+       
+        <q-field v-model="date" clearable dense outlined style="width: 33%;" @clear="change()">
+          <template v-slot:prepend>
+            <q-icon name="date_range" />
+          </template>
 
-            <template v-slot:control>
-              <div class="self-center full-width no-outline" tabindex="0">
-                {{ date_model }}
+          <template v-slot:control>
+            <div class="self-center full-width no-outline" tabindex="0">
+              {{ date_model }}
+            </div>
+          </template>
+          <q-popup-proxy
+            style="width:fit-content"
+            transition-show="scale"
+            transition-hide="scale"
+          >
+            <q-date v-model="date" @input="change()">
+              <div class="row items-center justify-end">
+                <q-btn v-close-popup label="Close" color="primary" flat />
               </div>
-            </template>
-            <q-popup-proxy
-              style="width:fit-content"
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date v-model="date">
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-field>
+            </q-date>
+          </q-popup-proxy>
+        </q-field>
+
         <q-select
           outlined
           dense
@@ -84,8 +52,8 @@
           input-debounce="0"
           :options="filteredVD"
           @filter="filterVD"
-          label="Nama Vendor"
-          style="width:49%"
+          label="Pilih Vendor"
+          style="width:33%"
           @input="change()"
         >
           <template v-slot:no-option>
@@ -107,65 +75,114 @@
             ></q-btn>
           </template>
         </q-select>
+        
       </q-card-section>
-      <q-markup-table
-        flat
-        square
-        class="stickyTable"
-        style="height:calc(100vh - 230px)"
+      <div v-if="priceList.length">
+        <q-markup-table
+          flat
+          square
+          wrap-cells
+          class="stickyTable"
+          style="height:calc(100vh - 280px)"
+          
+        >
+          <thead>
+            <tr class="bg-blue-grey-14 text-white">
+              <th class="text-left">No</th>
+              <th class="text-left">Nomor PO</th>
+              <th class="text-left">Tanggal PO</th>
+              <th class="text-left">Nama Vendor</th>
+              <th class="text-right">Harga Satuan</th>
+              <th class="text-right">Jumlah Pembelian</th>
+              <th class="text-center">Keterangan</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody class="bg-blue-grey-1">
+            <tr
+              v-for="(p, i) in priceList"
+              :key="i"
+              :class="{ 'bg-white': i % 2 == 0 }"
+            >
+              <td class="text-center">
+                {{ (pagination.current - 1) * 25 + i + 1 }}
+              </td>
+              <td class="text-left">{{ p.po_id }}</td>
+              <td class="text-left">{{ momentFormatDate(p.po_date) }}</td>
+              <td class="text-left">{{ p.vendor }}</td>
+              <td class="text-left">
+                {{
+                  setCurrency(parseFloat(p.price) / parseFloat(p.qty), p.currency)
+                }}
+                / {{ p.unit }}
+              </td>
+              <td class="text-center">{{ p.qty }} {{ p.unit }}</td>
+              <td>
+                <div class="l-wrap-cell">
+                    <span>
+                    {{
+                        p.description.length > 55
+                        ? p.description.slice(0, 50)
+                        : p.description
+                    }}
+                    </span>
+                    <span v-if="p.description.length > 55" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ p.description }}</q-tooltip
+                    >
+                    </span>
+                </div>
+              </td>
+              <td class="text-center">
+                <q-btn
+                  label="Detail"
+                  flat
+                  no-caps
+                  color="blue"
+                  dense
+                  :to="`/po/detail/${encodeURIComponent(p.po_id)}`"
+                />
+              </td>
+            </tr>
+          </tbody>
+          <!-- <tbody v-else class="bg-green-1">
+            <tr>
+              <td class="text-center text-grey" colspan="99">
+                tidak ada data, atau mungkin anda belum memilih
+              </td>
+            </tr>
+          </tbody> -->
+        </q-markup-table>
+        <q-separator/>
+        <q-card-actions align="center">
+          <q-pagination
+            v-model="pagination.current"
+            :max="pagination.max"
+            input
+            @input="change()"
+          ></q-pagination>
+        </q-card-actions>
+      </div>
+      
+      <q-card-section
+        class="column items-center justify-center"
+        style="height: calc(100vh - 275px);"
+        v-else
       >
-        <thead>
-          <tr class="bg-blue-grey-14 text-white">
-            <th class="text-left">No</th>
-            <th class="text-left">Nomer PO</th>
-            <th class="text-left">Tanggal PO</th>
-            <th class="text-left">Nama Vendor</th>
-            <th class="text-right">Harga Satuan</th>
-            <th class="text-right">Jumlah Pembelian</th>
-          </tr>
-        </thead>
-        <tbody v-if="priceList.length" class="bg-blue-grey-1">
-          <tr
-            v-for="(p, i) in priceList"
-            :key="i"
-            :class="{ 'bg-white': i % 2 == 0 }"
-          >
-            <td class="text-center">
-              {{ (pagination.current - 1) * 25 + i + 1 }}
-            </td>
-            <td class="text-left">{{ p.po_id }}</td>
-            <td class="text-left">{{ p.po_date }}</td>
-            <td class="text-left">{{ p.vendor }}</td>
-            <td class="text-right">
-              {{
-                setCurrency(parseFloat(p.price) / parseFloat(p.qty), p.currency)
-              }}
-              / {{ p.unit }}
-            </td>
-            <td class="text-right">{{ p.qty }} {{ p.unit }}</td>
-          </tr>
-        </tbody>
-        <tbody v-else class="bg-green-1">
-          <tr>
-            <td class="text-center text-grey" colspan="99">
-              tidak ada data, atau mungkin anda belum memilih
-            </td>
-          </tr>
-        </tbody>
-      </q-markup-table>
-      <q-card-actions align="right">
-        <q-pagination
-          v-model="pagination.current"
-          :max="pagination.max"
-          input
-          @input="change()"
-        ></q-pagination>
-      </q-card-actions>
+        <q-img width="400px" :src="`./empty.png`"></q-img>
+        <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
+      </q-card-section>
+      
     </q-card>
   </div>
 </template>
 
 <script>
+import moment from "moment";
+moment.locale("id");
 export default {
   data() {
     return {
@@ -234,6 +251,8 @@ export default {
           item: this.selectOption,
           vendor: this.selectVendor,
           current: this.pagination.current,
+          search: this.searchTerm ? this.searchTerm : "",
+          date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
         };
         await this.$http.post("/pricelist/new", payload).then((result) => {
           this.priceList = result.data.items;
@@ -264,8 +283,21 @@ export default {
         return formatter.format(price);
       }
     },
+    momentFormatDate(date) {
+        if (date) {
+            return moment(date).format("DD MMM YYYY");
+        }
+        return "-";
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.l-wrap-cell {
+  width: 200px !important;
+  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
+  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
+  word-break: break-all;
+}
+</style>

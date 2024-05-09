@@ -74,7 +74,14 @@
                             <tr v-for="(d, i) in po.spp" :key="i">
                                 <td class="text-center">{{ d.spp_id }}</td>
                                 <td>{{ d.name }}</td>
-                                <td>{{ d.item }}</td>
+                                <td v-if="!isEdit">{{ d.item }}</td>
+                                <td v-else class="text-center">
+                                    <q-input 
+                                        style="min-width: 150px;"
+                                        outlined 
+                                        dense
+                                        v-model="d.item"/>
+                                </td>
                                 <td v-if="!isEdit" class="text-center">
                                     {{ d.qty }} {{ d.unit }}
                                 </td>
@@ -130,17 +137,17 @@
                                         </template>
                                     </q-input>
                                 </td>
-                                <td v-if="!isEdit" class="text-left" style="max-width: 250px;">
+                                <td v-if="!isEdit" class="text-left" style="max-width: 150px;">
                                     <!-- {{d.note}} -->
-                                    <div class="l-wrap-cell">
+                                    <div class="l-wrap-cell" v-if="d.note">
                                         <span>
                                         {{
-                                            d.note.length > 20
-                                            ? d.note.slice(0, 13)
+                                            d.note.length > 40
+                                            ? d.note.slice(0, 33)
                                             : d.note
                                         }}
                                         </span>
-                                        <span v-if="d.note.length > 20" class=" no-wrap ">
+                                        <span v-if="d.note.length > 40" class=" no-wrap ">
                                         ...
                                         <q-tooltip
                                             content-style="width:300px"
@@ -149,8 +156,9 @@
                                         >
                                         </span>
                                     </div>
+                                    <div v-else class="text-center l-grow">-</div>
                                 </td>
-                                <td v-else class="text-center" style="max-width: 400px;">
+                                <td v-else class="text-center" style="width: 200px;">
                                     <q-input 
                                         outlined 
                                         dense
@@ -206,7 +214,7 @@
                         label="Simpan"
                         color="blue"
                         no-caps
-                        @click="updatePO"
+                        @click="updateSPP"
                     >
                     </q-btn>
                 </div>
@@ -225,7 +233,7 @@ export default {
         return {
             isEdit: false,
             po: {},
-            isReceived: "0",
+            old: {},
             cost_ctg: [
                 "BELUM DIKATEGORIKAN",
                 "Marketing/Sales",
@@ -249,7 +257,7 @@ export default {
         };
     },
     async mounted() {
-        await this.getPO();
+        await this.fetchData();
         
     },
     // watch: {
@@ -274,7 +282,7 @@ export default {
 
     },
     methods: {
-        async getPO() {
+        async fetchData() {
             let id = decodeURIComponent(this.$route.params.id);
 
             let result = await this.$http.get(
@@ -282,10 +290,7 @@ export default {
                 {}
             );
             this.po = result.data;
-            this.isReceived = result.data.is_received;
-        },
-        async updatePO() {
-
+            this.old = JSON.parse(JSON.stringify(result.data));
         },
         momentFormatDate(date) {
             if (date) {
@@ -334,7 +339,114 @@ export default {
             }
 
             return money
-        }
+        },
+        async updateSPP() {
+            for (var i = 0; i < this.po.spp.length; i++) {
+                let data = {
+                    is_received: this.po.spp[i].is_received,
+                    coa: this.po.spp[i].coa,
+                    note: this.po.spp[i].note,
+                    cost_category: this.po.cost_category,
+
+                    item: this.po.spp[i].item,
+                    qty: this.po.spp[i].qty,
+                    unit: this.po.spp[i].unit,
+                    price: this.po.spp[i].price,
+                    est_arrival: this.po.spp[i].est_arrival,
+                };
+                var note_add = "";
+                if (this.po.spp[i].item != this.old.spp[i].item) {
+                    note_add =
+                        note_add +
+                        ", nama item: " +
+                        this.old.spp[i].item +
+                        " => " +
+                        this.po.spp[i].item;
+                }
+                if (this.po.spp[i].qty != this.old.spp[i].qty) {
+                    note_add =
+                        note_add +
+                        ", qty: " +
+                        this.old.spp[i].qty +
+                        " => " +
+                        this.po.spp[i].qty;
+                    }
+                if (this.po.spp[i].unit != this.old.spp[i].unit) {
+                    note_add =
+                        note_add +
+                        ", unit: " +
+                        this.po.spp[i].unit +
+                        " => " +
+                        this.old.spp[i].unit;
+                    }
+                if (this.po.spp[i].price != this.old.spp[i].price) {
+                    note_add =
+                        note_add +
+                        ", harga: " +
+                        this.old.spp[i].price +
+                        " => " +
+                        this.po.spp[i].price;
+                }
+                if (this.po.spp[i].note != this.old.spp[i].note) {
+                    note_add =
+                        note_add +
+                        ", harga: " +
+                        this.old.spp[i].note +
+                        " => " +
+                        this.po.spp[i].note;
+                }
+                if (note_add != "")
+                    data.revision = this.$store.state.currentUser.username;
+
+                await this.$http
+                    .put("/update_spp/" + this.po.spp[i].spp_id, data, {})
+                    .then((result) => {});
+
+                let history = {
+                    spp_id: this.po.spp[i].spp_id,
+                    status: "process",
+                    content: this.po.spp[i].note + note_add,
+                };
+                if (this.po.spp[i].is_received == 2) {
+                    history.status = "done";
+                }
+                if (this.po.spp[i].is_received == 300) {
+                    history.status = "suspended";
+                }
+                if (this.po.spp[i].is_received == 40000) {
+                    history.status = "closed";
+                }
+                this.$http.post("/new_history", history, {}).then((result) => {});
+                
+                var info = "";
+                if (this.po.spp[i].is_received == 2)
+                    info = "barang sudah diterima penuh";
+                if (this.po.spp[i].is_received == 1)
+                    info = "barang sudah diterima sebagian";
+                if (this.po.spp[i].is_received == 300)
+                    info = "PO sementara di suspend";
+                if (this.po.spp[i].is_received == 40000)
+                    info = "PO dinyatakan closed";
+                var notifikasi = {
+                    from_id: this.$store.state.currentUser.user_id,
+                    to_id: this.po.spp[i].user_id,
+                    notif: "Konfirmasi Penerimaan barang",
+                    note: info,
+                    spp_id: this.po.spp[i].spp_id,
+                    reference_page: "/spp/list",
+                };
+                if (info != 0) {
+                    this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+
+                    notifikasi.to_id = 1; // Notif ke Manager purchasing
+                    this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+                }
+            }
+            this.show_detail = false;
+            await this.fetchData();
+            this.$q.notify("Data PO berhasil diubah!");
+            this.isEdit = false;
+        },
     },
 
 }
@@ -352,5 +464,11 @@ export default {
 .v-money:focus {
   outline: none;
   box-shadow: inset 0 0 0 1.5pt #0e84eb;
+}
+.l-wrap-cell {
+  width: 150px !important;
+  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
+  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
+  word-break: break-all;
 }
 </style>

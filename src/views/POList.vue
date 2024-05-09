@@ -143,11 +143,46 @@
                 {{ d.handler_name }}
               </td>
               <td class="text-left">
-                {{ d.vendor }}
+                <!-- {{ d.vendor }} -->
+                <div>
+                    <span>
+                    {{
+                        d.vendor.length > 20
+                        ? d.vendor.slice(0, 13)
+                        : d.vendor
+                    }}
+                    </span>
+                    <span v-if="d.vendor.length > 20" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ d.vendor }}</q-tooltip
+                    >
+                    </span>
+                </div>
               </td>
               <td class="text-left">
-                {{ d.item }}
-                {{ d.spp_count > 1 ? "(+" + (d.spp_count - 1) + ")" : "" }}
+                <!-- {{ d.item }} -->
+                <div>
+                    <span>
+                    {{
+                        d.item.length > 20
+                        ? d.item.slice(0, 13)
+                        : d.item
+                    }}
+                    </span>
+                    <span v-if="d.item.length > 20" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ d.item }}</q-tooltip
+                    >
+                    </span>
+                    <span>{{ d.spp_count > 1 ? "(+" + (d.spp_count - 1) + ")" : "" }}</span>
+                </div>
+
               </td>
               <td class="text-center">
                 {{ d.cost_category }}
@@ -241,7 +276,7 @@
       </q-card-section>
     </q-card>
 
-    <q-dialog v-model="dialogFilter" position="bottom">
+    <q-dialog v-model="dialogFilter" position="bottom" persistent>
       <q-card style="width: 400px">
         <q-card-section class="row justify-between items-center">
           <div class="text-h6">Filter</div>

@@ -252,7 +252,7 @@
       </q-card-section>
     </q-card>
 
-    <q-dialog v-model="dialogConfirm" persistents>
+    <!-- <q-dialog v-model="dialogConfirm" persistents>
       <q-card>
         <q-card-section class="bg-grey-2 row items-center justify-between ">
           <div class="text-h6 text-bold">Konfirmasi Pembuatan PO</div>
@@ -283,7 +283,7 @@
           ></q-btn>
         </q-card-actions>
       </q-card>
-    </q-dialog>
+    </q-dialog> -->
 
     <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
       <q-card-section class="row justify-end items-center">
