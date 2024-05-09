@@ -147,7 +147,7 @@ Flight::route('GET /spp-approval', function () {
 //           WHERE spp.po_id is null 
 //                 AND (spp.handle_by = $id OR $ispurch = 1)
 //                 AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1 
-          
+
 //           ORDER BY spp.$order
 //     ";
 //   runQuery($q);
@@ -201,9 +201,9 @@ Flight::route('POST /po', function () {
   $w_search = "";
   if ($search) $w_search = "AND po_id LIKE '%$search%'";
 
-  if ($date != null){
+  if ($date != null) {
     $w_search = $w_search . " AND po_date LIKE '%$date%'";
-  } 
+  }
 
   $w_src = "";
   if ($is_rcv != "null") {
@@ -244,49 +244,50 @@ Flight::route('POST /po', function () {
   }
 
   $q = " SELECT * , (SELECT COUNT(*)
-          FROM (
-                SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
-                spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
-                        CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
-                        WHEN SUM(spp.is_received) = 0 THEN 'not received' 
-                        WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
-                        WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
-                        ELSE 'half received' END as 'is_received',
-                        spp.item, 
-                        COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
-                        FROM po INNER JOIN spp on po.po_id = spp.po_id 
-                        INNER JOIN `user` usr on usr.user_id = po.user_id
-                        GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-            WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search) AS total_count 
-            
-            FROM (
-                  SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
-                  SUM(spp.price) AS 'total_price', 
-                  spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
-                          CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
-                          WHEN SUM(spp.is_received) = 0 THEN 'not received' 
-                          WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
-                          WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
-                          ELSE 'half received' END as 'is_received',
-                          COUNT(spp.spp_id) AS 'spp_count', spp.item, 
-                          COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
-                          FROM po INNER JOIN spp on po.po_id = spp.po_id 
-                          INNER JOIN `user` usr on usr.user_id = po.user_id
-                          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-              WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search
-              LIMIT $limit OFFSET $offset
-            
-            ";
-  
-  //  echo $q;
-  // runQuery($q);
+        FROM (
+        SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
+        spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
+          CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
+          WHEN SUM(spp.is_received) = 0 THEN 'not received' 
+          WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
+          WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
+          ELSE 'half received' END as 'is_received',
+          spp.item, 
+          COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
+          FROM po 
+          INNER JOIN spp on po.po_id = spp.po_id 
+          INNER JOIN `user` usr on usr.user_id = po.user_id
+          GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
+        WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search) AS total_count 
+    
+    FROM (
+          SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
+          SUM(spp.price) AS 'total_price', 
+          spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
+                  CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
+                  WHEN SUM(spp.is_received) = 0 THEN 'not received' 
+                  WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
+                  WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
+                  ELSE 'half received' END as 'is_received',
+                  COUNT(spp.spp_id) AS 'spp_count', spp.item, 
+                  COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
+                  FROM po INNER JOIN spp on po.po_id = spp.po_id 
+                  INNER JOIN `user` usr on usr.user_id = po.user_id
+                  GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
+      WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search
+      LIMIT $limit OFFSET $offset
+    
+    ";
 
-  $po["poList"] = getRows($q);
-  // $po = getRows($q);
-  
-  // var_dump($id);
+  $ret = array(
+    "not received" => 0,
+    "suspended" => 0,
+    "half received" => 0,
+    "poList" => [],
+  );
+  $ret["poList"] = getRows($q);
 
-  $q = "SELECT COUNT(*) AS not_count
+  $q = "SELECT COUNT(*) AS count, is_received
         FROM (SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
                 spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
                 CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
@@ -299,44 +300,16 @@ Flight::route('POST /po', function () {
                 FROM po INNER JOIN spp on po.po_id = spp.po_id 
                 INNER JOIN `user` usr on usr.user_id = po.user_id
                 GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-        WHERE is_received = 'not received'";
-  $po["not_count"] = getRows($q)[0]['not_count'];
-
-  $q = "SELECT COUNT(*) AS suspended_count
-        FROM (SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
-                spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
-                CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
-                WHEN SUM(spp.is_received) = 0 THEN 'not received' 
-                WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
-                WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
-                ELSE 'half received' END as 'is_received',
-                spp.item, 
-                COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
-                FROM po INNER JOIN spp on po.po_id = spp.po_id 
-                INNER JOIN `user` usr on usr.user_id = po.user_id
-                GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-        WHERE is_received = 'suspended'";
-  $po["suspended_count"] = getRows($q)[0]['suspended_count'];
-  
-  $q = "SELECT COUNT(*) AS half_count
-    FROM (SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
-            spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
-            CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
-            WHEN SUM(spp.is_received) = 0 THEN 'not received' 
-            WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
-            WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
-            ELSE 'half received' END as 'is_received',
-            spp.item, 
-            COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
-            FROM po INNER JOIN spp on po.po_id = spp.po_id 
-            INNER JOIN `user` usr on usr.user_id = po.user_id
-            GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-    WHERE is_received = 'half received'";
-  $po["half_count"] = getRows($q)[0]['half_count'];
-
-  Flight::json($po);
-  
+        WHERE is_received = 'not received' OR is_received = 'suspended' OR is_received = 'half received'
+        GROUP BY is_received";
+  $resp = getRows($q);
+  for ($i = 0; $i < count($resp); $i++) {
+    $row = $resp[$i];
+    $ret[$row['is_received']] = $row['count'];
+  }
+  Flight::json($ret);
 });
+
 Flight::route('GET /po_byid/@id', function ($id) {
   $q = "SELECT * FROM po where po_id = $id";
   runQuery2($q);
@@ -435,9 +408,9 @@ Flight::route('POST /pricelist/new', function () {
 
   if ($search) $whereClause = $whereClause . "AND spp.po_id LIKE '%$search%'";
 
-  if ($date != null){
+  if ($date != null) {
     $whereClause = $whereClause . " AND po.po_date LIKE '%$date%'";
-  } 
+  }
 
   $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor 
   FROM spp INNER JOIN po ON po.po_id = spp.po_id
@@ -585,7 +558,7 @@ Flight::route('GET /po/detail', function () {
         WHERE po_id = '$id'";
   $po = getRows($q)[0];
   // $po = getRows($q);
-  
+
   // var_dump($id);
 
   try {
@@ -595,10 +568,10 @@ Flight::route('GET /po/detail', function () {
     WHERE po_id = '$id'";
     $po["spp"] = getRows($q);
   } catch (Exception $e) {
-      // Code to handle the exception
-      echo 'Caught exception: ',  $e->getMessage(), "\n";
+    // Code to handle the exception
+    echo 'Caught exception: ',  $e->getMessage(), "\n";
   }
-  
+
   Flight::json($po);
 });
 
