@@ -380,9 +380,13 @@ export default {
         if (this.curr == "IDR") {
           this.money.precision = 0;
           this.money.prefix = "Rp ";
+          this.money.decimal = ",";
+          this.money.thousands = ".";
         } else {
           this.money.precision = 2;
           this.money.prefix = "$ ";
+          this.money.decimal = ".";
+          this.money.thousands = ",";
         }
       },
     },

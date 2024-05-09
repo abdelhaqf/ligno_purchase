@@ -18,12 +18,11 @@
                   replaceRoute();
                   fetchData();"
       >
-        <q-tab name="null" no-caps label="Semua" />
-        <q-tab name="not" no-caps label="Belum Diterima" />
-        <q-tab name="half" no-caps label="Diterima Sebagian" />
+        <q-tab name="not" no-caps :label="'Belum Diterima (' + countNot + ')'" />
+        <q-tab name="half" no-caps  :label="'Diterima Sebagian (' + countPartial + ')'" />
+        <q-tab name="suspend" no-caps :label="'Suspended ('+ countSuspend + ')'" />
         <q-tab name="fully" no-caps label="Sudah Diterima" />
         <q-tab name="closed" no-caps label="Ditutup" />
-        <q-tab name="suspend" no-caps label="Suspended" />
       </q-tabs>
       <q-separator />
       <div class="row q-ma-md items-center q-gutter-x-md">
@@ -36,7 +35,7 @@
             fetchData();"
             clearable
             @clear="searchTerm = ''"
-            placeholder="Cari Nama Barang"
+            placeholder="Cari Nomor PO"
             style="width: 30%;"
           >
             <template v-slot:prepend>
@@ -123,8 +122,8 @@
             <td class="text-left">
                 {{ d.vendor }}
             </td>
-            <td class="text-center">
-                {{ d.item }}
+            <td class="text-left">
+                {{ d.item }} {{ d.spp_count > 1? '(+'+ (d.spp_count - 1) +')' : '' }}
             </td>
             <td class="text-center">
                 {{ d.cost_category }}
@@ -181,6 +180,7 @@
                 no-caps
                 color="blue"
                 dense
+                :to="`/po/detail/${encodeURIComponent(d.po_id)}`"
               />
             </td>
           </tr>
@@ -305,19 +305,21 @@
           </q-select>
         </q-card-section>
         <q-card-section class="row justify-center items-center">
-          <template v-slot="props">
-            <q-btn 
-                v-close-popup 
-                style="width: 100%;" 
-                v-bind="FilterButtonProps(props)" 
-                @click="
-                  // selVendor = null;
-                  // selCat = null;
-                  // selKategori = null;
-                  replaceRoute();
-                  fetchData();">
-            </q-btn>
-          </template>
+
+          <q-btn 
+              v-close-popup 
+              style="width: 100%;" 
+              color="primary"
+              noCaps
+              :label="this.selCat ? `Pilih Filter (${this.selCat.length})` : `Pilih Filter`"
+              @click="
+                // selVendor = null;
+                // selCat = null;
+                // selKategori = null;
+                replaceRoute();
+                fetchData();">
+          </q-btn>
+
           
         </q-card-section>
       </q-card>
@@ -337,23 +339,6 @@ export default {
       date: "",
       searchTerm: "",
       poList: [],
-
-      isReceivedOption: [
-        { label: "no", value: "0" },
-        { label: "partial", value: "1" },
-        { label: "full", value: "2" },
-        { label: "suspended", value: "300" },
-        { label: "closed", value: "40000" },
-      ],
-      
-      receivedOption: [
-        { label: "show all", value: "null" },
-        { label: "fully received", value: "fully" },
-        { label: "half received", value: "half" },
-        { label: "not received", value: "not" },
-        { label: "suspended", value: "suspended" },
-        { label: "closed", value: "closed" },
-      ],
 
       dialogFilter: false,
       filterOption: [],
@@ -413,15 +398,21 @@ export default {
       filVendor: [],
 
       selVendor: null,
-      is_received: "null",
+      is_received: "not",
       selCat: null,
       selKategori: null,
+
+      countNot: "",
+      countPartial: "",
+      countSuspend: "",
 
       pagination: {
         max: 2,
         current: 1,
         limit: 25,
       },
+
+      show_detail: false,
     };
   },
   async created() {
@@ -519,14 +510,18 @@ export default {
           },
         })
         .then((result) => {
-          for (var i = 0; i < result.data.length; i++) {
+          for (var i = 0; i < result.data.poList.length; i++) {
             if (i == 0) {
-              let total_count = parseInt(result.data[i].total_count);
+              let total_count = parseInt(result.data.poList[i].total_count);
               this.pagination.max = Math.ceil(
                 total_count / this.pagination.limit
               );
+
+              this.countNot = result.data.not_count;
+              this.countPartial = result.data.half_count;
+              this.countSuspend = result.data.suspended_count;
             }
-            this.poList.push(result.data[i]);
+            this.poList.push(result.data.poList[i]);
           }
         });
 
@@ -584,15 +579,6 @@ export default {
                                       this.searchTerm ? this.searchTerm : ""}&date=${
                                         this.date ? moment(this.date).format("YYYY-MM-DD") : ""}`,
       });
-    },
-    FilterButtonProps () {
-      const props = {
-        color: 'primary',
-        noCaps: true,
-        label: this.selCat ? `Pilih Filter (${this.selCat.length})` : `Pilih Filter`,
-      }
-
-      return props
     },
   },
   computed: {

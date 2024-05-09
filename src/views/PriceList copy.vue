@@ -1,8 +1,11 @@
 <template>
-  <div class="row relative q-px-lg ">
+  <div class="row relative q-px-lg q-pt-lg">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
+      <q-card-section class="text-h6 text-bold q-pb-none"
+        >LIST HARGA</q-card-section
+      >
       <q-card-section class="row justify-between">
-        <!-- <q-select
+        <q-select
           outlined
           dense
           v-model="selectOption"
@@ -36,42 +39,7 @@
               size="sm"
             ></q-btn>
           </template>
-        </q-select> -->
-        <q-input
-          outlined
-          dense
-          v-model="searchTerm"
-          clearable
-          @clear="searchTerm = ''"
-          placeholder="Cari Nama Barang"
-          style="width: 30%;"
-        >
-          <template v-slot:prepend>
-            <q-icon name="search"></q-icon>
-          </template>
-        </q-input>
-        <q-field v-model="date" clearable dense outlined style="width: 30%;">
-            <template v-slot:prepend>
-              <q-icon name="date_range" />
-            </template>
-
-            <template v-slot:control>
-              <div class="self-center full-width no-outline" tabindex="0">
-                {{ date_model }}
-              </div>
-            </template>
-            <q-popup-proxy
-              style="width:fit-content"
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date v-model="date">
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-field>
+        </q-select>
         <q-select
           outlined
           dense
@@ -169,11 +137,9 @@
 export default {
   data() {
     return {
-      searchTerm: "",
-      date: "",
       option: [],
       filtered: [],
-      // selectOption: null,
+      selectOption: null,
       priceList: [],
       optVendor: [],
       filteredVD: [],
@@ -188,18 +154,6 @@ export default {
   async mounted() {
     await this.fetchData();
     await this.change();
-  },
-  computed: {
-    date_model() {
-      if (!this.date) return "Pilih Tanggal";
-
-      return moment(this.date).format("DD MMMM YYYY");
-    },
-    selectCount() {
-      var count = this.selCat.length;
-
-      return count;
-    },
   },
   methods: {
     filterOP(val, update, abort) {

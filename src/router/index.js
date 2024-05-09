@@ -54,7 +54,7 @@ const routes = [
     path: "/po/create",
     name: "POCreate",
     component: () => import("../views/POCreate.vue"),
-    meta: { title: "Form PO Baru", path: ["SPP Disetujui"] },
+    meta: { title: "Form PO Baru", path: ["PO"] },
   },
   {
     path: "/po/list",
@@ -63,9 +63,16 @@ const routes = [
     meta: { title: "Daftar PO", path: ["PO"] },
   },
   {
+    path: "/po/detail/:id",
+    name: "PODetail",
+    component: () => import("../views/PODetail.vue"),
+    meta: { title: "PO Detail", path: ["PO"] },
+  },
+  {
     path: "/price/list",
     name: "PriceList",
     component: () => import("../views/PriceList.vue"),
+    meta: { title: "List Harga", path: [""] },
   },
   {
     path: "/report",
