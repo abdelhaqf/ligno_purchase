@@ -419,6 +419,8 @@ Flight::route('POST /pricelist/new', function () {
   $data = Flight::request()->data;
   $item = $data['item'];
   $vendor = $data['vendor'];
+  $search = $data['search'];
+  $date = $data['date'];
 
   $ofset = ((int) $data['current'] - 1) * 25;
 
@@ -431,9 +433,16 @@ Flight::route('POST /pricelist/new', function () {
     $whereClause = "WHERE  po.vendor like '%$vendor%'";
   }
 
+  if ($search) $whereClause = $whereClause . "AND spp.po_id LIKE '%$search%'";
+
+  if ($date != null){
+    $whereClause = $whereClause . " AND po.po_date LIKE '%$date%'";
+  } 
+
   $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor 
   FROM spp INNER JOIN po ON po.po_id = spp.po_id
-  $whereClause ORDER BY po.po_date DESC LIMIT 25 OFFSET $ofset
+  $whereClause 
+  ORDER BY po.po_date DESC LIMIT 25 OFFSET $ofset
   ";
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $data = [];

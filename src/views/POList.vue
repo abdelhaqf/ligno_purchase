@@ -85,6 +85,7 @@
       </div>
       <div v-if="poList.length">      
         <q-markup-table
+          wrap-cells
           flat
           class="stickyTable"
           style="height: calc(100vh - 375px);"
@@ -114,7 +115,7 @@
                 {{ d.po_id }}
             </td>
             <td class="text-center">
-                {{ d.po_date }}
+                {{ momentFormatDate(d.po_date) }}
             </td>
             <td class="text-left">
                 {{ d.handler_name }}
@@ -129,7 +130,7 @@
                 {{ d.cost_category }}
             </td>
             <td class="text-center">
-                {{ d.est_arrival }}
+                {{ momentFormatDate(d.est_arrival) }}
             </td>
             <td class="text-center">
                 <!-- <q-btn
@@ -473,6 +474,12 @@ export default {
     //   else if (label == "closed") return "dark";
     //   else return "primary";
     // },
+    momentFormatDate(date) {
+        if (date) {
+            return moment(date).format("DD MMM YYYY");
+        }
+        return "-";
+    },
     async fetchData() {
       this.poList = [];
 
@@ -583,7 +590,7 @@ export default {
   },
   computed: {
     date_model() {
-      if (!this.date) return "Pilih Tanggal";
+      if (!this.date) return "Pilih Tanggal PO";
 
       return moment(this.date).format("DD MMMM YYYY");
     },
