@@ -64,6 +64,7 @@
             <th>Deadline</th>
             <th>Barang</th>
             <th>Jumlah</th>
+            <th style="width: 250px;">Ket</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -82,6 +83,25 @@
             </td>
             <td class="text-left l-grow">{{ d.item }}</td>
             <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
+            <td>
+              <div class="l-wrap-cell">
+                <span>
+                  {{
+                    d.description.length > 70
+                      ? d.description.slice(0, 63)
+                      : d.description
+                  }}
+                </span>
+                <span v-if="d.description.length > 70" class=" no-wrap ">
+                  ...
+                  <q-tooltip
+                    content-style="width:300px"
+                    content-class="l-text-detail bg-white text-black shadow-2"
+                    >{{ d.description }}</q-tooltip
+                  >
+                </span>
+              </div>
+            </td>
             <td>
               <div
                 class="capsule text-white q-px-md q-mx-auto"
@@ -490,8 +510,14 @@ export default {
   outline: none;
   box-shadow: inset 0 0 0 1.5pt #0e84eb;
 }
+.l-wrap-cell {
+  width: 250px !important;
+  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
+  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
+  word-break: break-all;
+}
 </style>
-<style>
+<style lang="scss">
 .q-timeline__title {
   font-size: 16px;
 }

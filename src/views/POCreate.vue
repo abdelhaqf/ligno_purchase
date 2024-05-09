@@ -117,8 +117,8 @@
             <q-radio v-model="curr" val="USD" label="USD" />
           </div>
         </div>
-        <div class="l-grow row items-center no-wrap">
-          <div class="col-2">Daftar SPP</div>
+        <div class="l-grow row items-center no-wrap q-my-none">
+          <div class="col-2" style="height: fit-content;">Daftar SPP</div>
           <div class="l-grow row justify-end items-center q-py-md bg-grey-2">
             <div class="text-weight-thin l-grow q-mx-md">
               Atur dan terapkan ke semua
