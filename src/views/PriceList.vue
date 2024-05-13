@@ -118,7 +118,7 @@
               </td>
               <td class="text-center">{{ p.qty }} {{ p.unit }}</td>
               <td>
-                <div class="l-wrap-cell">
+                <div class="l-wrap-cell" v-if="p.description">
                     <span>
                     {{
                         p.description.length > 55
@@ -135,6 +135,7 @@
                     >
                     </span>
                 </div>
+                <div v-else class="l-grow text-center">-</div>
               </td>
               <td class="text-center">
                 <q-btn
@@ -208,7 +209,7 @@ export default {
   },
   computed: {
     date_model() {
-      if (!this.date) return "Pilih Tanggal";
+      if (!this.date) return "Pilih Tanggal PO";
 
       return moment(this.date).format("DD MMMM YYYY");
     },
