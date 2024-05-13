@@ -72,6 +72,7 @@
               input-debounce="0"
               :options="filteredVD"
               @filter="filterVD"
+              @input-value="setModel"
               label="Nama Vendor"
             >
               <template v-slot:append>
@@ -408,6 +409,9 @@ export default {
     },
   },
   methods: {
+    setModel (val) {
+      this.po.vendor = val
+    },
     async fetchData() {
       this.sppSelectID = this.$route.query.ids.split(",");
       for (var i = 0; i < this.sppSelectID.length; i++) {

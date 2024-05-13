@@ -348,8 +348,11 @@ Flight::route('GET /spp_history/@spp_id', function ($spp_id) {
 });
 
 Flight::route('GET /list_item', function () {
+  // $q = "SELECT DISTINCT item as 'value', item as 'label' FROM spp
+  //         WHERE po_id IS NOT NULL
+  //         ORDER BY item ASC";
+
   $q = "SELECT DISTINCT item as 'value', item as 'label' FROM spp
-          WHERE po_id IS NOT NULL
           ORDER BY item ASC";
   runQuery($q);
 });

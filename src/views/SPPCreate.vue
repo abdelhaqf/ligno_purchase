@@ -43,6 +43,7 @@
                 use-input
                 hide-selected
                 fill-input
+                @input-value="setModel"
                 input-debounce="0"
                 :options="filtered"
                 @filter="filterOP"
@@ -284,6 +285,7 @@ export default {
   mounted() {
     this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
+      this.option = this.option.filter(obj => obj.value !== "");
       if (this.option.length == 0) this.showInput = true;
     });
     this.getUsers();
@@ -296,6 +298,9 @@ export default {
     },
   },
   methods: {
+    setModel (val) {
+      this.spp.item = val
+    },
     resetForm() {
       this.spp = {
         deadline: moment()
