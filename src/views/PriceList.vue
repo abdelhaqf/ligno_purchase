@@ -8,7 +8,7 @@
           v-model="searchTerm"
           clearable
           @clear="searchTerm = ''"
-          placeholder="Cari Nomor PO"
+          placeholder="Cari Nama Barang"
           style="width: 30%;"
           @input="change()"
         >
@@ -92,8 +92,8 @@
               <th class="text-left">Nomor PO</th>
               <th class="text-left">Tanggal PO</th>
               <th class="text-left">Nama Vendor</th>
-              <th class="text-right">Harga Satuan</th>
-              <th class="text-right">Jumlah Pembelian</th>
+              <th class="text-left">Nama Items</th>
+              <th class="text-right">Harga Items</th>
               <th class="text-center">Keterangan</th>
               <th class="text-center">Action</th>
             </tr>
@@ -109,16 +109,57 @@
               </td>
               <td class="text-left">{{ p.po_id }}</td>
               <td class="text-left">{{ momentFormatDate(p.po_date) }}</td>
-              <td class="text-left">{{ p.vendor }}</td>
+              <td class="text-left">
+                <!-- {{ p.vendor }} -->
+                <div class="l-wrap-cell" style="width: 150px !important;">
+                    <span>
+                    {{
+                        p.vendor.length > 40
+                        ? p.vendor.slice(0, 35)
+                        : p.vendor
+                    }}
+                    </span>
+                    <span v-if="p.vendor.length > 40" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ p.vendor }}</q-tooltip
+                    >
+                    </span>
+                </div>
+              </td>
+              <td class="text-left">
+                <!-- {{ p.item }} -->
+                <div class="l-wrap-cell" style="width: 200px !important;">
+                    <span>
+                    {{
+                        p.item.length > 25
+                        ? p.item.slice(0, 24)
+                        : p.item
+                    }}
+                    </span>
+                    <span v-if="p.item.length > 25" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ p.item }}</q-tooltip
+                    >
+                    </span>
+                </div>
+                <div class="text-grey">
+                  {{ p.qty }} {{ p.unit }}
+                </div>
+              </td>
               <td class="text-left">
                 {{
                   setCurrency(parseFloat(p.price) / parseFloat(p.qty), p.currency)
                 }}
                 / {{ p.unit }}
               </td>
-              <td class="text-center">{{ p.qty }} {{ p.unit }}</td>
               <td>
-                <div class="l-wrap-cell" v-if="p.description">
+                <div class="l-wrap-cell" v-if="p.description" style="width: 200px !important;">
                     <span>
                     {{
                         p.description.length > 55
@@ -249,7 +290,6 @@ export default {
       try {
         this.$q.loading.show();
         let payload = {
-          item: this.selectOption,
           vendor: this.selectVendor,
           current: this.pagination.current,
           search: this.searchTerm ? this.searchTerm : "",
@@ -296,7 +336,6 @@ export default {
 
 <style lang="scss" scoped>
 .l-wrap-cell {
-  width: 200px !important;
   word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
   white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
   word-break: break-all;

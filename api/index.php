@@ -393,7 +393,6 @@ Flight::route('POST /pricelist/new', function () {
   $link = getLink();
   $date1 = new DateTime();
   $data = Flight::request()->data;
-  $item = $data['item'];
   $vendor = $data['vendor'];
   $search = $data['search'];
   $date = $data['date'];
@@ -401,15 +400,13 @@ Flight::route('POST /pricelist/new', function () {
   $ofset = ((int) $data['current'] - 1) * 25;
 
   $whereClause = "";
-  if ($item != "null" && $vendor != "null") {
-    $whereClause = "WHERE spp.item like '%$item%' AND po.vendor like '%$vendor%'";
-  } else if ($item != "null") {
-    $whereClause = "WHERE spp.item like '%$item%' ";
+  if ($search != "null" && $vendor != "null") {
+    $whereClause = "WHERE spp.item like '%$search%' AND po.vendor like '%$vendor%'";
+  } else if ($search != "null") {
+    $whereClause = "WHERE spp.item like '%$search%' ";
   } else if ($vendor != "null") {
     $whereClause = "WHERE  po.vendor like '%$vendor%'";
   }
-
-  if ($search) $whereClause = $whereClause . "AND spp.po_id LIKE '%$search%'";
 
   if ($date != null) {
     $whereClause = $whereClause . " AND po.po_date LIKE '%$date%'";
