@@ -147,8 +147,6 @@ export default {
 
       totalPrice: 0,
       report: [],
-      
-      
 
       option50: {
         title: {
@@ -341,28 +339,28 @@ export default {
           },
         ],
         color: colorPalette,
-      },      
+      },
       report_byKat: [],
       total_byKat: 0,
     };
   },
   mounted() {
-    if (
-      this.$store.state.currentUser.is_purchasing == 1 ||
-      this.$store.state.currentUser.username == "ceo"
-    ) {
-      this.fetchData();
-      // this.myChart = echart.init();
+    this.fetchData();
+    // if (
+    //   this.$store.state.currentUser.is_purchasing == 1 ||
+    //   this.$store.state.currentUser.username == "ceo"
+    // ) {
+    //   // this.myChart = echart.init();
 
-      // this.myChart.on("click", (params) => {
-      //   console.log(params);
-      // });
-      // console.log(this.$refs.chart1);
-      // console.log(ECharts);
-      // ECharts.refresh();
-    } else {
-      this.$router.push("/spp/create");
-    }
+    //   // this.myChart.on("click", (params) => {
+    //   //   console.log(params);
+    //   // });
+    //   // console.log(this.$refs.chart1);
+    //   // console.log(ECharts);
+    //   // ECharts.refresh();
+    // } else {
+    //   this.$router.push("/spp/create");
+    // }
   },
   methods: {
     handleClick50(...args) {
