@@ -409,8 +409,8 @@ export default {
     },
   },
   methods: {
-    setModel (val) {
-      this.po.vendor = val
+    setModel(val) {
+      this.po.vendor = val;
     },
     async fetchData() {
       this.sppSelectID = this.$route.query.ids.split(",");
@@ -518,19 +518,8 @@ export default {
             };
             this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
           }
-
-          // this.formPO = false;
-          // this.po = {
-          //   po_date: moment().format("YYYY/MM/DD"),
-          // };
-          // this.fetchData();
         });
 
-        // await this.sync_formula();
-
-        // await this.$root.$emit("refresh");
-        // this.sppSelect = [];
-        // this.allowed = false;
         this.$q.loading.hide();
         this.$q.notify({ message: "Berhasil membuat PO!", color: "positive" });
         this.$router.push("/spp/approved");
@@ -538,30 +527,6 @@ export default {
         console.log(err);
         this.$q.loading.hide();
         this.$q.notify({ message: "Gagal membuat PO!", color: "negative" });
-      }
-    },
-    async sync_formula() {
-      let temp = this.sppSelect.filter((val) => {
-        return val.id_rm;
-      });
-
-      if (temp.length > 0) {
-        for (let i = 0; i < temp.length; i++) {
-          let item = temp[i];
-          let payload = {
-            id: item.id_rm,
-            new_price: item.price,
-          };
-
-          if (item.currency == "USD") {
-            payload.new_price = parseFloat(this.kurs * item.price).toFixed(2);
-          }
-
-          payload.new_price =
-            parseFloat(payload.new_price) / parseFloat(item.qty);
-
-          // await this.$http_formulation.put("/purchase/rm/price", payload);
-        }
       }
     },
     limitDate(date) {

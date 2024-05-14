@@ -1,236 +1,235 @@
 <template>
-    <div class="q-px-lg rounded-borders full-width">
-        <q-card flat bordered class="bg-white">
-            <q-item class="q-py-md">
-                <q-item-section side>
-                    <q-btn flat icon="arrow_back" @click="$router.go(-1)" dense></q-btn>
-                </q-item-section>
-                <q-item-section>
-                    <div class="text-bold l-text-detail">Detail PO #{{ po.po_id }}</div>
-                    <div class="text-grey-6">
-                        <span>
-                            <q-icon name="today" />
-                        </span>
-                        Tanggal PO:
-                        <span class="text-bold">
-                        {{ momentFormatDate(po.po_date) }}
-                        </span>
-                    </div>
-                </q-item-section>
-            </q-item>
-            <q-separator size="2px" inset></q-separator>
-            <q-card-section class="q-ma-md bg-grey-2 column q-gutter-y-sm">
-                <div class="row justify-between items-center">
-                    <div class="text-grey-8" style="min-width: 150px ;">Ditangani Oleh</div>
-                    <div class="text-bold text-right">{{ po.handler_name }}</div>
-                </div>
-                <div class="row justify-between items-center">
-                    <div class="text-grey-8" style="min-width: 150px ;">Vendor</div>
-                    <div class="text-right">{{ po.vendor }}</div>
-                </div>
-                <div class="row justify-between items-center">
-                    <div class="text-grey-8" style="min-width: 150px ;">Kategori Biaya</div>
-                    <div class="text-right">          
-                        <q-select
-                            outlined
-                            v-model="po.cost_category"
-                            :options="cost_ctg"
-                            class="bg-white"
-                            map-options
-                            emit-value
-                            use-input
-                            hide-selected
-                            fill-input
-                            dense
-                        >
-                        </q-select>
-                    </div>
-                </div>
-            </q-card-section>
-            <q-scroll-area style="height:calc(100vh - 480px)" class="q-px-md">
-                <q-markup-table
-                    wrap-cells
-                    flat
-                    bordered
-                    class="stickyTable"
-                    style="max-height: calc(100vh - 375px);"
-                    >
-                        <!-- table head -->
-                        <thead class="text-white">
-                        <tr>
-                            <th class="q-px-xs">SPP</th>
-                            <th>Request By</th>
-                            <th>Barang</th>
-                            <th>QTY</th>
-                            <th>Value</th>
-                            <th>Est. Arrival</th>
-                            <th>Note</th>
-                            <th>Received</th>             
-                            <th class="q-mx-sm">Action</th>
-                        </tr>
-                        </thead>
-                        <!-- table body  -->
-                        <tbody>
-                            <tr v-for="(d, i) in po.spp" :key="i">
-                                <td class="text-center">{{ d.spp_id }}</td>
-                                <td>{{ d.name }}</td>
-                                <td v-if="!isEdit">{{ d.item }}</td>
-                                <td v-else class="text-center">
-                                    <q-input 
-                                        style="min-width: 150px;"
-                                        outlined 
-                                        dense
-                                        v-model="d.item"/>
-                                </td>
-                                <td v-if="!isEdit" class="text-center">
-                                    {{ d.qty }} {{ d.unit }}
-                                </td>
-                                <td v-else class="text-center">
-                                    <q-input 
-                                        style="min-width: 100px;"
-                                        outlined 
-                                        dense
-                                        v-model="d.qty"/>
-                                    <q-input 
-                                        class="q-my-sm"
-                                        outlined 
-                                        dense
-                                        v-model="d.unit"/>
-                                </td>
-                                <td v-if="!isEdit" class="text-center">
-                                    {{ setCurrency(parseFloat(d.price) , d.currency) }}
-                                </td>
-                                <td v-else>
-                                    <money v-model="d.price" v-bind="moneyType(d.currency)"></money>
-                                </td>
-                                <td v-if="!isEdit" class="text-center"> 
-                                    {{ momentFormatDate(d.est_arrival)}}
-                                </td>
-                                <td v-else>
-                                    <q-input
-                                        outlined
-                                        dense
-                                        bg-color="white"
-                                        v-model="d.est_arrival"
-                                        class="l-grow"
-                                        style="min-width: 150px;"
-                                    >
-                                        <template v-slot:append>
-                                        <q-icon name="event" class="cursor-pointer">
-                                            <q-popup-proxy
-                                            ref="qDateProxy"
-                                            transition-show="scale"
-                                            transition-hide="scale"
-                                            >
-                                            <q-date minimal v-model="d.est_arrival">
-                                                <div class="row items-center justify-end">
-                                                <q-btn
-                                                    v-close-popup
-                                                    label="Close"
-                                                    color="primary"
-                                                    flat
-                                                />
-                                                </div>
-                                            </q-date>
-                                            </q-popup-proxy>
-                                        </q-icon>
-                                        </template>
-                                    </q-input>
-                                </td>
-                                <td v-if="!isEdit" class="text-left" style="max-width: 150px;">
-                                    <!-- {{d.note}} -->
-                                    <div class="l-wrap-cell" v-if="d.note">
-                                        <span>
-                                        {{
-                                            d.note.length > 40
-                                            ? d.note.slice(0, 33)
-                                            : d.note
-                                        }}
-                                        </span>
-                                        <span v-if="d.note.length > 40" class=" no-wrap ">
-                                        ...
-                                        <q-tooltip
-                                            content-style="width:300px"
-                                            content-class="l-text-detail bg-white text-black shadow-2"
-                                            >{{ d.note }}</q-tooltip
-                                        >
-                                        </span>
-                                    </div>
-                                    <div v-else class="text-center l-grow">-</div>
-                                </td>
-                                <td v-else class="text-center" style="width: 200px;">
-                                    <q-input 
-                                        outlined 
-                                        dense
-                                        autogrow
-                                        v-model="d.note" 
-                                        label="Note" />
-                                </td>
-                                <td class="text-center">
-                                    <q-select
-                                        outlined
-                                        v-model="d.is_received"
-                                        :options="isReceivedOption"
-                                        class="bg-white"
-                                        map-options
-                                        emit-value
-                                        dense
-                                    >
-                                    </q-select>
-                                </td>
-                                <td class="text-center">
-                                    <q-btn
-                                        unelevated
-                                        label="Sync"
-                                        color="blue"
-                                        no-caps
-                                    >
-                                    </q-btn>
-                                </td>
-                            </tr>
-                        </tbody>
-                </q-markup-table>
-            </q-scroll-area>
-        </q-card>
-
-        <q-footer
-            style="max-width: 1440px;"
-            class="q-mx-auto atas-radius bg-white"
+  <div class="q-px-lg rounded-borders full-width">
+    <q-card flat bordered class="bg-white">
+      <q-item class="q-py-md">
+        <q-item-section side>
+          <q-btn flat icon="arrow_back" @click="$router.go(-1)" dense></q-btn>
+        </q-item-section>
+        <q-item-section>
+          <div class="text-bold l-text-detail">Detail PO #{{ po.po_id }}</div>
+          <div class="text-grey-6">
+            <span>
+              <q-icon name="today" />
+            </span>
+            Tanggal PO:
+            <span class="text-bold">
+              {{ momentFormatDate(po.po_date) }}
+            </span>
+          </div>
+        </q-item-section>
+      </q-item>
+      <q-separator size="2px" inset></q-separator>
+      <q-card-section class="q-ma-md bg-grey-2 column q-gutter-y-sm">
+        <div class="row justify-between items-center">
+          <div class="text-grey-8" style="min-width: 150px ;">
+            Ditangani Oleh
+          </div>
+          <div class="text-bold text-right">{{ po.handler_name }}</div>
+        </div>
+        <div class="row justify-between items-center">
+          <div class="text-grey-8" style="min-width: 150px ;">Vendor</div>
+          <div class="text-right">{{ po.vendor }}</div>
+        </div>
+        <div class="row justify-between items-center">
+          <div class="text-grey-8" style="min-width: 150px ;">
+            Kategori Biaya
+          </div>
+          <div class="text-right">
+            <q-select
+              outlined
+              v-model="po.cost_category"
+              :options="cost_ctg"
+              class="bg-white"
+              map-options
+              emit-value
+              use-input
+              hide-selected
+              fill-input
+              dense
             >
-            <q-card-section class="row justify-end items-center">
-                <div class="row justify-end q-gutter-x-md">
-                    <q-btn
-                        unelevated
-                        label="Edit"
-                        color="white" 
-                        text-color="black" 
-                        outline style="color: black;"
-                        no-caps
-                        @click="isEdit=!isEdit"
+            </q-select>
+          </div>
+        </div>
+      </q-card-section>
+      <q-scroll-area style="height:calc(100vh - 480px)" class="q-px-md">
+        <q-markup-table
+          wrap-cells
+          flat
+          bordered
+          class="stickyTable"
+          style="max-height: calc(100vh - 375px);"
+        >
+          <!-- table head -->
+          <thead class="text-white">
+            <tr>
+              <th class="q-px-xs">SPP</th>
+              <th>Request By</th>
+              <th>Barang</th>
+              <th>QTY</th>
+              <th>Value</th>
+              <th>Est. Arrival</th>
+              <th>Note</th>
+              <th>Received</th>
+              <th class="q-mx-sm">Action</th>
+            </tr>
+          </thead>
+          <!-- table body  -->
+          <tbody>
+            <tr v-for="(d, i) in po.spp" :key="i">
+              <td class="text-center">{{ d.spp_id }}</td>
+              <td>{{ d.name }}</td>
+              <td v-if="!isEdit">{{ d.item }}</td>
+              <td v-else class="text-center">
+                <q-input
+                  style="min-width: 150px;"
+                  outlined
+                  dense
+                  v-model="d.item"
+                />
+              </td>
+              <td v-if="!isEdit" class="text-center">
+                {{ d.qty }} {{ d.unit }}
+              </td>
+              <td v-else class="text-center">
+                <q-input
+                  style="min-width: 100px;"
+                  outlined
+                  dense
+                  v-model="d.qty"
+                />
+                <q-input class="q-my-sm" outlined dense v-model="d.unit" />
+              </td>
+              <td v-if="!isEdit" class="text-center">
+                {{ setCurrency(parseFloat(d.price), d.currency) }}
+              </td>
+              <td v-else>
+                <money v-model="d.price" v-bind="moneyType(d.currency)"></money>
+              </td>
+              <td v-if="!isEdit" class="text-center">
+                {{ momentFormatDate(d.est_arrival) }}
+              </td>
+              <td v-else>
+                <q-input
+                  outlined
+                  dense
+                  bg-color="white"
+                  v-model="d.est_arrival"
+                  class="l-grow"
+                  style="min-width: 150px;"
+                >
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date minimal v-model="d.est_arrival">
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </td>
+              <td v-if="!isEdit" class="text-left" style="max-width: 150px;">
+                <!-- {{d.note}} -->
+                <div class="l-wrap-cell" v-if="d.note">
+                  <span>
+                    {{ d.note.length > 40 ? d.note.slice(0, 33) : d.note }}
+                  </span>
+                  <span v-if="d.note.length > 40" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ d.note }}</q-tooltip
                     >
-                    </q-btn>
-                    <q-btn
-                        unelevated
-                        label="Simpan"
-                        color="blue"
-                        no-caps
-                        @click="updateSPP"
-                    >
-                    </q-btn>
-                    <q-btn
-                        unelevated
-                        label="Re-Order"
-                        color="blue"
-                        no-caps
-                        @click="reorderList();
-                                showDialogReorder();"
-                    >
-                    </q-btn>
+                  </span>
                 </div>
-            </q-card-section>
-        </q-footer>
+                <div v-else class="text-center l-grow">-</div>
+              </td>
+              <td v-else class="text-center" style="width: 200px;">
+                <q-input
+                  outlined
+                  dense
+                  autogrow
+                  v-model="d.note"
+                  label="Note"
+                />
+              </td>
+              <td class="text-center">
+                <q-select
+                  outlined
+                  v-model="d.is_received"
+                  :options="isReceivedOption"
+                  class="bg-white"
+                  map-options
+                  emit-value
+                  dense
+                >
+                </q-select>
+              </td>
+              <td class="text-center">
+                <q-btn
+                  unelevated
+                  label="Sync"
+                  color="blue"
+                  no-caps
+                  @click="showDialogSync(d)"
+                >
+                </q-btn>
+              </td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-scroll-area>
+    </q-card>
 
-    </div>
+    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
+      <q-card-section class="row justify-end items-center">
+        <div class="row justify-end q-gutter-x-md">
+          <q-btn
+            unelevated
+            label="Edit"
+            color="white"
+            text-color="black"
+            outline
+            style="color: black;"
+            no-caps
+            @click="isEdit = !isEdit"
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Simpan"
+            color="blue"
+            no-caps
+            @click="updateSPP"
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Re-Order"
+            color="blue"
+            no-caps
+            @click="
+              reorderList();
+              showDialogReorder();
+            "
+          >
+          </q-btn>
+        </div>
+      </q-card-section>
+    </q-footer>
+  </div>
 </template>
 
 <script>
@@ -238,243 +237,259 @@ import moment from "moment";
 moment.locale("id");
 import { Money } from "v-money";
 import dialogReorderPO from "../components/dialogReorderPO.vue";
+import dialogSyncRM from "../components/dialogSyncRM.vue";
 export default {
-    components: { Money },
-    data() {
-        return {
-            isEdit: false,
-            po: {},
-            old: {},
-            cost_ctg: [
-                "BELUM DIKATEGORIKAN",
-                "Marketing/Sales",
-                "RnD",
-                "Produksi/Gudang",
-                "Purchasing/Accounting",
-                "Lab Pusat",
-                "Lab Beton",
-                "IT",
-                "Umum/HRD",
-                "Maintenance",
-            ],
-            isReceivedOption: [
-                { label: "No", value: "0" },
-                { label: "Partial", value: "1" },
-                { label: "Full", value: "2" },
-                { label: "Suspended", value: "300" },
-                { label: "Closed", value: "40000" },
-            ],
-            newSpp: [],
+  components: { Money },
+  data() {
+    return {
+      isEdit: false,
+      po: {},
+      old: {},
+      cost_ctg: [
+        "BELUM DIKATEGORIKAN",
+        "Marketing/Sales",
+        "RnD",
+        "Produksi/Gudang",
+        "Purchasing/Accounting",
+        "Lab Pusat",
+        "Lab Beton",
+        "IT",
+        "Umum/HRD",
+        "Maintenance",
+      ],
+      isReceivedOption: [
+        { label: "No", value: "0" },
+        { label: "Partial", value: "1" },
+        { label: "Full", value: "2" },
+        { label: "Suspended", value: "300" },
+        { label: "Closed", value: "40000" },
+      ],
+      newSpp: [],
+    };
+  },
+  async mounted() {
+    await this.fetchData();
+  },
+  watch: {},
+  computed: {},
+  methods: {
+    showDialogReorder() {
+      this.$q
+        .dialog({
+          component: dialogReorderPO,
+          parent: this,
+          newSpp: this.newSpp,
+          style: "border: 2px solid black",
+        })
+        .onOk((val) => {
+          console.log("OK was clicked on dialog: ", val);
+        })
+        .onCancel(() => {
+          console.log("Cancel was clicked on dialog");
+        })
+        .onDismiss(() => {
+          console.log("OK or cancel was clicked on dialog");
+        });
+    },
+    showDialogSync(spp) {
+      let payload = JSON.parse(JSON.stringify(spp));
+      payload.confirmed = false;
+      payload.id_rm = null;
+      payload.syncPrice = 0;
 
+      this.$q
+        .dialog({
+          component: dialogSyncRM,
+          parent: this,
+          spp: payload,
+        })
+        .onOk(async () => {
+          await this.fetchData();
+        });
+    },
+    async fetchData() {
+      let id = decodeURIComponent(this.$route.params.id);
+
+      let result = await this.$http.get(
+        `/po/detail?id=${encodeURIComponent(id)}`,
+        {}
+      );
+      this.po = result.data;
+      this.old = JSON.parse(JSON.stringify(result.data));
+    },
+    momentFormatDate(date) {
+      if (date) {
+        return moment(date).format("DD MMM YYYY");
+      }
+      return "-";
+    },
+    setCurrency(price, cur) {
+      if (cur == "IDR") {
+        const formatter = new Intl.NumberFormat("ID", {
+          style: "currency",
+          currency: "IDR",
+          currencyDisplay: "symbol",
+          minimumFractionDigits: 0,
+        });
+        return formatter.format(price);
+      } else if (cur == "USD") {
+        const formatter = new Intl.NumberFormat("US", {
+          style: "currency",
+          currency: "USD",
+          currencyDisplay: "symbol",
+          minimumFractionDigits: 2,
+        });
+        return formatter.format(price);
+      }
+    },
+    moneyType(curr) {
+      let money = {
+        decimal: ",",
+        thousands: ".",
+        prefix: "Rp ",
+        suffix: "",
+        precision: 0,
+        masked: false,
+      };
+      if (curr == "IDR") {
+        money.precision = 0;
+        money.prefix = "Rp ";
+        money.decimal = ",";
+        money.thousands = ".";
+      } else {
+        money.precision = 0;
+        money.prefix = "$ ";
+        money.decimal = ".";
+        money.thousands = ",";
+      }
+
+      return money;
+    },
+    reorderList() {
+      this.newSpp = [];
+      for (var i = 0; i < this.po.spp.length; i++) {
+        let temp = {};
+        temp.item = this.po.spp[i].item;
+        temp.qty = this.po.spp[i].qty;
+        temp.unit = this.po.spp[i].unit;
+        temp.cc = this.po.spp[i].cc;
+        temp.deadline =
+          this.po.spp[i].deadline >= moment().format("YYYY-MM-DD")
+            ? moment(this.po.spp[i].deadline).format("YYYY/MM/DD")
+            : moment().format("YYYY/MM/DD");
+        temp.description = this.po.spp[i].description;
+        temp.user_id = this.$store.state.currentUser.user_id;
+
+        this.newSpp.push(temp);
+      }
+    },
+    async updateSPP() {
+      for (var i = 0; i < this.po.spp.length; i++) {
+        let data = {
+          is_received: this.po.spp[i].is_received,
+          coa: this.po.spp[i].coa,
+          note: this.po.spp[i].note,
+          cost_category: this.po.cost_category,
+
+          item: this.po.spp[i].item,
+          qty: this.po.spp[i].qty,
+          unit: this.po.spp[i].unit,
+          price: this.po.spp[i].price,
+          est_arrival: this.po.spp[i].est_arrival,
         };
+        var note_add = "";
+        if (this.po.spp[i].item != this.old.spp[i].item) {
+          note_add =
+            note_add +
+            ", nama item: " +
+            this.old.spp[i].item +
+            " => " +
+            this.po.spp[i].item;
+        }
+        if (this.po.spp[i].qty != this.old.spp[i].qty) {
+          note_add =
+            note_add +
+            ", qty: " +
+            this.old.spp[i].qty +
+            " => " +
+            this.po.spp[i].qty;
+        }
+        if (this.po.spp[i].unit != this.old.spp[i].unit) {
+          note_add =
+            note_add +
+            ", unit: " +
+            this.po.spp[i].unit +
+            " => " +
+            this.old.spp[i].unit;
+        }
+        if (this.po.spp[i].price != this.old.spp[i].price) {
+          note_add =
+            note_add +
+            ", harga: " +
+            this.old.spp[i].price +
+            " => " +
+            this.po.spp[i].price;
+        }
+        if (this.po.spp[i].note != this.old.spp[i].note) {
+          note_add =
+            note_add +
+            ", harga: " +
+            this.old.spp[i].note +
+            " => " +
+            this.po.spp[i].note;
+        }
+        if (note_add != "")
+          data.revision = this.$store.state.currentUser.username;
+
+        await this.$http
+          .put("/update_spp/" + this.po.spp[i].spp_id, data, {})
+          .then((result) => {});
+
+        let history = {
+          spp_id: this.po.spp[i].spp_id,
+          status: "process",
+          content: this.po.spp[i].note + note_add,
+        };
+        if (this.po.spp[i].is_received == 2) {
+          history.status = "done";
+        }
+        if (this.po.spp[i].is_received == 300) {
+          history.status = "suspended";
+        }
+        if (this.po.spp[i].is_received == 40000) {
+          history.status = "closed";
+        }
+        this.$http.post("/new_history", history, {}).then((result) => {});
+
+        var info = "";
+        if (this.po.spp[i].is_received == 2)
+          info = "barang sudah diterima penuh";
+        if (this.po.spp[i].is_received == 1)
+          info = "barang sudah diterima sebagian";
+        if (this.po.spp[i].is_received == 300) info = "PO sementara di suspend";
+        if (this.po.spp[i].is_received == 40000) info = "PO dinyatakan closed";
+        var notifikasi = {
+          from_id: this.$store.state.currentUser.user_id,
+          to_id: this.po.spp[i].user_id,
+          notif: "Konfirmasi Penerimaan barang",
+          note: info,
+          spp_id: this.po.spp[i].spp_id,
+          reference_page: "/spp/list",
+        };
+        if (info != 0) {
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+
+          notifikasi.to_id = 1; // Notif ke Manager purchasing
+          this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+        }
+      }
+      this.show_detail = false;
+      await this.fetchData();
+      this.$q.notify("Data PO berhasil diubah!");
+      this.isEdit = false;
     },
-    async mounted() {
-        await this.fetchData();  
-    },
-    watch: {},
-    computed: {},
-    methods: {
-        showDialogReorder() {
-            this.$q
-                .dialog({
-                    component: dialogReorderPO,
-                    parent: this,
-                    newSpp: this.newSpp,
-                    style: "border: 2px solid black",
-                })
-                .onOk((val) => {
-                console.log("OK was clicked on dialog: ", val);
-                })
-                .onCancel(() => {
-                console.log("Cancel was clicked on dialog");
-                })
-                .onDismiss(() => {
-                console.log("OK or cancel was clicked on dialog");
-                });
-        },
-        async fetchData() {
-            let id = decodeURIComponent(this.$route.params.id);
-
-            let result = await this.$http.get(
-                `/po/detail?id=${encodeURIComponent(id)}`,
-                {}
-            );
-            this.po = result.data;
-            this.old = JSON.parse(JSON.stringify(result.data));
-        },
-        momentFormatDate(date) {
-            if (date) {
-                return moment(date).format("DD MMM YYYY");
-            }
-            return "-";
-        },
-        setCurrency(price, cur) {
-            if (cur == "IDR") {
-                const formatter = new Intl.NumberFormat("ID", {
-                style: "currency",
-                currency: "IDR",
-                currencyDisplay: "symbol",
-                minimumFractionDigits: 0,
-                });
-                return formatter.format(price);
-            } else if (cur == "USD") {
-                const formatter = new Intl.NumberFormat("US", {
-                style: "currency",
-                currency: "USD",
-                currencyDisplay: "symbol",
-                minimumFractionDigits: 2,
-                });
-                return formatter.format(price);
-            }
-        },
-        moneyType(curr) {
-            let money = {
-                decimal: ",",
-                thousands: ".",
-                prefix: "Rp ",
-                suffix: "",
-                precision: 0,
-                masked: false,
-            };
-            if (curr == "IDR") {
-                money.precision = 0;
-                money.prefix = "Rp ";
-                money.decimal = ",";
-                money.thousands = ".";
-            } else {
-                money.precision = 0;
-                money.prefix = "$ ";
-                money.decimal = ".";
-                money.thousands = ",";
-            }
-
-            return money
-        },
-        reorderList(){
-            this.newSpp = [];
-            for (var i = 0; i < this.po.spp.length; i++) {
-                let temp = {};
-                temp.item = this.po.spp[i].item;
-                temp.qty = this.po.spp[i].qty;
-                temp.unit = this.po.spp[i].unit;
-                temp.cc = this.po.spp[i].cc;
-                temp.deadline = this.po.spp[i].deadline >= moment().format("YYYY-MM-DD")? moment(this.po.spp[i].deadline).format("YYYY/MM/DD") : moment().format("YYYY/MM/DD");
-                temp.description = this.po.spp[i].description;
-                temp.user_id = this.$store.state.currentUser.user_id;
-
-                this.newSpp.push(temp);
-            }
-        },
-        async updateSPP() {
-            for (var i = 0; i < this.po.spp.length; i++) {
-                let data = {
-                    is_received: this.po.spp[i].is_received,
-                    coa: this.po.spp[i].coa,
-                    note: this.po.spp[i].note,
-                    cost_category: this.po.cost_category,
-
-                    item: this.po.spp[i].item,
-                    qty: this.po.spp[i].qty,
-                    unit: this.po.spp[i].unit,
-                    price: this.po.spp[i].price,
-                    est_arrival: this.po.spp[i].est_arrival,
-                };
-                var note_add = "";
-                if (this.po.spp[i].item != this.old.spp[i].item) {
-                    note_add =
-                        note_add +
-                        ", nama item: " +
-                        this.old.spp[i].item +
-                        " => " +
-                        this.po.spp[i].item;
-                }
-                if (this.po.spp[i].qty != this.old.spp[i].qty) {
-                    note_add =
-                        note_add +
-                        ", qty: " +
-                        this.old.spp[i].qty +
-                        " => " +
-                        this.po.spp[i].qty;
-                    }
-                if (this.po.spp[i].unit != this.old.spp[i].unit) {
-                    note_add =
-                        note_add +
-                        ", unit: " +
-                        this.po.spp[i].unit +
-                        " => " +
-                        this.old.spp[i].unit;
-                    }
-                if (this.po.spp[i].price != this.old.spp[i].price) {
-                    note_add =
-                        note_add +
-                        ", harga: " +
-                        this.old.spp[i].price +
-                        " => " +
-                        this.po.spp[i].price;
-                }
-                if (this.po.spp[i].note != this.old.spp[i].note) {
-                    note_add =
-                        note_add +
-                        ", harga: " +
-                        this.old.spp[i].note +
-                        " => " +
-                        this.po.spp[i].note;
-                }
-                if (note_add != "")
-                    data.revision = this.$store.state.currentUser.username;
-
-                await this.$http
-                    .put("/update_spp/" + this.po.spp[i].spp_id, data, {})
-                    .then((result) => {});
-
-                let history = {
-                    spp_id: this.po.spp[i].spp_id,
-                    status: "process",
-                    content: this.po.spp[i].note + note_add,
-                };
-                if (this.po.spp[i].is_received == 2) {
-                    history.status = "done";
-                }
-                if (this.po.spp[i].is_received == 300) {
-                    history.status = "suspended";
-                }
-                if (this.po.spp[i].is_received == 40000) {
-                    history.status = "closed";
-                }
-                this.$http.post("/new_history", history, {}).then((result) => {});
-                
-                var info = "";
-                if (this.po.spp[i].is_received == 2)
-                    info = "barang sudah diterima penuh";
-                if (this.po.spp[i].is_received == 1)
-                    info = "barang sudah diterima sebagian";
-                if (this.po.spp[i].is_received == 300)
-                    info = "PO sementara di suspend";
-                if (this.po.spp[i].is_received == 40000)
-                    info = "PO dinyatakan closed";
-                var notifikasi = {
-                    from_id: this.$store.state.currentUser.user_id,
-                    to_id: this.po.spp[i].user_id,
-                    notif: "Konfirmasi Penerimaan barang",
-                    note: info,
-                    spp_id: this.po.spp[i].spp_id,
-                    reference_page: "/spp/list",
-                };
-                if (info != 0) {
-                    this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-
-                    notifikasi.to_id = 1; // Notif ke Manager purchasing
-                    this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-                }
-            }
-            this.show_detail = false;
-            await this.fetchData();
-            this.$q.notify("Data PO berhasil diubah!");
-            this.isEdit = false;
-        },
-    },
-
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>

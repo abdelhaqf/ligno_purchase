@@ -311,6 +311,23 @@ export default {
       });
   },
   methods: {
+    showDialogPlugin() {
+      this.$q
+        .dialog({
+          component: dialogPulginContoh,
+          parent: this,
+          text: [{ nama: "kikiuw" }],
+        })
+        .onOk((val) => {
+          console.log("OK was clicked on dialog, sambil bawa", val);
+        })
+        .onCancel(() => {
+          console.log("Cancel was clicked on dialog");
+        })
+        .onDismiss(() => {
+          console.log("OK or cancel was clicked on dialog");
+        });
+    },
     fetchData() {
       this.sppList = [];
       let q_filter = `?current=${this.pagination.current}&limit=${
