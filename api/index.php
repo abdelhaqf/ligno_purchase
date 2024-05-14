@@ -118,6 +118,66 @@ Flight::route('GET /spp/list/@id', function ($id) {
   runQuery($q);
 });
 
+Flight::route('GET /template_list', function () {
+
+  // $query = Flight::request()->query;
+
+  // $current = $query->current;
+  // $limit = $query->limit;
+  // $offset = ($current - 1) * $limit;
+
+  // $w_search = "";
+  // if ($query->search != "") {
+  //   $w_search = "AND spp.item LIKE '%$query->search%'";
+  // }
+
+  // $w_date = "";
+  // if ($query->date) {
+  //   $w_date = "AND DATE(create_at) = '$query->date'";
+  // } else if ($query->from && $query->to) {
+  //   $w_date = "AND DATE(create_at) BETWEEN '$query->from' AND '$query->to'";
+
+  // $q = "SELECT template.name, template.note,
+  //         (SELECT *
+  //         FROM template_detail
+  //         INNER JOIN user ON spp.user_id = user.user_id
+  //         LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+  //         WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
+  //         ) AS detail
+  //       FROM template
+  //       INNER JOIN user ON spp.user_id = user.user_id
+  //       LEFT JOIN user hnd on hnd.user_id = spp.handle_by
+  //       WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
+  //       ORDER BY spp.spp_id DESC
+  //       LIMIT $limit OFFSET $offset
+  //   ";
+  // runQuery($q);
+
+  // }
+  
+  $q = "SELECT *
+        FROM template
+        INNER JOIN template_detail ON template.id = template_detail.id_template
+        GROUP BY template.id
+        ORDER BY template.id DESC
+    ";
+  runQuery($q);
+  // $template = getRows($q)[0];
+
+  // try {
+  //   $q = "SELECT spp.*, user.name
+  //   FROM template 
+  //   INNER JOIN template_detail ON template.id = template_detail.id_template
+  //   WHERE po_id = '$id'";
+  //   $po["spp"] = getRows($q);
+  // } catch (Exception $e) {
+  //   // Code to handle the exception
+  //   echo 'Caught exception: ',  $e->getMessage(), "\n";
+  // }
+
+  // Flight::json($template);
+});
+
 Flight::route('GET /spp-approval', function () {
   $query = Flight::request()->query;
 
@@ -749,6 +809,22 @@ Flight::route('POST /new_spp', function () {
   $data = (array) json_decode($data);
 
   runQuery3('POST', 'spp', $data, '');
+});
+Flight::route('POST /new_template', function () {
+  $data = Flight::request()->getBody();
+  $data = (array) json_decode($data);
+
+  // var_dump($data);
+
+  runQuery3('POST', 'template', $data, '');
+});
+Flight::route('POST /new_template_detail', function () {
+  $data = Flight::request()->getBody();
+  $data = (array) json_decode($data);
+
+  // var_dump($data);
+
+  runQuery3('POST', 'template_detail', $data, '');
 });
 Flight::route('POST /new_po', function () {
   $data = Flight::request()->getBody();

@@ -1,10 +1,10 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
-    <q-card class="q-dialog-plugin">
+  <q-dialog ref="dialog" @hide="onDialogHide" persistent>
+    <q-card class="q-dialog-plugin" style="min-width: 900px;">
       <q-card-section>Buat Template Baru </q-card-section>
       <q-card-section>
-        <q-input label="nama template"></q-input>
-        <q-input label="Notes"></q-input>
+        <q-input label="nama template" v-model="template.name"></q-input>
+        <q-input label="Notes" v-model="template.notes"></q-input>
       </q-card-section>
 
       <q-card-section>
@@ -75,9 +75,9 @@
                     </template>
                   </q-select>
                 </td>
-                <td><q-input></q-input></td>
-                <td><q-input></q-input></td>
-                <td><q-btn label="delete"></q-btn></td>
+                <td><q-input v-model="val.qty"></q-input></td>
+                <td><q-input v-model="val.unit"></q-input></td>
+                <td><q-btn no-caps label="Hapus" @click="deleteSPPItem(i)"></q-btn></td>
               </q-tr>
             </tr>
             <tr>
@@ -96,8 +96,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn color="primary" label="OK" @click="onOKClick" />
         <q-btn color="primary" label="Cancel" @click="onCancelClick" />
+        <q-btn color="primary" label="OK" @click="onOKClick" />      
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -112,6 +112,9 @@ export default {
       option: [],
       filtered: [],
       showInput: false,
+      template: {
+        "id_user": this.$store.state.currentUser.user_id,
+      },
     };
   },
   mounted() {
@@ -132,8 +135,32 @@ export default {
         );
       });
     },
-    setModel(val) {
-      this.spp.item = val;
+    deleteSPPItem(index) {
+        this.spp_detail.splice(index, 1);
+    },
+    createTemplate(){
+      this.$http.post("/new_template", this.template, {}).then((result) => {
+          // console.log(result.data);
+          for (var i = 0; i < this.spp_detail.length; i++) {
+            this.spp_detail[i].id_template = result.data;
+            this.$http.post("/new_template_detail", this.spp_detail[i], {}).then((result) => {});
+          }
+
+          // var notifikasi = {
+          //     from_id: this.$store.state.currentUser.user_id,
+          //     to_id: this.$store.state.currentUser.manager_id,
+          //     notif: this.$store.state.currentUser.username + " membuat Template baru",
+          //     note: "",
+          //     spp_id: result.data,
+          //     reference_page: "/spp/template",
+          //     };
+          // this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+      });
+      
+    },
+    setModel(val, id) {
+      console.log(val);
+      // this.spp_detail[id].item = val;
     },
     show() {
       this.$refs.dialog.show();
@@ -147,7 +174,7 @@ export default {
     },
 
     onOKClick() {
-      this.$emit("ok", "ayam");
+      this.createTemplate();
       this.hide();
     },
 
