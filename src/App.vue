@@ -209,6 +209,20 @@
               >Buat SPP</q-item-section
             >
           </q-item>
+          <q-item
+            active-class="active-menu"
+            :active="$route.name == 'SPPTemplate'"
+            to="/spp/template"
+            clickable
+          >
+            <q-item-section avatar></q-item-section>
+            <q-item-section
+              :class="
+                $route.name == 'SPPTemplate' ? 'text-primary' : 'text-black'
+              "
+              >Template SPP</q-item-section
+            >
+          </q-item>
         </q-expansion-item>
         <q-expansion-item
           class="cursor-pointer"
