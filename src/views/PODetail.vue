@@ -217,9 +217,19 @@
                         @click="updateSPP"
                     >
                     </q-btn>
+                    <q-btn
+                        unelevated
+                        label="Re-Order"
+                        color="blue"
+                        no-caps
+                        @click="reorderList();
+                                showDialogReorder();"
+                    >
+                    </q-btn>
                 </div>
             </q-card-section>
         </q-footer>
+
     </div>
 </template>
 
@@ -227,6 +237,7 @@
 import moment from "moment";
 moment.locale("id");
 import { Money } from "v-money";
+import dialogReorderPO from "../components/dialogReorderPO.vue";
 export default {
     components: { Money },
     data() {
@@ -253,35 +264,34 @@ export default {
                 { label: "Suspended", value: "300" },
                 { label: "Closed", value: "40000" },
             ],
+            newSpp: [],
 
         };
     },
     async mounted() {
-        await this.fetchData();
-        
+        await this.fetchData();  
     },
-    // watch: {
-    //     curr: {
-    //     deep: true,
-    //         handler(val) {
-    //             for (var i = 0; i < this.sppSelect.length; i++) {
-    //             this.sppSelect[i].currency = this.curr;
-    //             }
-
-    //             if (this.curr == "IDR") {
-    //             this.money.precision = 0;
-    //             this.money.prefix = "Rp ";
-    //             } else {
-    //             this.money.precision = 2;
-    //             this.money.prefix = "$ ";
-    //             }
-    //         },
-    //     },
-    // },
-    computed: {
-
-    },
+    watch: {},
+    computed: {},
     methods: {
+        showDialogReorder() {
+            this.$q
+                .dialog({
+                    component: dialogReorderPO,
+                    parent: this,
+                    newSpp: this.newSpp,
+                    style: "border: 2px solid black",
+                })
+                .onOk((val) => {
+                console.log("OK was clicked on dialog: ", val);
+                })
+                .onCancel(() => {
+                console.log("Cancel was clicked on dialog");
+                })
+                .onDismiss(() => {
+                console.log("OK or cancel was clicked on dialog");
+                });
+        },
         async fetchData() {
             let id = decodeURIComponent(this.$route.params.id);
 
@@ -339,6 +349,21 @@ export default {
             }
 
             return money
+        },
+        reorderList(){
+            this.newSpp = [];
+            for (var i = 0; i < this.po.spp.length; i++) {
+                let temp = {};
+                temp.item = this.po.spp[i].item;
+                temp.qty = this.po.spp[i].qty;
+                temp.unit = this.po.spp[i].unit;
+                temp.cc = this.po.spp[i].cc;
+                temp.deadline = this.po.spp[i].deadline >= moment().format("YYYY-MM-DD")? moment(this.po.spp[i].deadline).format("YYYY/MM/DD") : moment().format("YYYY/MM/DD");
+                temp.description = this.po.spp[i].description;
+                temp.user_id = this.$store.state.currentUser.user_id;
+
+                this.newSpp.push(temp);
+            }
         },
         async updateSPP() {
             for (var i = 0; i < this.po.spp.length; i++) {
