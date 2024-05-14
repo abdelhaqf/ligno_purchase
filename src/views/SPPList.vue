@@ -44,6 +44,7 @@
               <q-icon name="search"></q-icon>
             </template>
           </q-input>
+          <q-btn label="Buka Plugin" @click="showDialogPlugin"></q-btn>
         </div>
 
         <q-btn
@@ -268,7 +269,7 @@
 
 <script>
 import moment from "moment";
-
+import dialogPulginContoh from "../components/dialogPulginContoh.vue";
 export default {
   data() {
     return {
@@ -312,6 +313,23 @@ export default {
       });
   },
   methods: {
+    showDialogPlugin() {
+      this.$q
+        .dialog({
+          component: dialogPulginContoh,
+          parent: this,
+          text: "kikiuw",
+        })
+        .onOk((val) => {
+          console.log("OK was clicked on dialog, sambil bawa", val);
+        })
+        .onCancel(() => {
+          console.log("Cancel was clicked on dialog");
+        })
+        .onDismiss(() => {
+          console.log("OK or cancel was clicked on dialog");
+        });
+    },
     fetchData() {
       this.sppList = [];
       let q_filter = `?current=${this.pagination.current}&limit=${
