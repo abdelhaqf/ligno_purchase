@@ -22,7 +22,7 @@
                                 <th>Deadline</th>
                                 <th>CC</th>
                                 <th>Keterangan</th>             
-                                <th class="q-mx-sm">Action</th>
+                                <th class="q-mx-sm" v-if="page == 'po_detail'">Action</th>
                             </tr>
                             </thead>
                             <!-- table body  -->
@@ -42,17 +42,17 @@
                                         />
                                     </td>
                                     <td>
-                                        {{ d.unit }}
-                                        <!-- <q-input
+                                        <!-- {{ d.unit }} -->
+                                        <q-input
                                             outlined
                                             v-model="d.unit"
                                             dense
                                             class="l-grow"
                                             placeholder="e.g. kg / m / dus"
                                         >
-                                        </q-input> -->
+                                        </q-input>
                                     </td>
-                                    <td style="min-width: 170px;">
+                                    <td style="min-width: 200px;">
                                         <!-- <q-input
                                             outlined
                                             dense
@@ -119,14 +119,14 @@
                                     <td style="min-width: 180px;">
                                         
                                         <!-- {{ d.description }}    -->
-                                        <!-- <q-input
+                                        <q-input
                                                 outlined
                                                 v-model="d.description"
                                                 dense
                                                 autogrow
                                                 class="l-grow"
-                                                /> -->
-                                        <div class="l-wrap-cell" v-if="d.description">
+                                                />
+                                        <!-- <div class="l-wrap-cell" v-if="d.description">
                                             <span>
                                                 {{ d.description.length > 40 ? d.description.slice(0, 33) : d.description }}
                                             </span>
@@ -139,9 +139,9 @@
                                                 >
                                             </span>
                                         </div>
-                                        <div v-else class="text-center l-grow">-</div>
+                                        <div v-else class="text-center l-grow">-</div> -->
                                     </td>
-                                    <td>
+                                    <td v-if="page == 'po_detail'">
                                         <q-btn
                                             label="Hapus"
                                             flat
@@ -184,7 +184,7 @@
 <script>
 import moment from "moment";
 export default {
-props: ["newSpp"],
+props: ["newSpp", "from"],
     data() {
         return {
         spp: [],
@@ -193,6 +193,7 @@ props: ["newSpp"],
     },
     mounted() {
         this.spp = this.$props.newSpp;
+        this.page = this.$props.from;
         this.getUsers();
     },
     computed: {

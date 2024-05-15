@@ -279,6 +279,7 @@ export default {
           component: dialogReorderPO,
           parent: this,
           newSpp: this.newSpp,
+          from: "po_detail",
           style: "border: 2px solid black",
         })
         .onOk((val) => {

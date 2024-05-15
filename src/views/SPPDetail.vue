@@ -90,7 +90,7 @@
     </q-card>
 
     <q-footer
-      class="atas-radius bg-white"
+      class="atas-radius bg-white q-mx-auto"
       style="max-width: 1440px !important;"
     >
       <q-card-section
@@ -123,6 +123,10 @@
           color="primary"
           text-color="white"
           label="Ajukan Ulang"
+          @click="
+              reorderList();
+              showDialogReorder();
+            "
           no-caps
         ></q-btn>
       </q-card-section>
@@ -298,6 +302,7 @@
 </template>
 
 <script>
+import dialogReorderPO from "../components/dialogReorderPO.vue";
 import moment from "moment";
 moment.locale("id");
 export default {
@@ -339,6 +344,7 @@ export default {
 
       promptApprove: false,
       promptReject: false,
+      newSpp: [],
     };
   },
   async mounted() {
@@ -547,6 +553,45 @@ export default {
       }
 
       this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+    },
+
+    reorderList() {
+      this.newSpp = [];
+      
+      let temp = {};
+      temp.item = this.spp.item;
+      temp.qty = this.spp.qty;
+      temp.unit = this.spp.unit;
+      temp.cc = this.spp.cc;
+      temp.deadline =
+        this.spp.deadline >= moment().format("YYYY-MM-DD")
+          ? moment(this.spp.deadline).format("YYYY/MM/DD")
+          : moment().format("YYYY/MM/DD");
+      temp.description = this.spp.description;
+      temp.user_id = this.$store.state.currentUser.user_id;
+
+      this.newSpp.push(temp);
+      
+    },
+
+    showDialogReorder() {
+      this.$q
+        .dialog({
+          component: dialogReorderPO,
+          parent: this,
+          newSpp: this.newSpp,
+          from: "spp_detail",
+          style: "border: 2px solid black",
+        })
+        .onOk((val) => {
+          console.log("OK was clicked on dialog: ", val);
+        })
+        .onCancel(() => {
+          console.log("Cancel was clicked on dialog");
+        })
+        .onDismiss(() => {
+          console.log("OK or cancel was clicked on dialog");
+        });
     },
   },
 };
