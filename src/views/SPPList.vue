@@ -491,11 +491,9 @@ export default {
       if (!this.selDate) return "Pilih Tanggal Dibuat";
 
       if (this.selDate.from) {
-        return `${moment(this.selDate.from).format("DD/MM/YY")} ~ ${moment(
-          this.selDate.to
-        ).format("DD/MM/YY")}`;
+        return (moment(this.selDate.from).format("DD MMMM YYYY") + " - " +moment(this.selDate.to).format("DD MMMM YYYY"));
       } else {
-        return moment(this.selDate).format("DD/MM/YY");
+        return moment(this.selDate).format("DD MMMM YYYY");
       }
     },
   },

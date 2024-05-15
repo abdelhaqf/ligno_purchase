@@ -70,11 +70,8 @@
           </template>
 
           <template v-slot:control>
-            <div class="self-center full-width no-outline" tabindex="0" v-if="(typeof date === 'string') ">
+            <div class="self-center full-width no-outline" tabindex="0">
               {{ date_model }}
-            </div>
-            <div class="self-center full-width no-outline" tabindex="0" v-if="(typeof date === 'object') ">
-              {{ date_model2 }}
             </div>
           </template>
           <q-popup-proxy
@@ -682,14 +679,13 @@ export default {
   },
   computed: {
     date_model() {
-      if (!this.date) return "Pilih Tanggal PO";
+      if (!this.selDate) return "Pilih Tanggal Dibuat";
 
-      return moment(this.date).format("DD MMMM YYYY");
-    },
-    date_model2() {
-      if (!this.date) return "Pilih Tanggal PO";
-
-      return (moment(this.date.from).format("DD MMMM YYYY") + " - " +moment(this.date.to).format("DD MMMM YYYY"));
+      if (this.selDate.from) {
+        return (moment(this.selDate.from).format("DD MMMM YYYY") + " - " +moment(this.selDate.to).format("DD MMMM YYYY"));
+      } else {
+        return moment(this.selDate).format("DD MMMM YYYY");
+      }
     },
     selectCount() {
       var count = this.selCat.length;

@@ -97,7 +97,7 @@ Flight::route('GET /spp/list/@id', function ($id) {
   $w_date = "";
   if ($query->date) {
     $w_date = "AND DATE(create_at) = '$query->date'";
-  } else if ($query->from && $query->to) {
+  } elseif ($query->from && $query->to) {
     $w_date = "AND DATE(create_at) BETWEEN '$query->from' AND '$query->to'";
   }
 
@@ -454,8 +454,20 @@ Flight::route('POST /pricelist/new', function () {
     $whereClause = "WHERE  po.vendor like '%$vendor%'";
   }
 
+  // if ($date != null) {
+  //   $whereClause = $whereClause . " AND po.po_date LIKE '%$date%'";
+  // }
+
   if ($date != null) {
-    $whereClause = $whereClause . " AND po.po_date LIKE '%$date%'";
+    if (is_string($date)) {
+      $whereClause = $whereClause . " AND po.po_date LIKE '%$date%'";
+    } else {
+      $date_o = new stdClass();
+      $date_o->from = $date["from"];
+      $date_o->to = $date["to"];
+      $whereClause = $whereClause . " AND po.po_date BETWEEN '$date_o->from' AND '$date_o->to'";
+    }
+
   }
 
   $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor, spp.description 

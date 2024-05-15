@@ -32,7 +32,7 @@
             transition-show="scale"
             transition-hide="scale"
           >
-            <q-date v-model="date" @input="change()">
+            <q-date v-model="date" @input="change()" range>
               <div class="row items-center justify-end">
                 <q-btn v-close-popup label="Close" color="primary" flat />
               </div>
@@ -250,9 +250,13 @@ export default {
   },
   computed: {
     date_model() {
-      if (!this.date) return "Pilih Tanggal PO";
+      if (!this.selDate) return "Pilih Tanggal Dibuat";
 
-      return moment(this.date).format("DD MMMM YYYY");
+      if (this.selDate.from) {
+        return (moment(this.selDate.from).format("DD MMMM YYYY") + " - " +moment(this.selDate.to).format("DD MMMM YYYY"));
+      } else {
+        return moment(this.selDate).format("DD MMMM YYYY");
+      }
     },
     selectCount() {
       var count = this.selCat.length;
@@ -293,7 +297,8 @@ export default {
           vendor: this.selectVendor,
           current: this.pagination.current,
           search: this.searchTerm ? this.searchTerm : "",
-          date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
+          // date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
+          date: this.date ? ((typeof this.date === 'string') ? moment(this.date).format("YYYY-MM-DD") :  {from: moment(this.date.from).format("YYYY-MM-DD"),to: moment(this.date.to).format("YYYY-MM-DD")}) : "",
         };
         await this.$http.post("/pricelist/new", payload).then((result) => {
           this.priceList = result.data.items;
