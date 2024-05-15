@@ -423,8 +423,8 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container class="q-mx-auto q-py-md" style="max-width: 1440px;">
-      <q-card-section class="q-px-lg">
+    <q-page-container :class="$route.name != 'Login' ? 'q-mx-auto q-py-md' : ''" :style="$route.name != 'Login' ? 'max-width: 1440px;' : ''">
+      <q-card-section class="q-px-lg" v-if="$route.name != 'Login' ">
         <div>
           <q-breadcrumbs>
             <q-breadcrumbs-el

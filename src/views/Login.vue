@@ -1,36 +1,60 @@
-<template>
-  <div class="row justify-center q-pt-xl">
-    <q-card class="loginForm">
-      <q-card-section class="q-gutter-md">
-        <q-input
-          outlined
-          v-model="user.username"
-          label="Username"
-          stack-label
-          dense
+<template class="q-pa-none">
+  <div class="row my-font" style="height: 100vh;">
+    <div style="width: 50%;" class="bg-white column items-center justify-center"> 
+      <q-img
+          :src="require('@/assets/login_bg.png') "
+          style="max-height: 100vh; max-width: 80vh;"
         />
-        <q-input
-          type="password"
-          outlined
-          v-model="user.password"
-          label="Password"
-          stack-label
+    </div>
+    <div style="width: 50%;" class="bg-grey-2 column justify-center">
+      <q-card class="loginForm bg-grey-2 q-pa-lg" flat>
+        <q-card-section class="column items-center q-gutter-y-md">
+          <q-img
+            :src="require('@/assets/Logo_Ligno.png') "
+            style="max-width: 180px;"
+          />
+          <div style="max-width: 400px; text-align: center;" class="text-h4 text-weight-bold">
+            Selamat Datang Di Ligno app <span class="text-blue">Purchase</span>
+          </div>
+        </q-card-section>
+        <q-card-section class="column q-gutter-y-md q-mt-md q-mx-lg">
+          <div>
+            <div>Username</div>
+            <q-input
+              outlined
+              v-model="user.username"
+              placeholder="Masukkan Username Anda"
+              dense
+              class="q-mt-xs bg-white"
+            />
+          </div>
+
+          <div>
+            <div>Password</div>
+            <q-input
+              type="password"
+              outlined
+              v-model="user.password"
+              placeholder="Masukkan Password Anda"
+              dense
+              @keyup.enter="login"
+              class="q-mt-xs bg-white"
+            />
+          </div>
+
+          <q-btn
+          no-caps
           dense
-          @keyup.enter="login"
+          class="full-width no-border-radius q-mt-xl q-pa-xs"
+          label="Login"
+          @click="login"
+          color="blue-7"
         />
-      </q-card-section>
+        </q-card-section>
 
-      <q-separator />
-
-      <q-btn
-        no-caps
-        dense
-        class="full-width no-border-radius"
-        label="login"
-        @click="login"
-        color="primary"
-      />
+        
     </q-card>
+    </div>
   </div>
 </template>
 
