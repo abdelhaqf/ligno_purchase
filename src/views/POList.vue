@@ -286,6 +286,13 @@
       <q-card style="width: 400px">
         <q-card-section class="row justify-between items-center">
           <div class="text-h6">Filter</div>
+          <q-btn
+            flat
+            dense
+            icon="close"
+            v-close-popup
+            @click="replaceFilter"
+          ></q-btn>
         </q-card-section>
 
         <q-separator />
@@ -493,37 +500,7 @@ export default {
     };
   },
   async created() {
-    if (this.$route.query.category) {
-      this.selCat =
-        this.$route.query.category == "null"
-          ? null
-          : this.$route.query.category.split(",");
-    }
-
-    if (this.$route.query?.vendor) {
-      this.selVendor =
-        this.$route.query.vendor == "null" ? null : this.$route.query.vendor;
-    }
-
-    if (this.$route.query?.kategori) {
-      this.selKategori =
-        this.$route.query.kategori == "null"
-          ? null
-          : this.$route.query.kategori;
-    }
-
-    if (this.$route.query?.status) {
-      this.is_received = this.$route.query.status;
-    }
-
-    if (this.$route.query?.search) {
-      this.searchTerm = this.$route.query.search;
-    }
-
-    if (this.$route.query?.date) {
-      // this.date = this.$route.query.date;
-      this.date = this.$route.query.date.includes("to") ? {from: this.$route.query.date.split("to")[0], to: this.$route.query.date.split("to")[1]} : this.$route.query.date;
-    }
+    await this.replaceFilter();
 
     await this.$http
       .get("/list_month_po", {
@@ -583,7 +560,6 @@ export default {
         }
 
         category = category.join(",");
-        console.log(category);
       }
 
       let payload = {
@@ -593,7 +569,14 @@ export default {
         kategori: this.selKategori == null ? "" : this.selKategori,
         search: this.searchTerm ? this.searchTerm : "",
         // date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
-        date: this.date ? ((typeof this.date === 'string') ? moment(this.date).format("YYYY-MM-DD") :  {from: moment(this.date.from).format("YYYY-MM-DD"),to: moment(this.date.to).format("YYYY-MM-DD")}) : "",
+        date: this.date
+          ? typeof this.date === "string"
+            ? moment(this.date).format("YYYY-MM-DD")
+            : {
+                from: moment(this.date.from).format("YYYY-MM-DD"),
+                to: moment(this.date.to).format("YYYY-MM-DD"),
+              }
+          : "",
         current: this.pagination.current,
         limit: this.pagination.limit,
       };
@@ -605,19 +588,16 @@ export default {
           },
         })
         .then((result) => {
-          for (var i = 0; i < result.data.poList.length; i++) {
-            if (i == 0) {
-              let total_count = parseInt(result.data.poList[i].total_count);
-              this.pagination.max = Math.ceil(
-                total_count / this.pagination.limit
-              );
+          let total_count = result.data.poList[0]
+            ? parseInt(result.data.poList[0].total_count)
+            : 0;
+          this.pagination.max = Math.ceil(total_count / this.pagination.limit);
 
-              this.countNot = result.data["not received"];
-              this.countPartial = result.data["half received"];
-              this.countSuspend = result.data["suspended"];
-            }
-            this.poList.push(result.data.poList[i]);
-          }
+          this.countNot = result.data["not received"];
+          this.countPartial = result.data["half received"];
+          this.countSuspend = result.data["suspended"];
+
+          this.poList = JSON.parse(JSON.stringify(result.data.poList));
         });
 
       // temporary
@@ -645,17 +625,6 @@ export default {
       });
     },
     replaceRoute() {
-      // let the_cat = null;
-      // if (this.selCat) {
-      // the_cat = this.selCat.split("/");
-      // if (the_cat.length > 1) {
-      //   the_cat = the_cat.join("%2F");
-      // } else {
-      //   the_cat = the_cat.join("");
-      // }
-
-      // }
-
       let category = [];
       if (this.selCat) {
         for (var i = 0; i < this.selCat.length; i++) {
@@ -663,7 +632,6 @@ export default {
         }
 
         category = category.join(",");
-        console.log(category);
       }
 
       this.$router.replace({
@@ -672,9 +640,53 @@ export default {
         }&category=${this.selCat ? category : null}&kategori=${
           this.selKategori
         }&search=${this.searchTerm ? this.searchTerm : ""}&date=${
-          this.date ? ((typeof this.date === 'string') ? moment(this.date).format("YYYY-MM-DD") :  (moment(this.date.from).format("YYYY-MM-DD") + "to" +moment(this.date.to).format("YYYY-MM-DD"))) : ""
+          this.date
+            ? typeof this.date === "string"
+              ? moment(this.date).format("YYYY-MM-DD")
+              : moment(this.date.from).format("YYYY-MM-DD") +
+                "to" +
+                moment(this.date.to).format("YYYY-MM-DD")
+            : ""
         }`,
       });
+    },
+    async replaceFilter() {
+      if (this.$route.query.category) {
+        this.selCat =
+          this.$route.query.category == "null"
+            ? null
+            : this.$route.query.category.split(",");
+      }
+
+      if (this.$route.query?.vendor) {
+        this.selVendor =
+          this.$route.query.vendor == "null" ? null : this.$route.query.vendor;
+      }
+
+      if (this.$route.query?.kategori) {
+        this.selKategori =
+          this.$route.query.kategori == "null"
+            ? null
+            : this.$route.query.kategori;
+      }
+
+      if (this.$route.query?.status) {
+        this.is_received = this.$route.query.status;
+      }
+
+      if (this.$route.query?.search) {
+        this.searchTerm = this.$route.query.search;
+      }
+
+      if (this.$route.query?.date) {
+        // this.date = this.$route.query.date;
+        this.date = this.$route.query.date.includes("to")
+          ? {
+              from: this.$route.query.date.split("to")[0],
+              to: this.$route.query.date.split("to")[1],
+            }
+          : this.$route.query.date;
+      }
     },
   },
   computed: {
@@ -682,7 +694,11 @@ export default {
       if (!this.date) return "Pilih Tanggal Dibuat";
 
       if (this.date.from) {
-        return (moment(this.date.from).format("DD MMMM YYYY") + " - " +moment(this.date.to).format("DD MMMM YYYY"));
+        return (
+          moment(this.date.from).format("DD MMMM YYYY") +
+          " - " +
+          moment(this.date.to).format("DD MMMM YYYY")
+        );
       } else {
         return moment(this.date).format("DD MMMM YYYY");
       }
