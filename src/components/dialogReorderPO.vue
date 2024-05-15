@@ -1,8 +1,12 @@
 <template>
     <q-dialog ref="dialog" @hide="onDialogHide" persistent>
-            <q-card style="min-width: 1200px !important;">
-                <q-card-section>
-                    Create SPP
+            <q-card class="my-font" style="min-width: 1200px !important;">
+                <q-card-section class="items-center">
+                    <div class="text-h6 text-weight-bold">Re Order</div>
+                    <div class="text-grey">Pastikan data yang akan dibuat  SPP sudah benar dan sesuai</div>
+                </q-card-section>
+                <q-separator/>
+                <q-card-section class="bg-grey-2">
                     <q-markup-table
                         wrap-cells
                         flat
@@ -49,7 +53,7 @@
                                         </q-input> -->
                                     </td>
                                     <td style="min-width: 170px;">
-                                        <q-input
+                                        <!-- <q-input
                                             outlined
                                             dense
                                             bg-color="white"
@@ -76,7 +80,29 @@
                                                 </q-popup-proxy>
                                             </q-icon>
                                             </template>
-                                        </q-input>
+                                        </q-input> -->
+                                        <q-field dense outlined class="l-grow">
+                                            <template v-slot:prepend>
+                                            <q-icon name="date_range" />
+                                            </template>
+
+                                            <template v-slot:control>
+                                            <div class="self-center full-width no-outline" tabindex="0">
+                                                {{ date_model(d.deadline) }}
+                                            </div>
+                                            </template>
+                                            <q-popup-proxy
+                                            style="width:fit-content"
+                                            transition-show="scale"
+                                            transition-hide="scale"
+                                            >
+                                            <q-date v-model="d.deadline" :options="limitDate">
+                                                <div class="row items-center justify-end">
+                                                <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-date>
+                                            </q-popup-proxy>
+                                        </q-field>
                                     </td>
                                     <td style="min-width: 170px;">
                                         <q-select
@@ -92,7 +118,7 @@
                                     </td>
                                     <td style="min-width: 180px;">
                                         
-                                        {{ d.description }}   
+                                        <!-- {{ d.description }}    -->
                                         <!-- <q-input
                                                 outlined
                                                 v-model="d.description"
@@ -100,13 +126,27 @@
                                                 autogrow
                                                 class="l-grow"
                                                 /> -->
+                                        <div class="l-wrap-cell" v-if="d.description">
+                                            <span>
+                                                {{ d.description.length > 40 ? d.description.slice(0, 33) : d.description }}
+                                            </span>
+                                            <span v-if="d.description.length > 40" class=" no-wrap ">
+                                                ...
+                                                <q-tooltip
+                                                content-style="width:300px"
+                                                content-class="l-text-detail bg-white text-black shadow-2"
+                                                >{{ d.description }}</q-tooltip
+                                                >
+                                            </span>
+                                        </div>
+                                        <div v-else class="text-center l-grow">-</div>
                                     </td>
                                     <td>
                                         <q-btn
                                             label="Hapus"
                                             flat
                                             no-caps
-                                            color="blue"
+                                            color="negative"
                                             dense
                                             @click="deleteSPPItem(i)"
                                         />
@@ -115,13 +155,13 @@
                             </tbody>
                     </q-markup-table>
                 </q-card-section>
-                <q-card-actions align="between" class="row q-gutter-x-sm bg-grey-3 q-pa-md">
+                <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md">
                     <q-btn
                         outline
-                        label="Batal"
+                        label="Tidak, Kembali"
                         dense
-                        class="l-grow"
-                        color="grey-8"
+                        class="l-grow q-py-sm text-weight-bold"
+                        color="black"
                         no-caps
                         @click="onCancelClick"
                         style="width: 30%"
@@ -132,7 +172,7 @@
                         no-caps
                         color="primary"
                         label="Ya, Buat SPP"
-                        class=" l-grow"
+                        class=" l-grow q-py-sm text-weight-bold"
                         style="width: 40%"
                         @click="onOKClick"
                     />
@@ -155,7 +195,14 @@ props: ["newSpp"],
         this.spp = this.$props.newSpp;
         this.getUsers();
     },
+    computed: {
+    },
     methods: {
+        date_model(date) {
+            if (!date) return "Pilih Tanggal Dibutuhkan";
+
+            return moment(date).format("DD MMMM YYYY");
+        },
         show() {
             this.$refs.dialog.show();
         },
@@ -210,7 +257,7 @@ props: ["newSpp"],
                     notif: this.$store.state.currentUser.username + " membuat SPP baru",
                     note: "",
                     spp_id: result.data,
-                    reference_page: "/spp/approval",
+                    reference_page: "/spp/list",
                     };
                     this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
                 });
@@ -220,4 +267,13 @@ props: ["newSpp"],
     },
 };
 </script>
+
+<style lang="scss" scoped>
+.l-wrap-cell {
+  width: 150px !important;
+  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
+  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
+  word-break: break-all;
+}
+</style>
   
