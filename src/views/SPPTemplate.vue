@@ -4,7 +4,7 @@
       <q-card-section class="row justify-center"
         ><q-btn label="add template" @click="showDialogTemplate(null)"></q-btn>
       </q-card-section>
-      
+
       <!-- table  -->
       <q-markup-table class="stickyTable" style="height: calc(100vh - 320px);">
         <thead class="bg-blue-grey-14 text-white">
@@ -24,16 +24,11 @@
             <td class="text-left l-grow">{{ d.name }}</td>
             <td class="text-center">
               item
-            
             </td>
             <td>
               <div class="l-wrap-cell">
                 <span>
-                  {{
-                    d.notes.length > 70
-                      ? d.notes.slice(0, 63)
-                      : d.notes
-                  }}
+                  {{ d.notes.length > 70 ? d.notes.slice(0, 63) : d.notes }}
                 </span>
                 <span v-if="d.notes.length > 70" class=" no-wrap ">
                   ...
@@ -49,8 +44,9 @@
               <q-btn
                 flat
                 no-caps
-                label="Add"
+                label="Detail"
                 color="primary"
+                @click="showDialogTemplate(d.id)"
               ></q-btn>
             </td>
           </tr>
@@ -76,18 +72,13 @@ export default {
     this.fetchData();
   },
   methods: {
-    async fetchData(){
+    async fetchData() {
       this.template = [];
-      this.$http
-        .get(
-          `/template_list`,
-          {}
-        )
-        .then((result) => {
-          for (var i = 0; i < result.data.length; i++) {
-            this.template.push(result.data[i]);
-          }
-        });
+      this.$http.get(`/template_list`, {}).then((result) => {
+        for (var i = 0; i < result.data.length; i++) {
+          this.template.push(result.data[i]);
+        }
+      });
     },
     showDialogTemplate(id) {
       console.log("called");

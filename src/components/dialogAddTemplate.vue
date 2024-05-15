@@ -6,7 +6,6 @@
         <q-input label="nama template" v-model="template.name"></q-input>
         <q-input label="Notes" v-model="template.notes"></q-input>
       </q-card-section>
-
       <q-card-section>
         <q-markup-table>
           <thead>
@@ -19,9 +18,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(val, i) in spp_detail" :key="i">
+            <tr v-for="(val, i) in template.template_detail" :key="i">
               <q-tr style="display: contents;" v-if="!val.id">
-                <td>
+                <td class="text-center">
                   {{ i + 1 }}
                 </td>
                 <td>
@@ -75,9 +74,41 @@
                     </template>
                   </q-select>
                 </td>
-                <td><q-input v-model="val.qty"></q-input></td>
-                <td><q-input v-model="val.unit"></q-input></td>
-                <td><q-btn no-caps label="Hapus" @click="deleteSPPItem(i)"></q-btn></td>
+                <td>
+                  <q-input
+                    outlined
+                    dense
+                    type="number"
+                    v-model="val.qty"
+                    
+                  ></q-input>
+                </td>
+                <td><q-input outlined
+                    dense v-model="val.unit" style="width:200px"></q-input></td>
+                <td>
+                  <q-btn
+                    no-caps
+                    label="Hapus"
+                    @click="deleteSPPItem(i)"
+                  ></q-btn>
+                </td>
+              </q-tr>
+              <q-tr style="display: contents;" v-else>
+                <td>
+                  {{ i + 1 }}
+                </td>
+                <td>
+                  {{ val.item }}
+                </td>
+                <td>{{ val.qty }}</td>
+                <td>{{ val.unit }}</td>
+                <td>
+                  <q-btn
+                    no-caps
+                    label="Hapus"
+                    @click="deleteSPPItem(i)"
+                  ></q-btn>
+                </td>
               </q-tr>
             </tr>
             <tr>
@@ -85,7 +116,12 @@
                 colspan="5"
                 class="text-center"
                 @click="
-                  spp_detail.push({ id: null, item: '', qty: 0, unit: '' })
+                  template.template_detail.push({
+                    id: null,
+                    item: '',
+                    qty: 0,
+                    unit: '',
+                  })
                 "
               >
                 + tambah barang
@@ -95,9 +131,13 @@
         </q-markup-table>
       </q-card-section>
 
-      <q-card-actions align="right">
+      <q-card-actions align="right" v-if="!$props.id_template">
         <q-btn color="primary" label="Cancel" @click="onCancelClick" />
-        <q-btn color="primary" label="OK" @click="onOKClick" />      
+        <q-btn color="primary" label="Add Template" @click="onOKClick" />
+      </q-card-actions>
+      <q-card-actions align="right" v-else>
+        <q-btn color="primary" label="Cancel" @click="onCancelClick" />
+        <q-btn color="primary" label="Edit Template" @click="onOKClick" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -108,23 +148,25 @@ export default {
   props: ["id_template"],
   data() {
     return {
-      spp_detail: [],
       option: [],
       filtered: [],
       showInput: false,
       template: {
-        "id_user": this.$store.state.currentUser.user_id,
+        id_user: this.$store.state.currentUser.user_id,
+        template_detail: [],
+        notes: "",
       },
     };
   },
-  mounted() {
-    this.$http.get("/list_item", {}).then((result) => {
+  async mounted() {
+    if (this.$props.id_template) {
+      await this.getTemplate();
+    }
+    await this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
       this.option = this.option.filter((obj) => obj.value !== "");
       if (this.option.length == 0) this.showInput = true;
     });
-    if (this.$props.id_template) {
-    }
   },
   methods: {
     filterOP(val, update, abort) {
@@ -136,27 +178,24 @@ export default {
       });
     },
     deleteSPPItem(index) {
-        this.spp_detail.splice(index, 1);
+      this.template.template_detail.splice(index, 1);
     },
-    createTemplate(){
+    async getTemplate() {
+      await this.$http
+        .get(`/template_detail/${this.$props.id_template}`)
+        .then((resp) => {
+          this.template = JSON.parse(JSON.stringify(resp.data));
+        });
+    },
+    createTemplate() {
       this.$http.post("/new_template", this.template, {}).then((result) => {
-          // console.log(result.data);
-          for (var i = 0; i < this.spp_detail.length; i++) {
-            this.spp_detail[i].id_template = result.data;
-            this.$http.post("/new_template_detail", this.spp_detail[i], {}).then((result) => {});
-          }
-
-          // var notifikasi = {
-          //     from_id: this.$store.state.currentUser.user_id,
-          //     to_id: this.$store.state.currentUser.manager_id,
-          //     notif: this.$store.state.currentUser.username + " membuat Template baru",
-          //     note: "",
-          //     spp_id: result.data,
-          //     reference_page: "/spp/template",
-          //     };
-          // this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+        // for (var i = 0; i < this.template_detail.length; i++) {
+        //   this.spp_detail[i].id_template = result.data;
+        //   this.$http
+        //     .post("/new_template_detail", this.spp_detail[i], {})
+        //     .then((result) => {});
+        // }
       });
-      
     },
     setModel(val, id) {
       console.log(val);
