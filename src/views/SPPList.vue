@@ -129,7 +129,7 @@
         </tbody>
       </q-markup-table>
 
-      <q-card-section class="row justify-center">
+      <q-card-section class="row justify-center q-py-sm">
         <q-pagination
           input
           :max="pagination.max"
@@ -491,7 +491,11 @@ export default {
       if (!this.selDate) return "Pilih Tanggal Dibuat";
 
       if (this.selDate.from) {
-        return (moment(this.selDate.from).format("DD MMMM YYYY") + " - " +moment(this.selDate.to).format("DD MMMM YYYY"));
+        return (
+          moment(this.selDate.from).format("DD MMMM YYYY") +
+          " - " +
+          moment(this.selDate.to).format("DD MMMM YYYY")
+        );
       } else {
         return moment(this.selDate).format("DD MMMM YYYY");
       }

@@ -262,7 +262,10 @@
                   "
                   rounded
                   color="red-8"
-                  :label="parseInt(count.count_approve + count.count_approvePM)"
+                  :label="
+                    parseInt(count.count_approve) +
+                      parseInt(count.count_approvePM)
+                  "
                 ></q-badge>
               </q-item-label>
             </q-item-section>

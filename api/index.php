@@ -583,11 +583,22 @@ Flight::route('GET /count_data/@userid/@ispurch', function ($userid, $ispurch) {
             WHERE purch_manager_approve = 0 AND manager_approve = 1
             AND $userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) 
                 UNION
-            SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3',COUNT(DISTINCT po.po_id) AS 'col4' FROM `po` 
-            INNER JOIN spp ON spp.po_id = po.po_id
-            WHERE spp.is_received <> 2
-            AND ($userid IN (SELECT user_id FROM user WHERE is_purch_manager = 1) OR po.user_id = $userid) 
-              ) tb";
+            SELECT 0 AS 'col1',0 AS 'col2',0 AS 'col3',COUNT(*) AS 'col4' 
+            FROM (SELECT po.po_id, po.user_id, po.vendor, po.po_date,spp.cost_category, po.create_at, 
+            spp.currency,spp.kategori, spp.est_arrival, usr.name AS 'handler_name', 
+            CASE WHEN SUM(spp.is_received) = 2 * COUNT(spp.is_received) THEN 'fully received'
+            WHEN SUM(spp.is_received) = 0 THEN 'not received' 
+            WHEN SUM(spp.is_received) >= 4000 THEN 'closed'
+            WHEN SUM(spp.is_received) >= 300 THEN 'suspended' 
+            ELSE 'half received' END as 'is_received',
+            spp.item, 
+            COUNT(DISTINCT CASE WHEN spp.sync IS NOT NULL THEN spp.sync END) AS synced
+            FROM po INNER JOIN spp on po.po_id = spp.po_id 
+            INNER JOIN `user` usr on usr.user_id = po.user_id
+            GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
+        WHERE is_received = 'not received' OR is_received = 'suspended' OR is_received = 'half received'
+            
+            ) tb";
   $link = getLink();
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $arr = array();
@@ -854,14 +865,24 @@ Flight::route('GET /count_notif/@id', function ($id) {
          AND `is_read` = 'N' AND to_id <> from_id ";
   runQuery2($q);
 });
-Flight::route('GET /notifikasi/@id', function ($id) {
-  $q = " SELECT n.* , user.name
-         FROM notifikasi n
-         INNER JOIN user ON user.user_id = n.from_id
-         WHERE to_id = $id 
-         ORDER BY notif_id DESC
-         LIMIT 20
-         ";
+
+Flight::route('GET /notifikasi/@id/@status(/@last)', function ($id, $status, $last) {
+  $w_last = "";
+  if ($last) {
+    $w_last = "AND notif_id < $last";
+  }
+
+  $w_read = "";
+  if ($status == 'UNREAD') {
+    $w_read = "AND is_read = 'N'";
+  }
+
+  $q = " SELECT n.* , user.name, user.username 
+  FROM notifikasi n
+  INNER JOIN user ON user.user_id = n.from_id
+  WHERE to_id = $id AND to_id <> from_id $w_last $w_read
+  ORDER BY notif_id DESC
+  LIMIT 20";
   runQuery($q);
 });
 

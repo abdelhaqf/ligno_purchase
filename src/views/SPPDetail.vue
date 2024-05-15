@@ -4,9 +4,6 @@
       <!-- form  -->
 
       <q-item class="q-py-md">
-        <!-- <q-item-section avatar>
-          <q-avatar color="light-blue-2" text-color="primary" icon="receipt" />
-        </q-item-section> -->
         <q-item-section side>
           <q-btn flat icon="arrow_back" @click="$router.go(-1)" dense></q-btn>
         </q-item-section>
@@ -65,7 +62,7 @@
           <div class="text-bold text-right">{{ spp.description }}</div>
         </div>
       </q-card-section>
-      <q-scroll-area style="height:calc(100vh - 480px)" class="q-px-md">
+      <q-scroll-area style="height:calc(100vh - 510px)" class="q-px-md">
         <div class="text-bold l-text-detail">SPP History</div>
         <q-timeline layout="comfortable" side="right">
           <q-timeline-entry
@@ -74,7 +71,10 @@
             :key="i"
           >
             <template v-slot:title>
-              <div>
+              <div
+                class="l-text-detail text-capitalize text-bold"
+                style="line-height: 1.4;"
+              >
                 {{ val.status }}
               </div>
             </template>
@@ -90,16 +90,18 @@
     </q-card>
 
     <q-footer
-      v-if="
-        ($route.query.approval == 'manager' &&
-          $store.state.currentUser.user_id == spp.manager_id) ||
-          ($route.query.approval == 'purchasing' &&
-            $store.state.currentUser.is_purch_manager == 1)
-      "
-      style="max-width: 1440px;"
-      class="q-mx-auto atas-radius bg-white"
+      class="atas-radius bg-white"
+      style="max-width: 1440px !important;"
     >
-      <q-card-section class="row justify-end q-gutter-x-md">
+      <q-card-section
+        v-if="
+          ($route.query.approval == 'manager' &&
+            $store.state.currentUser.user_id == spp.manager_id) ||
+            ($route.query.approval == 'purchasing' &&
+              $store.state.currentUser.is_purch_manager == 1)
+        "
+        class="row justify-end q-gutter-x-md"
+      >
         <q-btn
           unelevated
           label="Tolak"
@@ -112,6 +114,15 @@
           label="Setujui"
           color="positive"
           @click="promptApprove = true"
+          no-caps
+        ></q-btn>
+      </q-card-section>
+      <q-card-section v-else class="row justify-end">
+        <q-btn
+          unelevated
+          color="primary"
+          text-color="white"
+          label="Ajukan Ulang"
           no-caps
         ></q-btn>
       </q-card-section>
@@ -545,6 +556,12 @@ export default {
 .q-timeline__subtitle {
   width: 175px !important;
   padding-right: 0 !important;
+}
+.q-timeline__title {
+  margin-bottom: 0px !important;
+}
+.q-timeline__content {
+  padding-bottom: 16px !important;
 }
 </style>
 

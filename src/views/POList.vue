@@ -111,7 +111,7 @@
           wrap-cells
           flat
           class="stickyTable"
-          style="height: calc(100vh - 375px);"
+          style="height: calc(100vh - 355px);"
         >
           <!-- table head -->
           <thead class="text-white">
@@ -262,7 +262,7 @@
 
         <q-separator />
 
-        <q-card-section class="flex flex-center q-py-md">
+        <q-card-section class="flex flex-center q-py-sm">
           <q-pagination
             input
             :max="pagination.max"

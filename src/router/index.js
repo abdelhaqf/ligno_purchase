@@ -99,6 +99,7 @@ const routes = [
     path: "/notification",
     name: "notification",
     component: () => import("../views/Notification.vue"),
+    meta: { title: "Notifikasi", path: [""] },
   },
   {
     path: "/print/:data",

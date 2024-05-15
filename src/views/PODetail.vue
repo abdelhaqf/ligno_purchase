@@ -51,7 +51,7 @@
           </div>
         </div>
       </q-card-section>
-      <q-scroll-area style="height:calc(100vh - 480px)" class="q-px-md">
+      <q-scroll-area style="height:calc(100vh - 490px)" class="q-px-md">
         <q-markup-table
           wrap-cells
           flat

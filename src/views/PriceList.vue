@@ -16,8 +16,15 @@
             <q-icon name="search"></q-icon>
           </template>
         </q-input>
-       
-        <q-field v-model="date" clearable dense outlined style="width: 33%;" @clear="change()">
+
+        <q-field
+          v-model="date"
+          clearable
+          dense
+          outlined
+          style="width: 33%;"
+          @clear="change()"
+        >
           <template v-slot:prepend>
             <q-icon name="date_range" />
           </template>
@@ -75,7 +82,6 @@
             ></q-btn>
           </template>
         </q-select>
-        
       </q-card-section>
       <div v-if="priceList.length">
         <q-markup-table
@@ -83,8 +89,7 @@
           square
           wrap-cells
           class="stickyTable"
-          style="height:calc(100vh - 280px)"
-          
+          style="height:calc(100vh - 310px)"
         >
           <thead>
             <tr class="bg-blue-grey-14 text-white">
@@ -98,12 +103,8 @@
               <th class="text-center">Action</th>
             </tr>
           </thead>
-          <tbody class="bg-blue-grey-1">
-            <tr
-              v-for="(p, i) in priceList"
-              :key="i"
-              :class="{ 'bg-white': i % 2 == 0 }"
-            >
+          <tbody>
+            <tr v-for="(p, i) in priceList" :key="i">
               <td class="text-center">
                 {{ (pagination.current - 1) * 25 + i + 1 }}
               </td>
@@ -112,69 +113,68 @@
               <td class="text-left">
                 <!-- {{ p.vendor }} -->
                 <div class="l-wrap-cell" style="width: 150px !important;">
-                    <span>
+                  <span>
                     {{
-                        p.vendor.length > 40
-                        ? p.vendor.slice(0, 35)
-                        : p.vendor
+                      p.vendor.length > 40 ? p.vendor.slice(0, 35) : p.vendor
                     }}
-                    </span>
-                    <span v-if="p.vendor.length > 40" class=" no-wrap ">
+                  </span>
+                  <span v-if="p.vendor.length > 40" class=" no-wrap ">
                     ...
                     <q-tooltip
-                        content-style="width:300px"
-                        content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ p.vendor }}</q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ p.vendor }}</q-tooltip
                     >
-                    </span>
+                  </span>
                 </div>
               </td>
               <td class="text-left">
                 <!-- {{ p.item }} -->
                 <div class="l-wrap-cell" style="width: 200px !important;">
-                    <span>
-                    {{
-                        p.item.length > 25
-                        ? p.item.slice(0, 24)
-                        : p.item
-                    }}
-                    </span>
-                    <span v-if="p.item.length > 25" class=" no-wrap ">
+                  <span>
+                    {{ p.item.length > 25 ? p.item.slice(0, 24) : p.item }}
+                  </span>
+                  <span v-if="p.item.length > 25" class=" no-wrap ">
                     ...
                     <q-tooltip
-                        content-style="width:300px"
-                        content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ p.item }}</q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ p.item }}</q-tooltip
                     >
-                    </span>
+                  </span>
                 </div>
-                <div class="text-grey">
-                  {{ p.qty }} {{ p.unit }}
-                </div>
+                <div class="text-grey">{{ p.qty }} {{ p.unit }}</div>
               </td>
               <td class="text-left">
                 {{
-                  setCurrency(parseFloat(p.price) / parseFloat(p.qty), p.currency)
+                  setCurrency(
+                    parseFloat(p.price) / parseFloat(p.qty),
+                    p.currency
+                  )
                 }}
                 / {{ p.unit }}
               </td>
               <td>
-                <div class="l-wrap-cell" v-if="p.description" style="width: 200px !important;">
-                    <span>
+                <div
+                  class="l-wrap-cell"
+                  v-if="p.description"
+                  style="width: 200px !important;"
+                >
+                  <span>
                     {{
-                        p.description.length > 55
+                      p.description.length > 55
                         ? p.description.slice(0, 50)
                         : p.description
                     }}
-                    </span>
-                    <span v-if="p.description.length > 55" class=" no-wrap ">
+                  </span>
+                  <span v-if="p.description.length > 55" class=" no-wrap ">
                     ...
                     <q-tooltip
-                        content-style="width:300px"
-                        content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ p.description }}</q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ p.description }}</q-tooltip
                     >
-                    </span>
+                  </span>
                 </div>
                 <div v-else class="l-grow text-center">-</div>
               </td>
@@ -198,7 +198,7 @@
             </tr>
           </tbody> -->
         </q-markup-table>
-        <q-separator/>
+        <q-separator />
         <q-card-actions align="center">
           <q-pagination
             v-model="pagination.current"
@@ -208,7 +208,7 @@
           ></q-pagination>
         </q-card-actions>
       </div>
-      
+
       <q-card-section
         class="column items-center justify-center"
         style="height: calc(100vh - 275px);"
@@ -217,7 +217,6 @@
         <q-img width="400px" :src="`./empty.png`"></q-img>
         <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
       </q-card-section>
-      
     </q-card>
   </div>
 </template>
@@ -253,7 +252,11 @@ export default {
       if (!this.date) return "Pilih Tanggal Dibuat";
 
       if (this.date.from) {
-        return (moment(this.date.from).format("DD MMMM YYYY") + " - " +moment(this.date.to).format("DD MMMM YYYY"));
+        return (
+          moment(this.date.from).format("DD MMMM YYYY") +
+          " - " +
+          moment(this.date.to).format("DD MMMM YYYY")
+        );
       } else {
         return moment(this.date).format("DD MMMM YYYY");
       }
@@ -298,7 +301,14 @@ export default {
           current: this.pagination.current,
           search: this.searchTerm ? this.searchTerm : "",
           // date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
-          date: this.date ? ((typeof this.date === 'string') ? moment(this.date).format("YYYY-MM-DD") :  {from: moment(this.date.from).format("YYYY-MM-DD"),to: moment(this.date.to).format("YYYY-MM-DD")}) : "",
+          date: this.date
+            ? typeof this.date === "string"
+              ? moment(this.date).format("YYYY-MM-DD")
+              : {
+                  from: moment(this.date.from).format("YYYY-MM-DD"),
+                  to: moment(this.date.to).format("YYYY-MM-DD"),
+                }
+            : "",
         };
         await this.$http.post("/pricelist/new", payload).then((result) => {
           this.priceList = result.data.items;
@@ -330,10 +340,10 @@ export default {
       }
     },
     momentFormatDate(date) {
-        if (date) {
-            return moment(date).format("DD MMM YYYY");
-        }
-        return "-";
+      if (date) {
+        return moment(date).format("DD MMM YYYY");
+      }
+      return "-";
     },
   },
 };

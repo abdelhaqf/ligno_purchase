@@ -1,10 +1,6 @@
 <template>
   <div class="row relative q-px-lg ">
-    <q-card
-      flat
-      bordered
-      class="col-12 bg-white rounded-borders"
-    >
+    <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- table control -->
       <q-card-section class="row justify-between q-gutter-x-md">
         <div>
@@ -23,7 +19,7 @@
             </template>
           </q-input>
         </div>
-        
+
         <div class="row items-center q-gutter-x-sm">
           <q-select
             outlined
@@ -50,14 +46,13 @@
             style="width: 230px;"
           ></q-select>
         </div>
-        
       </q-card-section>
-  
+
       <!-- table header  -->
       <q-markup-table
         v-if="sppList.length"
         class="stickyTable"
-        style="height: calc(100vh - 275px);"
+        style="height: calc(100vh - 280px);"
       >
         <!-- table head -->
         <thead class="text-white">
@@ -117,7 +112,7 @@
                     @click="
                       clearSelect(i);
                       toPreview();
-                      "
+                    "
                   >
                     Print
                   </q-item>
@@ -152,9 +147,10 @@
           <q-btn
             unelevated
             label="Print"
-            color="white" 
-            text-color="black" 
-            outline style="color: black;"
+            color="white"
+            text-color="black"
+            outline
+            style="color: black;"
             @click="toPreview"
             no-caps
             icon="print"
@@ -213,7 +209,6 @@ export default {
 
       searchTerm: "",
       check_all: false,
-
 
       curr: "IDR",
       type: "PO",
@@ -292,7 +287,7 @@ export default {
       // let resp = this.$http.get("/dept")
       this.$http.get("/dept").then((resp) => {
         let dept = resp.data.map((a) => a.dept);
-        this.optDept = dept
+        this.optDept = dept;
       });
     },
     fetchData() {
@@ -306,8 +301,8 @@ export default {
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
             "/" +
-            this.$store.state.currentUser.is_purch_manager
-            + q_filter,
+            this.$store.state.currentUser.is_purch_manager +
+            q_filter,
 
           {}
         )
