@@ -236,9 +236,9 @@ Flight::route('POST /po', function () {
   // var_dump($date);
 
   $w_search = "";
-  if ($search) $w_search = "AND po_id LIKE '%$search%'";
+  if ($search && $search != '') $w_search = "AND po_id LIKE '%$search%'";
 
-  if ($date != null) {
+  if ($date != null && $date != '') {
     if (is_string($date)) {
       $w_search = $w_search . " AND po_date LIKE '%$date%'";
     } else {
@@ -247,7 +247,6 @@ Flight::route('POST /po', function () {
       $date_o->to = $date["to"];
       $w_search = $w_search . " AND po_date BETWEEN '$date_o->from' AND '$date_o->to'";
     }
-
   }
 
   $w_src = "";
@@ -346,7 +345,7 @@ Flight::route('POST /po', function () {
                 FROM po INNER JOIN spp on po.po_id = spp.po_id 
                 INNER JOIN `user` usr on usr.user_id = po.user_id
                 GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
-        WHERE is_received = 'not received' OR is_received = 'suspended' OR is_received = 'half received'
+        WHERE 1=1 $w_cat $w_vendor $w_kategori $w_search AND(is_received = 'not received' OR is_received = 'suspended' OR is_received = 'half received')
         GROUP BY is_received";
   $resp = getRows($q);
   for ($i = 0; $i < count($resp); $i++) {
@@ -467,7 +466,6 @@ Flight::route('POST /pricelist/new', function () {
       $date_o->to = $date["to"];
       $whereClause = $whereClause . " AND po.po_date BETWEEN '$date_o->from' AND '$date_o->to'";
     }
-
   }
 
   $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor, spp.description 
