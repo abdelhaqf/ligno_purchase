@@ -120,62 +120,37 @@ Flight::route('GET /spp/list/@id', function ($id) {
 
 Flight::route('GET /template_list', function () {
 
-  // $query = Flight::request()->query;
+  $query = Flight::request()->query;
 
-  // $current = $query->current;
-  // $limit = $query->limit;
-  // $offset = ($current - 1) * $limit;
+  $current = $query->current;
+  $limit = $query->limit;
+  $offset = ($current - 1) * $limit;
 
-  // $w_search = "";
-  // if ($query->search != "") {
-  //   $w_search = "AND spp.item LIKE '%$query->search%'";
-  // }
+  $w_search = "";
+  if ($query->search != "") {
+    $w_search = "AND spp.item LIKE '%$query->search%'";
+  }
 
-  // $w_date = "";
-  // if ($query->date) {
-  //   $w_date = "AND DATE(create_at) = '$query->date'";
-  // } else if ($query->from && $query->to) {
-  //   $w_date = "AND DATE(create_at) BETWEEN '$query->from' AND '$query->to'";
+  $q = "SELECT * FROM template";
+  $templates = getRows($q);
+  for ($i = 0; $i < count($templates); $i++) {
+    $template = $templates[$i];
 
-  // $q = "SELECT template.name, template.note,
-  //         (SELECT *
-  //         FROM template_detail
-  //         INNER JOIN user ON spp.user_id = user.user_id
-  //         LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-  //         WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
-  //         ) AS detail
-  //       FROM template
-  //       INNER JOIN user ON spp.user_id = user.user_id
-  //       LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-  //       WHERE (spp.user_id = $id OR spp.cc = $id) $w_search $w_date
-  //       ORDER BY spp.spp_id DESC
-  //       LIMIT $limit OFFSET $offset
-  //   ";
-  // runQuery($q);
+    $q_detail = "SELECT * FROM template_detail WHERE id_template = {$template['id']} AND is_active =1";
+    $templates[$i]['details'] = getRows($q_detail);
+  }
 
-  // }
-  
-  $q = "SELECT *
-        FROM template
-        INNER JOIN template_detail ON template.id = template_detail.id_template
-        GROUP BY template.id
-        ORDER BY template.id DESC
-    ";
-  runQuery($q);
-  // $template = getRows($q)[0];
+  Flight::json($templates);
+});
 
-  // try {
-  //   $q = "SELECT spp.*, user.name
-  //   FROM template 
-  //   INNER JOIN template_detail ON template.id = template_detail.id_template
-  //   WHERE po_id = '$id'";
-  //   $po["spp"] = getRows($q);
-  // } catch (Exception $e) {
-  //   // Code to handle the exception
-  //   echo 'Caught exception: ',  $e->getMessage(), "\n";
-  // }
+Flight::route('GET /template_detail/@id', function ($id) {
+  $q = "SELECT * FROM template WHERE id = $id";
+  $template = getRows($q)[0];
 
-  // Flight::json($template);
+  $q_detail = "SELECT * FROM template_detail WHERE id_template = $id";
+  $template['template_detail'] = getRows($q_detail);
+
+  Flight::json($template);
 });
 
 Flight::route('GET /spp-approval', function () {
@@ -810,19 +785,40 @@ Flight::route('POST /new_spp', function () {
 
   runQuery3('POST', 'spp', $data, '');
 });
+
 Flight::route('POST /new_template', function () {
-  $data = Flight::request()->getBody();
-  $data = (array) json_decode($data);
+  $link = getLink();
+  $data = Flight::request()->data;
+  mysqli_begin_transaction($link);
 
-  // var_dump($data);
+  try {
+    $q = "INSERT INTO template SET name = '{$data['name']}',
+    notes = '{$data['notes']}',
+    id_user = '{$data['id_user']}'";
+    mysqli_query($link, $q);
+    $id_template = mysqli_insert_id($link);
 
-  runQuery3('POST', 'template', $data, '');
+    for ($i = 0; $i < count($data['template_detail']); $i++) {
+      $detail = $data['template_detail'][$i];
+      $q_detail = "INSERT INTO template_detail SET item = '{$detail['item']}',
+      id_template = $id_template,
+      qty = '{$detail['qty']}',
+      unit = '{$detail['unit']}'";
+      mysqli_query($link, $q_detail);
+    }
+
+    mysqli_commit($link);
+  } catch (mysqli_sql_exception $exception) {
+    die($exception);
+  }
 });
+
 Flight::route('POST /new_template_detail', function () {
   $data = Flight::request()->getBody();
+  $template = $data;
+  unset($teamplate['template_detail']);
   $data = (array) json_decode($data);
 
-  // var_dump($data);
 
   runQuery3('POST', 'template_detail', $data, '');
 });

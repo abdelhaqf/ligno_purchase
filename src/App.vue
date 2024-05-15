@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh LpR fFf" class="bg-grey-2 my-font l-text-body">
     <q-header
-      v-if="this.$route.name != 'Login'"
+      v-if="!isLogin && $route.name != 'print_preview'"
       unelevated
       class="bg-white text-black"
       style="box-shadow: 0 8px 28px 0 #f1f1f1  !important"

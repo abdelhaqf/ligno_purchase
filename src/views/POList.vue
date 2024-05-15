@@ -129,7 +129,17 @@
           </thead>
           <!-- table body  -->
           <tbody>
-            <tr v-for="(d, i) in poList" :key="i">
+            <tr
+              v-for="(d, i) in poList"
+              :key="i"
+              :class="{
+                'bg-red-2':
+                  isPastEstimation(d.est_arrival) &&
+                  (is_received == 'not' ||
+                    is_received == 'half' ||
+                    is_received == 'suspend'),
+              }"
+            >
               <td class="text-center q-px-xs">
                 {{ (pagination.current - 1) * pagination.limit + i + 1 }}
               </td>
@@ -145,44 +155,39 @@
               <td class="text-left">
                 <!-- {{ d.vendor }} -->
                 <div>
-                    <span>
+                  <span>
                     {{
-                        d.vendor.length > 20
-                        ? d.vendor.slice(0, 13)
-                        : d.vendor
+                      d.vendor.length > 20 ? d.vendor.slice(0, 13) : d.vendor
                     }}
-                    </span>
-                    <span v-if="d.vendor.length > 20" class=" no-wrap ">
+                  </span>
+                  <span v-if="d.vendor.length > 20" class=" no-wrap ">
                     ...
                     <q-tooltip
-                        content-style="width:300px"
-                        content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ d.vendor }}</q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ d.vendor }}</q-tooltip
                     >
-                    </span>
+                  </span>
                 </div>
               </td>
               <td class="text-left">
                 <!-- {{ d.item }} -->
                 <div>
-                    <span>
-                    {{
-                        d.item.length > 20
-                        ? d.item.slice(0, 13)
-                        : d.item
-                    }}
-                    </span>
-                    <span v-if="d.item.length > 20" class=" no-wrap ">
+                  <span>
+                    {{ d.item.length > 20 ? d.item.slice(0, 13) : d.item }}
+                  </span>
+                  <span v-if="d.item.length > 20" class=" no-wrap ">
                     ...
                     <q-tooltip
-                        content-style="width:300px"
-                        content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ d.item }}</q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ d.item }}</q-tooltip
                     >
-                    </span>
-                    <span>{{ d.spp_count > 1 ? "(+" + (d.spp_count - 1) + ")" : "" }}</span>
+                  </span>
+                  <span>{{
+                    d.spp_count > 1 ? "(+" + (d.spp_count - 1) + ")" : ""
+                  }}</span>
                 </div>
-
               </td>
               <td class="text-center">
                 {{ d.cost_category }}
@@ -551,6 +556,10 @@ export default {
     //   else if (label == "closed") return "dark";
     //   else return "primary";
     // },
+    isPastEstimation(est_date) {
+      if (moment().isAfter(moment(est_date))) return true;
+      return false;
+    },
     momentFormatDate(date) {
       if (date) {
         return moment(date).format("DD MMM YYYY");

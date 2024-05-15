@@ -40,7 +40,9 @@
             <tr>
               <td style="width:100px">Requester</td>
               <td style="width:5px">:</td>
-              <td class="text-left text-capitalize">{{ val.name }} - {{ val.dept }}</td>
+              <td class="text-left text-capitalize">
+                {{ val.name }} - {{ val.dept }}
+              </td>
             </tr>
           </q-markup-table>
 

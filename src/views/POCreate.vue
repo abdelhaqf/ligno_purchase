@@ -87,7 +87,7 @@
           </div>
         </div>
         <div class="l-grow row items-center">
-          <div class="col-2">Tanggal SPP</div>
+          <div class="col-2">Tanggal PO</div>
           <q-field dense outlined class="l-grow">
             <template v-slot:prepend>
               <q-icon name="date_range" />
@@ -103,7 +103,7 @@
               transition-show="scale"
               transition-hide="scale"
             >
-              <q-date v-model="spp.deadline" :options="limitDate">
+              <q-date v-model="po.po_date">
                 <div class="row items-center justify-end">
                   <q-btn v-close-popup label="Close" color="primary" flat />
                 </div>
@@ -118,137 +118,148 @@
             <q-radio v-model="curr" val="USD" label="USD" />
           </div>
         </div>
-        <div class="l-grow row items-center no-wrap q-my-none">
-          <div class="col-2" style="height: fit-content;">Daftar SPP</div>
-          <div class="l-grow row justify-end items-center q-py-md bg-grey-2">
-            <div class="text-weight-thin l-grow q-mx-md">
-              Atur dan terapkan ke semua
-            </div>
-            <div class="q-px-md no-wrap q-mr-md" style="width:200px">
-              <money v-model="price" v-bind="money"></money>
-            </div>
-            <div class="q-px-md no-wrap" style="width:200px">
-              <q-input
-                outlined
-                v-model="po.po_date"
-                mask="date"
-                dense
-                class="bg-white l-grow"
-              >
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date minimal v-model="po.po_date" :options="limitDate">
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-                <!-- <template v-slot:label>
-                  Tanggal PO
-                  <a
-                    v-if="po.po_date"
-                    class="q-px-sm bg-info text-white rounded-borders"
-                    >tahun / bulan / tanggal</a
-                  >
-                </template> -->
-              </q-input>
-            </div>
-            <div class="q-px-md" style="width: 175px;">
-              <q-btn
-                unelevated
-                label="Ubah Massal"
-                color="blue"
-                no-caps
-                @click="changeAll()"
-              >
-              </q-btn>
-            </div>
+        <div class="l-grow row items-start no-wrap">
+          <div class="col-2 q-pt-lg" style="height: fit-content;">
+            Daftar SPP
           </div>
-        </div>
-        <div class="row no-wrap">
-          <div class="col-2"></div>
-          <q-markup-table class="stickyTable l-grow" flat bordered wrap-cells>
-            <!-- table head -->
-            <thead class="text-white">
-              <tr>
-                <th>No</th>
-                <th>Deadline</th>
-                <th>Harga</th>
-                <th>Est. Arrival</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <!-- table body  -->
-            <tbody>
-              <tr v-for="(x, i) in sppSelect" :key="i">
-                <td class="text-center">{{ i + 1 }}</td>
-                <td class="l-grow">{{ x.item }} ({{ x.qty }} {{ x.unit }})</td>
-                <td style="width:200px;" class="items-center">
-                  <money
-                    v-model="x.price"
-                    v-bind="money"
-                    class="l-grow"
-                  ></money>
-                </td>
-                <td
-                  class="text-center items-center q-px-none"
-                  style="width:200px;"
+          <div class="column q-gutter-y-sm">
+            <div
+              v-if="sppSelect.length > 1"
+              class="l-grow row justify-end items-center q-py-md bg-grey-2"
+            >
+              <div class="text-weight-thin l-grow q-mx-md">
+                Atur dan terapkan ke semua
+              </div>
+              <div class="q-px-md no-wrap q-mr-md" style="width:200px">
+                <money v-model="price" v-bind="money"></money>
+              </div>
+              <div class="q-px-md no-wrap" style="width:200px">
+                <q-input
+                  outlined
+                  v-model="date"
+                  mask="date"
+                  dense
+                  class="bg-white l-grow"
                 >
-                  <q-input
-                    outlined
-                    dense
-                    bg-color="white"
-                    v-model="x.est_arrival"
-                    readonly
-                    class="l-grow"
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date minimal v-model="date" :options="limitDate">
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                  <!-- <template v-slot:label>
+                    Tanggal PO
+                    <a
+                      v-if="po.po_date"
+                      class="q-px-sm bg-info text-white rounded-borders"
+                      >tahun / bulan / tanggal</a
+                    >
+                  </template> -->
+                </q-input>
+              </div>
+              <div class="q-px-md" style="width: 175px;">
+                <q-btn
+                  unelevated
+                  label="Ubah Massal"
+                  color="blue"
+                  no-caps
+                  @click="changeAll()"
+                >
+                </q-btn>
+              </div>
+            </div>
+
+            <q-markup-table class="stickyTable l-grow" flat bordered wrap-cells>
+              <!-- table head -->
+              <thead class="text-white">
+                <tr>
+                  <th>No</th>
+                  <th>Deadline</th>
+                  <th>Harga</th>
+                  <th>Est. Arrival</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <!-- table body  -->
+              <tbody>
+                <tr v-for="(x, i) in sppSelect" :key="i">
+                  <td class="text-center">{{ i + 1 }}</td>
+                  <td class="l-grow">
+                    {{ x.item }} ({{ x.qty }} {{ x.unit }})
+                  </td>
+                  <td style="width:200px;" class="items-center">
+                    <money
+                      v-model="x.price"
+                      v-bind="money"
+                      class="l-grow"
+                    ></money>
+                  </td>
+                  <td
+                    class="text-center items-center q-px-none"
+                    style="width:200px;"
                   >
-                    <template v-slot:append>
-                      <q-icon name="event" class="cursor-pointer">
-                        <q-popup-proxy
-                          ref="qDateProxy"
-                          transition-show="scale"
-                          transition-hide="scale"
-                        >
-                          <q-date minimal v-model="x.est_arrival">
-                            <div class="row items-center justify-end">
-                              <q-btn
-                                v-close-popup
-                                label="Close"
-                                color="primary"
-                                flat
-                              />
-                            </div>
-                          </q-date>
-                        </q-popup-proxy>
-                      </q-icon>
-                    </template>
-                  </q-input>
-                </td>
-                <td class="text-center" style="width: 175px;">
-                  <q-btn
-                    label="Hapus"
-                    flat
-                    no-caps
-                    color="blue"
-                    dense
-                    @click="deleteSPPItem(i)"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </q-markup-table>
+                    <q-input
+                      outlined
+                      dense
+                      bg-color="white"
+                      v-model="x.est_arrival"
+                      readonly
+                      class="l-grow"
+                    >
+                      <template v-slot:append>
+                        <q-icon name="event" class="cursor-pointer">
+                          <q-popup-proxy
+                            ref="qDateProxy"
+                            transition-show="scale"
+                            transition-hide="scale"
+                          >
+                            <q-date
+                              minimal
+                              v-model="x.est_arrival"
+                              :options="limitDate"
+                            >
+                              <div class="row items-center justify-end">
+                                <q-btn
+                                  v-close-popup
+                                  label="Close"
+                                  color="primary"
+                                  flat
+                                />
+                              </div>
+                            </q-date>
+                          </q-popup-proxy>
+                        </q-icon>
+                      </template>
+                    </q-input>
+                  </td>
+                  <td class="text-center" style="width: 175px;">
+                    <q-btn
+                      label="Hapus"
+                      flat
+                      no-caps
+                      color="blue"
+                      dense
+                      @click="deleteSPPItem(i)"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </q-markup-table>
+          </div>
         </div>
       </q-card-section>
     </q-card>
@@ -329,9 +340,7 @@ export default {
         item: "",
       },
       po: {
-        po_date: moment()
-          .add(1, "days")
-          .format("YYYY/MM/DD"),
+        po_date: moment().format("YYYY/MM/DD"),
         po_id: `OP/CM/${moment().format("YY")}/${moment().format("MM")}/`,
         vendor: "",
       },
@@ -347,6 +356,7 @@ export default {
         masked: false,
       },
       price: 0,
+      date: null,
       selected: {},
       sppSelect: [],
       sppSelectID: [],
@@ -394,11 +404,15 @@ export default {
   },
   computed: {
     date_model() {
-      if (!this.spp.deadline) return "Pilih Tanggal Dibutuhkan";
+      if (!this.po.po_date) return "Pilih Tanggal Dibutuhkan";
 
-      return moment(this.spp.deadline).format("DD MMMM YYYY");
+      return moment(this.po.po_date).format("DD MMMM YYYY");
     },
+    date_model_2() {
+      if (!this.date) return "Pilih Tanggal Dibutuhkan";
 
+      return moment(this.date).format("DD MMMM YYYY");
+    },
     isValid() {
       if (this.po.po_id == "" || this.po.vendor == "") {
         return false;
@@ -477,11 +491,15 @@ export default {
     },
     changeAll() {
       for (var i = 0; i < this.sppSelect.length; i++) {
-        this.sppSelect[i].est_arrival = this.po.po_date;
-        this.sppSelect[i].price = this.price;
+        if (this.date) {
+          this.sppSelect[i].est_arrival = this.date;
+        }
+        if (this.price > 0) {
+          this.sppSelect[i].price = this.price;
+        }
       }
-
-      console.log(this.sppSelect);
+      this.date = null;
+      this.price = 0;
     },
     async createPO() {
       this.po.user_id = this.$store.state.currentUser.user_id;
