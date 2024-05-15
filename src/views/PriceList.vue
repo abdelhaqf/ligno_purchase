@@ -250,12 +250,12 @@ export default {
   },
   computed: {
     date_model() {
-      if (!this.selDate) return "Pilih Tanggal Dibuat";
+      if (!this.date) return "Pilih Tanggal Dibuat";
 
-      if (this.selDate.from) {
-        return (moment(this.selDate.from).format("DD MMMM YYYY") + " - " +moment(this.selDate.to).format("DD MMMM YYYY"));
+      if (this.date.from) {
+        return (moment(this.date.from).format("DD MMMM YYYY") + " - " +moment(this.date.to).format("DD MMMM YYYY"));
       } else {
-        return moment(this.selDate).format("DD MMMM YYYY");
+        return moment(this.date).format("DD MMMM YYYY");
       }
     },
     selectCount() {
