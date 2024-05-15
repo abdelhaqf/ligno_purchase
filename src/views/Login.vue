@@ -35,6 +35,7 @@
               dense
               @keyup.enter="$refs.pass.focus()"
               class="q-mt-xs bg-white"
+              autofocus
             />
           </div>
 
@@ -42,14 +43,22 @@
             <div>Password</div>
             <q-input
               ref="pass"
-              type="password"
               outlined
               v-model="user.password"
               placeholder="Masukkan Password Anda"
               dense
               @keyup.enter="login"
               class="q-mt-xs bg-white"
-            />
+              :type="isPwd ? 'password' : 'text'"
+            >
+            <template v-slot:append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+            </q-input>
           </div>
 
           <q-btn
@@ -75,6 +84,7 @@ export default {
   data() {
     return {
       user: {},
+      isPwd: true,
     };
   },
   mounted() {
