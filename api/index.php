@@ -233,11 +233,21 @@ Flight::route('POST /po', function () {
   $limit =  $data["limit"];
   $offset = ($current - 1) * $limit;
 
+  // var_dump($date);
+
   $w_search = "";
   if ($search) $w_search = "AND po_id LIKE '%$search%'";
 
   if ($date != null) {
-    $w_search = $w_search . " AND po_date LIKE '%$date%'";
+    if (is_string($date)) {
+      $w_search = $w_search . " AND po_date LIKE '%$date%'";
+    } else {
+      $date_o = new stdClass();
+      $date_o->from = $date["from"];
+      $date_o->to = $date["to"];
+      $w_search = $w_search . " AND po_date BETWEEN '$date_o->from' AND '$date_o->to'";
+    }
+
   }
 
   $w_src = "";
@@ -314,6 +324,7 @@ Flight::route('POST /po', function () {
     
     ";
 
+  var_dump($q);
   $ret = array(
     "not received" => 0,
     "suspended" => 0,

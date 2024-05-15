@@ -70,8 +70,11 @@
           </template>
 
           <template v-slot:control>
-            <div class="self-center full-width no-outline" tabindex="0">
+            <div class="self-center full-width no-outline" tabindex="0" v-if="(typeof date === 'string') ">
               {{ date_model }}
+            </div>
+            <div class="self-center full-width no-outline" tabindex="0" v-if="(typeof date === 'object') ">
+              {{ date_model2 }}
             </div>
           </template>
           <q-popup-proxy
@@ -81,6 +84,7 @@
           >
             <q-date
               v-model="date"
+              range
               @input="
                 pagination.current = 1;
                 replaceRoute();
@@ -520,7 +524,8 @@ export default {
     }
 
     if (this.$route.query?.date) {
-      this.date = this.$route.query.date;
+      // this.date = this.$route.query.date;
+      this.date = this.$route.query.date.includes("to") ? {from: this.$route.query.date.split("to")[0], to: this.$route.query.date.split("to")[1]} : this.$route.query.date;
     }
 
     await this.$http
@@ -590,7 +595,8 @@ export default {
         cat: this.selCat ? category : "",
         kategori: this.selKategori == null ? "" : this.selKategori,
         search: this.searchTerm ? this.searchTerm : "",
-        date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
+        // date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
+        date: this.date ? ((typeof this.date === 'string') ? moment(this.date).format("YYYY-MM-DD") :  {from: moment(this.date.from).format("YYYY-MM-DD"),to: moment(this.date.to).format("YYYY-MM-DD")}) : "",
         current: this.pagination.current,
         limit: this.pagination.limit,
       };
@@ -669,7 +675,7 @@ export default {
         }&category=${this.selCat ? category : null}&kategori=${
           this.selKategori
         }&search=${this.searchTerm ? this.searchTerm : ""}&date=${
-          this.date ? moment(this.date).format("YYYY-MM-DD") : ""
+          this.date ? ((typeof this.date === 'string') ? moment(this.date).format("YYYY-MM-DD") :  (moment(this.date.from).format("YYYY-MM-DD") + "to" +moment(this.date.to).format("YYYY-MM-DD"))) : ""
         }`,
       });
     },
@@ -679,6 +685,11 @@ export default {
       if (!this.date) return "Pilih Tanggal PO";
 
       return moment(this.date).format("DD MMMM YYYY");
+    },
+    date_model2() {
+      if (!this.date) return "Pilih Tanggal PO";
+
+      return (moment(this.date.from).format("DD MMMM YYYY") + " - " +moment(this.date.to).format("DD MMMM YYYY"));
     },
     selectCount() {
       var count = this.selCat.length;
