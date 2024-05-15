@@ -13,8 +13,16 @@
             :src="require('@/assets/Logo_Ligno.png') "
             style="max-width: 180px;"
           />
-          <div style="max-width: 400px; text-align: center;" class="text-h4 text-weight-bold">
-            Selamat Datang Di Ligno app <span class="text-blue">Purchase</span>
+          <div style="max-width: 50vh;" class="column" >
+            <div class="text-h4 text-weight-bold text-center">
+              Selamat Datang Di Ligno app <span style="color: #0288D1;">Purchase</span>
+            </div>
+            <div class="text-right">
+              <q-img
+                :src="require('@/assets/Line.png') "
+                style="max-width: 180px;"
+              />
+            </div>
           </div>
         </q-card-section>
         <q-card-section class="column q-gutter-y-md q-mt-md q-mx-lg">
@@ -25,6 +33,7 @@
               v-model="user.username"
               placeholder="Masukkan Username Anda"
               dense
+              @keyup.enter="$refs.pass.focus()"
               class="q-mt-xs bg-white"
             />
           </div>
@@ -32,6 +41,7 @@
           <div>
             <div>Password</div>
             <q-input
+              ref="pass"
               type="password"
               outlined
               v-model="user.password"
@@ -45,7 +55,7 @@
           <q-btn
           no-caps
           dense
-          class="full-width no-border-radius q-mt-xl q-pa-xs"
+          class="full-width no-border-radius q-mt-lg q-pa-xs"
           label="Login"
           @click="login"
           color="blue-7"

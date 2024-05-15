@@ -27,14 +27,14 @@
                   <q-input
                     outlined
                     v-model="val.item"
-                    v-if="showInput"
+                    v-if="toggleStats[i - lengthExist]"
                     dense
                     class="l-grow"
                     placeholder="Masukan Nama Barang"
                   >
                     <template v-slot:append>
                       <q-toggle
-                        v-model="showInput"
+                        v-model="toggleStats[i - lengthExist]"
                         color="green"
                         icon="add"
                         keep-color
@@ -66,7 +66,7 @@
                   >
                     <template v-slot:append>
                       <q-toggle
-                        v-model="showInput"
+                        v-model="toggleStats[i - lengthExist]"
                         color="green"
                         icon="add"
                         keep-color
@@ -121,7 +121,8 @@
                     item: '',
                     qty: 0,
                     unit: '',
-                  })
+                  });
+                  toggleStats.push(false);
                 "
               >
                 + tambah barang
@@ -133,11 +134,11 @@
 
       <q-card-actions align="right" v-if="!$props.id_template">
         <q-btn color="primary" label="Cancel" @click="onCancelClick" />
-        <q-btn color="primary" label="Add Template" @click="onOKClick" />
+        <q-btn color="primary" label="Add Template" @click="createTemplate" />
       </q-card-actions>
       <q-card-actions align="right" v-else>
         <q-btn color="primary" label="Cancel" @click="onCancelClick" />
-        <q-btn color="primary" label="Edit Template" @click="onOKClick" />
+        <q-btn color="primary" label="Edit Template" @click="updateTemplate" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -156,6 +157,8 @@ export default {
         template_detail: [],
         notes: "",
       },
+      toggleStats: [],
+      lengthExist: 0,
     };
   },
   async mounted() {
@@ -179,6 +182,7 @@ export default {
     },
     deleteSPPItem(index) {
       this.template.template_detail.splice(index, 1);
+      this.toggleStats.splice(index, 1);
     },
     async getTemplate() {
       await this.$http
@@ -186,6 +190,8 @@ export default {
         .then((resp) => {
           this.template = JSON.parse(JSON.stringify(resp.data));
         });
+
+      this.lengthExist = this.template.template_detail.length;
     },
     createTemplate() {
       this.$http.post("/new_template", this.template, {}).then((result) => {
@@ -195,6 +201,12 @@ export default {
         //     .post("/new_template_detail", this.spp_detail[i], {})
         //     .then((result) => {});
         // }
+        this.onOKClick();
+      });
+    },
+    updateTemplate() {
+      this.$http.put("/update_template", this.template, {}).then((result) => {
+        this.onOKClick();
       });
     },
     setModel(val, id) {
@@ -213,12 +225,13 @@ export default {
     },
 
     onOKClick() {
-      this.createTemplate();
+      this.$emit("ok")
       this.hide();
     },
 
     onCancelClick() {
       this.hide();
+      this.toggleStats = [];
     },
   },
 };

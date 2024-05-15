@@ -131,12 +131,12 @@ Flight::route('GET /template_list', function () {
     $w_search = "AND spp.item LIKE '%$query->search%'";
   }
 
-  $q = "SELECT * FROM template";
+  $q = "SELECT * FROM template WHERE is_active = 1";
   $templates = getRows($q);
   for ($i = 0; $i < count($templates); $i++) {
     $template = $templates[$i];
 
-    $q_detail = "SELECT * FROM template_detail WHERE id_template = {$template['id']} AND is_active =1";
+    $q_detail = "SELECT * FROM template_detail WHERE id_template = {$template['id']}";
     $templates[$i]['details'] = getRows($q_detail);
   }
 
@@ -151,6 +151,81 @@ Flight::route('GET /template_detail/@id', function ($id) {
   $template['template_detail'] = getRows($q_detail);
 
   Flight::json($template);
+});
+
+Flight::route('POST /new_template', function () {
+  $link = getLink();
+  $data = Flight::request()->data;
+  mysqli_begin_transaction($link);
+
+  try {
+    $q = "INSERT INTO template SET name = '{$data['name']}',
+    notes = '{$data['notes']}',
+    id_user = '{$data['id_user']}'";
+    mysqli_query($link, $q);
+    $id_template = mysqli_insert_id($link);
+
+    for ($i = 0; $i < count($data['template_detail']); $i++) {
+      $detail = $data['template_detail'][$i];
+      $q_detail = "INSERT INTO template_detail SET item = '{$detail['item']}',
+      id_template = $id_template,
+      qty = '{$detail['qty']}',
+      unit = '{$detail['unit']}'";
+      mysqli_query($link, $q_detail);
+    }
+
+    mysqli_commit($link);
+  } catch (mysqli_sql_exception $exception) {
+    die($exception);
+  }
+});
+
+Flight::route('POST /new_template_detail', function () {
+  $data = Flight::request()->getBody();
+  $template = $data;
+  unset($teamplate['template_detail']);
+  $data = (array) json_decode($data);
+
+
+  runQuery3('POST', 'template_detail', $data, '');
+});
+
+Flight::route('PUT /update_template', function () {
+  $link = getLink();
+  $data = Flight::request()->data;
+  mysqli_begin_transaction($link);
+
+  try {
+    $q = "UPDATE template SET name = '{$data['name']}',
+    notes = '{$data['notes']}'
+    WHERE id = $data->id";
+    mysqli_query($link, $q);
+
+    $q = "DELETE FROM template_detail WHERE id_template = $data->id";
+    mysqli_query($link, $q);
+
+    for ($i = 0; $i < count($data['template_detail']); $i++) {
+      $detail = $data['template_detail'][$i];
+      $q_detail = "INSERT INTO template_detail SET item = '{$detail['item']}',
+      id_template = $data->id,
+      qty = '{$detail['qty']}',
+      unit = '{$detail['unit']}'";
+      mysqli_query($link, $q_detail);
+    }
+
+    mysqli_commit($link);
+  } catch (mysqli_sql_exception $exception) {
+    die($exception);
+  }
+});
+
+Flight::route('PUT /inactivate_template', function () {
+  $link = getLink();
+  $data = Flight::request()->data;
+
+  $q = "UPDATE template SET is_active = 0
+    WHERE id = $data->id";
+  mysqli_query($link, $q) or die(mysqli_error($link));
 });
 
 Flight::route('GET /spp-approval', function () {
@@ -805,43 +880,6 @@ Flight::route('POST /new_spp', function () {
   $data = (array) json_decode($data);
 
   runQuery3('POST', 'spp', $data, '');
-});
-
-Flight::route('POST /new_template', function () {
-  $link = getLink();
-  $data = Flight::request()->data;
-  mysqli_begin_transaction($link);
-
-  try {
-    $q = "INSERT INTO template SET name = '{$data['name']}',
-    notes = '{$data['notes']}',
-    id_user = '{$data['id_user']}'";
-    mysqli_query($link, $q);
-    $id_template = mysqli_insert_id($link);
-
-    for ($i = 0; $i < count($data['template_detail']); $i++) {
-      $detail = $data['template_detail'][$i];
-      $q_detail = "INSERT INTO template_detail SET item = '{$detail['item']}',
-      id_template = $id_template,
-      qty = '{$detail['qty']}',
-      unit = '{$detail['unit']}'";
-      mysqli_query($link, $q_detail);
-    }
-
-    mysqli_commit($link);
-  } catch (mysqli_sql_exception $exception) {
-    die($exception);
-  }
-});
-
-Flight::route('POST /new_template_detail', function () {
-  $data = Flight::request()->getBody();
-  $template = $data;
-  unset($teamplate['template_detail']);
-  $data = (array) json_decode($data);
-
-
-  runQuery3('POST', 'template_detail', $data, '');
 });
 Flight::route('POST /new_po', function () {
   $data = Flight::request()->getBody();

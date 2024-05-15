@@ -23,7 +23,9 @@
             </td>
             <td class="text-left l-grow">{{ d.name }}</td>
             <td class="text-center">
-              item
+              <div v-for="(item, i) in d.details" :key="i" class="">
+                <div>{{ item.item }} ({{ item.qty }} {{ item.unit }})</div>
+              </div>
             </td>
             <td>
               <div class="l-wrap-cell">
@@ -47,6 +49,13 @@
                 label="Detail"
                 color="primary"
                 @click="showDialogTemplate(d.id)"
+              ></q-btn>
+              <q-btn
+                flat
+                no-caps
+                label="Delete"
+                color="negative"
+                @click="deleteTemplate(d)"
               ></q-btn>
             </td>
           </tr>
@@ -86,6 +95,17 @@ export default {
         component: dialogAddTemplate,
         parent: this,
         id_template: id,
+      })
+      .onOk(() => {
+          this.fetchData();
+        })
+      ;
+
+      
+    },
+    deleteTemplate(item) {
+      this.$http.put("/inactivate_template", item, {}).then((result) => {
+        this.fetchData();
       });
     },
   },
