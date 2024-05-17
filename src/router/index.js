@@ -38,7 +38,7 @@ const routes = [
     path: "/spp/template",
     name: "SPPTemplate",
     component: () => import("../views/SPPTemplate.vue"),
-    meta: { title: "SPP Template", path: ["SPP"], access: ["PURCHASING"] },
+    meta: { title: "Template SPP", path: ["SPP"], access: ["PURCHASING"] },
   },
   {
     path: "/approval/manager",

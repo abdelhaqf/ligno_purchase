@@ -1,20 +1,45 @@
 <template>
   <q-dialog ref="dialog" @hide="onDialogHide" persistent>
-    <q-card class="q-dialog-plugin" style="min-width: 900px;">
-      <q-card-section>Buat Template Baru </q-card-section>
+    <q-card class="q-dialog-plugin my-font" style="min-width: 900px; max-height: 90vh;">
       <q-card-section>
-        <q-input label="nama template" v-model="template.name"></q-input>
-        <q-input label="Notes" v-model="template.notes"></q-input>
+        <div class="text-h6 text-weight-bold">Form Template Baru </div>
       </q-card-section>
-      <q-card-section>
-        <q-markup-table>
+      <q-separator/>
+      <q-card-section class="bg-grey-2 column q-gutter-y-md q-pt-none">
+        <div class="row items-center l-grow">
+          <div style="width: 125px;">Nama Template</div>
+          <q-input
+            outlined
+            v-model="template.name"
+            dense
+            class="l-grow bg-white"
+            placeholder="Masukkan Nama Template"
+          />
+        </div>
+        <div class="row items-center l-grow">
+          <div style="width: 125px;">Note</div>
+          <q-input
+            outlined
+            v-model="template.notes"
+            dense
+            autogrow
+            class="l-grow bg-white"
+            placeholder="e.g keperluan maintanance..."
+          />
+        </div>
+        
+        <q-markup-table
+            wrap-cells
+            flat
+            bordered
+            class="stickyTable">
           <thead>
             <tr>
               <th>No</th>
-              <th>Nama</th>
+              <th>Nama Barang</th>
               <th>Qty</th>
               <th>Unit</th>
-              <th>action</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -27,14 +52,14 @@
                   <q-input
                     outlined
                     v-model="val.item"
-                    v-if="toggleStats[i - lengthExist]"
+                    v-if="toggleStats[i]"
                     dense
                     class="l-grow"
                     placeholder="Masukan Nama Barang"
                   >
                     <template v-slot:append>
                       <q-toggle
-                        v-model="toggleStats[i - lengthExist]"
+                        v-model="toggleStats[i]"
                         color="green"
                         icon="add"
                         keep-color
@@ -66,7 +91,7 @@
                   >
                     <template v-slot:append>
                       <q-toggle
-                        v-model="toggleStats[i - lengthExist]"
+                        v-model="toggleStats[i]"
                         color="green"
                         icon="add"
                         keep-color
@@ -87,8 +112,11 @@
                     dense v-model="val.unit" style="width:200px"></q-input></td>
                 <td>
                   <q-btn
-                    no-caps
                     label="Hapus"
+                    flat
+                    no-caps
+                    color="negative"
+                    dense
                     @click="deleteSPPItem(i)"
                   ></q-btn>
                 </td>
@@ -104,8 +132,11 @@
                 <td>{{ val.unit }}</td>
                 <td>
                   <q-btn
-                    no-caps
                     label="Hapus"
+                    flat
+                    no-caps
+                    color="negative"
+                    dense
                     @click="deleteSPPItem(i)"
                   ></q-btn>
                 </td>
@@ -114,7 +145,7 @@
             <tr>
               <td
                 colspan="5"
-                class="text-center"
+                class="text-center text-blue"
                 @click="
                   template.template_detail.push({
                     id: null,
@@ -125,18 +156,32 @@
                   toggleStats.push(false);
                 "
               >
-                + tambah barang
+                + Tambah Barang
               </td>
             </tr>
           </tbody>
         </q-markup-table>
       </q-card-section>
 
-      <q-card-actions align="right" v-if="!$props.id_template">
-        <q-btn color="primary" label="Cancel" @click="onCancelClick" />
-        <q-btn color="primary" label="Add Template" @click="createTemplate" />
+      <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md" v-if="!$props.id_template">
+        <q-btn 
+          class="l-grow text-weight-bold"
+          outline
+          no-caps
+          color="black" 
+          label="Kembali" 
+          @click="onCancelClick"
+          style="width: 30%" />
+        <q-btn 
+          class="l-grow text-weight-bold"
+          unelevated
+          no-caps
+          color="primary"  
+          label="Simpan" 
+          @click="createTemplate" 
+          style="width: 40%"/>
       </q-card-actions>
-      <q-card-actions align="right" v-else>
+      <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md" v-else>
         <q-btn color="primary" label="Cancel" @click="onCancelClick" />
         <q-btn color="primary" label="Edit Template" @click="updateTemplate" />
       </q-card-actions>
@@ -165,11 +210,14 @@ export default {
     if (this.$props.id_template) {
       await this.getTemplate();
     }
+    
     await this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
       this.option = this.option.filter((obj) => obj.value !== "");
       if (this.option.length == 0) this.showInput = true;
     });
+
+    this.toggleStats = Array(this.template.template_detail.length).fill(false);
   },
   methods: {
     filterOP(val, update, abort) {
@@ -210,7 +258,7 @@ export default {
       });
     },
     setModel(val, id) {
-      console.log(val);
+      // console.log(val);
       // this.spp_detail[id].item = val;
     },
     show() {
