@@ -1,12 +1,12 @@
 <template class="q-pa-none">
-  <div class="row my-font" style="height: 100vh;">
-    <div style="width: 50%;" class="bg-white column items-center justify-center"> 
+  <div class="row my-font" style="height: 100vh; min-width: 100vh;">
+    <div class="bg-white column items-center justify-center l-grow"> 
       <q-img
           :src="require('@/assets/login_bg.png') "
-          style="max-height: 100vh; max-width: 80vh;"
+          style="max-height: 100vh;"
         />
     </div>
-    <div style="width: 50%;" class="bg-grey-2 column justify-center">
+    <div style="width: 800px;" class="bg-grey-2 column justify-center">
       <q-card class="loginForm bg-grey-2 q-pa-lg" flat>
         <q-card-section class="column items-center q-gutter-y-md">
           <q-img
