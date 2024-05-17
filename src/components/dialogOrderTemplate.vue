@@ -2,7 +2,8 @@
     <q-dialog ref="dialog" @hide="onDialogHide" persistent>
             <q-card class="my-font" style="min-width: 1200px !important;">
                 <q-card-section class="items-center">
-                    <div class="text-h6 text-weight-bold">Re Order</div>
+                    <div class="text-h6 text-weight-bold">Order dari Template</div>
+                    <div class="">SPP dibuat dari template {{ this.template.name }}</div>
                     <div class="text-grey">Pastikan data yang akan dibuat  SPP sudah benar dan sesuai</div>
                 </q-card-section>
                 <q-separator/>
@@ -22,12 +23,12 @@
                                 <th>Deadline</th>
                                 <th>CC</th>
                                 <th>Keterangan</th>             
-                                <th class="q-mx-sm" v-if="page == 'po_detail'">Action</th>
+                                <th class="q-mx-sm">Action</th>
                             </tr>
                             </thead>
                             <!-- table body  -->
                             <tbody>
-                                <tr v-for="(d, i) in spp" :key="i">
+                                <tr v-for="(d, i) in template.template_detail" :key="i">
                                     <td>
                                         {{ d.item }}
                                     </td>
@@ -141,7 +142,7 @@
                                         </div>
                                         <div v-else class="text-center l-grow">-</div> -->
                                     </td>
-                                    <td v-if="page == 'po_detail'">
+                                    <td>
                                         <q-btn
                                             label="Hapus"
                                             flat
@@ -184,17 +185,19 @@
 <script>
 import moment from "moment";
 export default {
-props: ["newSpp", "from"],
+props: ["id_template"],
     data() {
         return {
-        spp: [],
+        id: null,
+        template: {},
         listUser: [],
+        spp:[],
         };
     },
     mounted() {
-        this.spp = this.$props.newSpp;
-        this.page = this.$props.from;
+        this.id = this.$props.id_template;
         this.getUsers();
+        this.getTemplateDetail();
     },
     computed: {
     },
@@ -225,7 +228,7 @@ props: ["newSpp", "from"],
             this.hide();
         },
         deleteSPPItem(index) {
-            this.spp.splice(index, 1);
+            this.template.template_detail.splice(index, 1);
         },
         limitDate(date) {
             return date >= moment().format("YYYY/MM/DD");
@@ -239,9 +242,15 @@ props: ["newSpp", "from"],
                 id_user: 0,
             });
         },
+        async getTemplateDetail(){
+            await this.$http.get(`/template_detail/${this.id}`, {}).then((result) => {
+                this.template = result.data;
+            });
+        },
         createSPP() {
-            for (var i = 0; i < this.spp.length; i++) {
-                this.$http.post("/new_spp", this.spp[i], {}).then((result) => {
+            for (var i = 0; i < this.template.template_detail.length; i++) {
+                this.template.template_detail[i].user_id = this.$store.state.currentUser.user_id;
+                this.$http.post("/new_spp", this.template.template_detail[i], {}).then((result) => {
                     
                     var history = {
                         spp_id: result.data,

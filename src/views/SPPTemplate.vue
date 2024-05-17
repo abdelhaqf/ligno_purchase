@@ -53,6 +53,13 @@
               <q-btn
                 flat
                 no-caps
+                label="ADD"
+                color="primary"
+                @click="showDialogOrder(d.id)"
+              ></q-btn>
+              <q-btn
+                flat
+                no-caps
                 label="Delete"
                 color="negative"
                 @click="deleteTemplate(d)"
@@ -71,6 +78,7 @@
 </template>
 <script>
 import dialogAddTemplate from "../components/dialogAddTemplate.vue";
+import dialogOrderTemplate from "../components/dialogOrderTemplate.vue";
 export default {
   data() {
     return {
@@ -90,7 +98,6 @@ export default {
       });
     },
     showDialogTemplate(id) {
-      console.log("called");
       this.$q.dialog({
         component: dialogAddTemplate,
         parent: this,
@@ -98,10 +105,18 @@ export default {
       })
       .onOk(() => {
           this.fetchData();
+        });
+    },
+    showDialogOrder(id) {
+      this.$q
+        .dialog({
+          component: dialogOrderTemplate,
+          parent: this,
+          id_template: id,
         })
-      ;
-
-      
+        .onOk((val) => {
+          console.log("OK was clicked on dialog: ", val);
+        })
     },
     deleteTemplate(item) {
       this.$http.put("/inactivate_template", item, {}).then((result) => {

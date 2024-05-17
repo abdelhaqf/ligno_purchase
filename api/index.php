@@ -147,7 +147,7 @@ Flight::route('GET /template_detail/@id', function ($id) {
   $q = "SELECT * FROM template WHERE id = $id";
   $template = getRows($q)[0];
 
-  $q_detail = "SELECT * FROM template_detail WHERE id_template = $id";
+  $q_detail = "SELECT item, qty, unit FROM template_detail WHERE id_template = $id";
   $template['template_detail'] = getRows($q_detail);
 
   Flight::json($template);
