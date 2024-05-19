@@ -2,12 +2,48 @@
     <q-dialog ref="dialog" @hide="onDialogHide" persistent>
             <q-card class="my-font" style="min-width: 1200px !important;">
                 <q-card-section class="items-center">
-                    <div class="text-h6 text-weight-bold">Order dari Template</div>
-                    <div class="">SPP dibuat dari template {{ this.template.name }}</div>
-                    <div class="text-grey">Pastikan data yang akan dibuat  SPP sudah benar dan sesuai</div>
+                    <div class="text-h6 text-weight-bold q-mb-sm">Order dari Template</div>
                 </q-card-section>
                 <q-separator/>
-                <q-card-section class="bg-grey-2">
+                <q-card-section class="bg-grey-2 column q-gutter-y-md q-pt-none">
+                    <div class="row items-center l-grow">
+                        <div style="width: 125px;">Deadline</div>
+                        <q-field dense outlined class="l-grow bg-white">
+                            <template v-slot:prepend>
+                            <q-icon name="date_range" />
+                            </template>
+
+                            <template v-slot:control>
+                            <div class="self-center full-width no-outline" tabindex="0">
+                                {{ date_model(deadline) }}
+                            </div>
+                            </template>
+                            <q-popup-proxy
+                            style="width:fit-content"
+                            transition-show="scale"
+                            transition-hide="scale"
+                            >
+                            <q-date v-model="deadline" :options="limitDate">
+                                <div class="row items-center justify-end">
+                                <q-btn v-close-popup label="Close" color="primary" flat />
+                                </div>
+                            </q-date>
+                            </q-popup-proxy>
+                        </q-field>
+                    </div>
+                    <div class="row items-center l-grow">
+                        <div style="width: 125px;">CC</div>
+                        <q-select
+                            outlined
+                            dense
+                            emit-value
+                            map-options
+                            :options="listUser"
+                            v-model="cc"
+                            class="l-grow bg-white"
+                            placeholder="Pilih Nama"
+                        ></q-select>
+                    </div>
                     <q-markup-table
                         wrap-cells
                         flat
@@ -17,11 +53,10 @@
                             <!-- table head -->
                             <thead class="text-white">
                             <tr>
+                                <th>No</th>
                                 <th>Nama Barang</th>
                                 <th>QTY</th>
                                 <th>Satuan</th>
-                                <th>Deadline</th>
-                                <th>CC</th>
                                 <th>Keterangan</th>             
                                 <th class="q-mx-sm">Action</th>
                             </tr>
@@ -29,6 +64,7 @@
                             <!-- table body  -->
                             <tbody>
                                 <tr v-for="(d, i) in template.template_detail" :key="i">
+                                    <td>{{ i + 1 }}</td>
                                     <td>
                                         {{ d.item }}
                                     </td>
@@ -52,70 +88,6 @@
                                             placeholder="e.g. kg / m / dus"
                                         >
                                         </q-input>
-                                    </td>
-                                    <td style="min-width: 200px;">
-                                        <!-- <q-input
-                                            outlined
-                                            dense
-                                            bg-color="white"
-                                            v-model="d.deadline"
-                                            class="l-grow"
-                                        >
-                                            <template v-slot:append>
-                                            <q-icon name="event" class="cursor-pointer">
-                                                <q-popup-proxy
-                                                    ref="qDateProxy"
-                                                    transition-show="scale"
-                                                    transition-hide="scale"
-                                                >
-                                                    <q-date minimal v-model="d.deadline" :options="limitDate">
-                                                        <div class="row items-center justify-end">
-                                                        <q-btn
-                                                            v-close-popup
-                                                            label="Close"
-                                                            color="primary"
-                                                            flat
-                                                        />
-                                                        </div>
-                                                    </q-date>
-                                                </q-popup-proxy>
-                                            </q-icon>
-                                            </template>
-                                        </q-input> -->
-                                        <q-field dense outlined class="l-grow">
-                                            <template v-slot:prepend>
-                                            <q-icon name="date_range" />
-                                            </template>
-
-                                            <template v-slot:control>
-                                            <div class="self-center full-width no-outline" tabindex="0">
-                                                {{ date_model(d.deadline) }}
-                                            </div>
-                                            </template>
-                                            <q-popup-proxy
-                                            style="width:fit-content"
-                                            transition-show="scale"
-                                            transition-hide="scale"
-                                            >
-                                            <q-date v-model="d.deadline" :options="limitDate">
-                                                <div class="row items-center justify-end">
-                                                <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-date>
-                                            </q-popup-proxy>
-                                        </q-field>
-                                    </td>
-                                    <td style="min-width: 170px;">
-                                        <q-select
-                                            outlined
-                                            dense
-                                            emit-value
-                                            map-options
-                                            :options="listUser"
-                                            v-model="d.cc"
-                                            class="l-grow"
-                                            placeholder="Pilih Nama"
-                                            ></q-select>
                                     </td>
                                     <td style="min-width: 180px;">
                                         
@@ -142,7 +114,7 @@
                                         </div>
                                         <div v-else class="text-center l-grow">-</div> -->
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <q-btn
                                             label="Hapus"
                                             flat
@@ -192,6 +164,8 @@ props: ["id_template"],
         template: {},
         listUser: [],
         spp:[],
+        deadline: null,
+        cc: "",
         };
     },
     mounted() {
@@ -250,6 +224,8 @@ props: ["id_template"],
         createSPP() {
             for (var i = 0; i < this.template.template_detail.length; i++) {
                 this.template.template_detail[i].user_id = this.$store.state.currentUser.user_id;
+                this.template.template_detail[i].deadline = this.deadline;
+                this.template.template_detail[i].cc = this.cc;
                 this.$http.post("/new_spp", this.template.template_detail[i], {}).then((result) => {
                     
                     var history = {

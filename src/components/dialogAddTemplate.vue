@@ -2,7 +2,7 @@
   <q-dialog ref="dialog" @hide="onDialogHide" persistent>
     <q-card class="q-dialog-plugin my-font" style="min-width: 900px; max-height: 90vh;">
       <q-card-section>
-        <div class="text-h6 text-weight-bold">Form Template Baru </div>
+        <div class="text-h6 text-weight-bold q-mb-sm">Form Template Baru </div>
       </q-card-section>
       <q-separator/>
       <q-card-section class="bg-grey-2 column q-gutter-y-md q-pt-none">
@@ -182,8 +182,22 @@
           style="width: 40%"/>
       </q-card-actions>
       <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md" v-else>
-        <q-btn color="primary" label="Cancel" @click="onCancelClick" />
-        <q-btn color="primary" label="Edit Template" @click="updateTemplate" />
+        <q-btn 
+          class="l-grow text-weight-bold"
+          outline
+          no-caps
+          color="black" 
+          label="Kembali" 
+          @click="onCancelClick"
+          style="width: 30%" />
+        <q-btn 
+          class="l-grow text-weight-bold"
+          unelevated
+          no-caps
+          color="primary"  
+          label="Edit Template" 
+          @click="updateTemplate" 
+          style="width: 40%"/>
       </q-card-actions>
     </q-card>
   </q-dialog>
