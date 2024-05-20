@@ -141,6 +141,7 @@
           :class="
             $route.name == 'SPPList' ||
             $route.name == 'SPPCreate' ||
+            $route.name == 'SPPTemplate' ||
             $route.name == 'SPPDetail'
               ? 'text-primary'
               : ''
@@ -148,7 +149,7 @@
         >
           <template v-slot:header>
             <q-item-section avatar>
-              <q-icon name="summarize" />
+              <q-icon :name="`${$route.name == 'SPPList' || $route.name == 'SPPCreate' || $route.name == 'SPPTemplate' || $route.name == 'SPPDetail' ? '' : 'o_'}summarize`" />
             </q-item-section>
             <q-item-section>
               <q-item-label>SPP</q-item-label>
@@ -169,7 +170,7 @@
           <q-item
             active-class="active-menu"
             :active="$route.name == 'SPPCreate'"
-            to="/"
+            to="/spp/create"
             clickable
           >
             <q-item-section avatar></q-item-section>
@@ -206,7 +207,8 @@
         >
           <template v-slot:header>
             <q-item-section avatar>
-              <q-icon name="o_assignment_turned_in"> </q-icon>
+              <q-icon :name="`${$route.name == 'SPPApprove' || $route.name == 'SPPApprovePM' ? '' : 'o_'}assignment_turned_in`" />
+              <!-- <q-icon name="o_assignment_turned_in"> </q-icon> -->
               <q-chip
                 v-if="
                   miniState &&
@@ -304,7 +306,8 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon name="fact_check" />
+            <q-icon :name="`${$route.name == 'SPPApproved' ? '' : 'o_'}fact_check`" />
+            <!-- <q-icon name="fact_check" /> -->
             <q-chip
               v-if="miniState && count.count_spp > 0"
               dense
@@ -340,7 +343,8 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon name="shopping_bag" />
+            <q-icon :name="`${$route.name == 'POList' ? '' : 'o_'}shopping_bag`" />
+            <!-- <q-icon name="shopping_bag" /> -->
             <q-chip
               v-if="miniState && count.count_spp > 0"
               dense
@@ -376,7 +380,8 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon name="price_check" />
+            <q-icon :name="`${$route.name == 'PriceList' ? '' : 'o_'}price_check`" />
+            <!-- <q-icon name="price_check" /> -->
           </q-item-section>
           <q-item-section>
             <q-item-label class="row items-center">

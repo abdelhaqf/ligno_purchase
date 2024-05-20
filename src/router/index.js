@@ -23,7 +23,7 @@ const routes = [
     meta: { title: "Daftar SPP", path: ["SPP"] },
   },
   {
-    path: "/",
+    path: "/spp/create",
     name: "SPPCreate",
     component: () => import("../views/SPPCreate.vue"),
     meta: { title: "SPP Baru", path: ["SPP", "Daftar SPP"] },
