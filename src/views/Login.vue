@@ -117,7 +117,7 @@ export default {
             .then((resp) => {
               if (resp.data.is_purchasing == 1 || resp.data.username == "ceo")
                 this.$router.push("/dashboard");
-              else this.$router.push("/");
+              else this.$router.push("/spp/create");
             });
           this.$q.notify({ message: "Login Berhasil!", color: "positive" });
         })
