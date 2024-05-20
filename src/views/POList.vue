@@ -41,6 +41,7 @@
           v-model="searchTerm"
           @input="
             pagination.current = 1;
+            replaceRoute();
             fetchData();
           "
           clearable

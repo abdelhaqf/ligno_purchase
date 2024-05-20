@@ -23,7 +23,8 @@
             </template>
 
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date range v-model="selDate" @input="fetchData">
+              <q-date range v-model="selDate" @input="pagination.current = 1;
+                                                      fetchData();">
                 <div class="row items-center justify-end">
                   <q-btn v-close-popup label="Close" color="primary" flat />
                 </div>
@@ -36,7 +37,9 @@
             placeholder="Cari Nama Barang"
             style="width: 275px;"
             v-model="searchTerm"
-            @input="fetchData"
+            @input="
+              pagination.current = 1;
+              fetchData();"
             clearable
             @clear="searchTerm = ''"
           >

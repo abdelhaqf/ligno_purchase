@@ -10,7 +10,7 @@
           @clear="searchTerm = ''"
           placeholder="Cari Nama Barang"
           style="width: 30%;"
-          @input="change()"
+          @input="pagination.current = 1; change();"
         >
           <template v-slot:prepend>
             <q-icon name="search"></q-icon>
@@ -23,7 +23,7 @@
           dense
           outlined
           style="width: 33%;"
-          @clear="change()"
+          @clear="pagination.current = 1; change()"
         >
           <template v-slot:prepend>
             <q-icon name="date_range" />
@@ -39,7 +39,7 @@
             transition-show="scale"
             transition-hide="scale"
           >
-            <q-date v-model="date" @input="change()" range>
+            <q-date v-model="date" @input="pagination.current = 1; change()" range>
               <div class="row items-center justify-end">
                 <q-btn v-close-popup label="Close" color="primary" flat />
               </div>
