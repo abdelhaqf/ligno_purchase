@@ -116,39 +116,10 @@
       mini-to-overlay
     >
       <q-list class="column" style="height: 100%;">
-        <!-- <q-item
-          clickable
-          v-ripple
-          v-for="m in menu"
-          :key="m.title"
-          :to="m.link"
-          :active="$route.name == m.name"
-          class="inactive-menu"
-          :active-class="
-            miniState ? 'text-primary' : 'text-primary active-menu'
-          "
-        >
-          <q-item-section avatar>
-            <q-icon :name="m.icon" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="row items-center">
-              <div>{{ m.title }}</div>
-
-              <q-badge
-                rounded
-                color="pink"
-                class="q-ml-sm round-radius"
-                v-if="m.count > 0"
-                :label="m.count"
-              ></q-badge>
-            </q-item-label>
-          </q-item-section>
-        </q-item> -->
         <q-item
           clickable
           v-ripple
-          :active="$route.name == 'Dashboard'"
+          :active="$route.name == 'Home'"
           class="inactive-menu"
           :active-class="
             miniState ? 'text-primary' : 'text-primary active-menu'
@@ -157,7 +128,7 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon name="dashboard" />
+            <q-icon :name="`${$route.name == 'Home' ? '' : 'o_'}dashboard`" />
           </q-item-section>
           <q-item-section>
             <q-item-label class="row items-center">
@@ -177,7 +148,7 @@
         >
           <template v-slot:header>
             <q-item-section avatar>
-              <q-icon name="list_alt" />
+              <q-icon name="summarize" />
             </q-item-section>
             <q-item-section>
               <q-item-label>SPP</q-item-label>
@@ -198,7 +169,7 @@
           <q-item
             active-class="active-menu"
             :active="$route.name == 'SPPCreate'"
-            to="/spp/create"
+            to="/"
             clickable
           >
             <q-item-section avatar></q-item-section>
@@ -235,7 +206,7 @@
         >
           <template v-slot:header>
             <q-item-section avatar>
-              <q-icon name="assignment_turned_in"> </q-icon>
+              <q-icon name="o_assignment_turned_in"> </q-icon>
               <q-chip
                 v-if="
                   miniState &&
@@ -413,21 +384,16 @@
             </q-item-label>
           </q-item-section>
         </q-item>
-        <!-- menus -->
         <q-separator />
         <div style="flex-grow: 99 !important;"></div>
-        <!-- <q-separator />
-        <q-item clickable v-ripple>
-          <q-item-section avatar>
-            <q-icon name="keyboard_arrow_left" color="indigo-2" />
-          </q-item-section>
-          <q-item-label class="row items-center">Tutup Menu</q-item-label>
-        </q-item> -->
       </q-list>
     </q-drawer>
 
-    <q-page-container :class="$route.name != 'Login' ? 'q-mx-auto q-py-md' : ''" :style="$route.name != 'Login' ? 'max-width: 1440px;' : ''">
-      <q-card-section class="q-px-lg" v-if="$route.name != 'Login' ">
+    <q-page-container
+      :class="$route.name != 'Login' ? 'q-mx-auto q-py-md' : ''"
+      :style="$route.name != 'Login' ? 'max-width: 1440px;' : ''"
+    >
+      <q-card-section class="q-px-lg" v-if="$route.name != 'Login'">
         <div>
           <q-breadcrumbs>
             <q-breadcrumbs-el
@@ -783,7 +749,7 @@ export default {
 
 .my-font {
   font-family: "mainfont";
-  letter-spacing: 1px !important;
+  letter-spacing: 0.25px !important;
 }
 
 .f10 {
