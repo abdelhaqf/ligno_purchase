@@ -46,13 +46,7 @@
           </q-input>
         </div>
 
-        <q-btn
-          label="SPP Baru"
-          icon="add"
-          color="primary"
-          to="/spp/create"
-          unelevated
-        />
+        <q-btn label="SPP Baru" icon="add" color="primary" to="/" unelevated />
       </q-card-section>
 
       <!-- table  -->
