@@ -124,9 +124,9 @@
           text-color="white"
           label="Ajukan Ulang"
           @click="
-              reorderList();
-              showDialogReorder();
-            "
+            reorderList();
+            showDialogReorder();
+          "
           no-caps
         ></q-btn>
       </q-card-section>
@@ -344,7 +344,7 @@ export default {
 
       promptApprove: false,
       promptReject: false,
-      newSpp: [],
+      content: "",
     };
   },
   async mounted() {
@@ -557,7 +557,7 @@ export default {
 
     reorderList() {
       this.newSpp = [];
-      
+
       let temp = {};
       temp.item = this.spp.item;
       temp.qty = this.spp.qty;
@@ -571,7 +571,6 @@ export default {
       temp.user_id = this.$store.state.currentUser.user_id;
 
       this.newSpp.push(temp);
-      
     },
 
     showDialogReorder() {

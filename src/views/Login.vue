@@ -1,25 +1,32 @@
 <template class="q-pa-none">
   <div class="row my-font" style="height: 100vh; min-width: 100vh;">
-    <div class="bg-white column items-center justify-center l-grow"> 
+    <div
+      class="bg-white column items-center justify-center l-grow"
+      v-if="$q.screen.width > 768"
+    >
       <q-img
-          :src="require('@/assets/login_bg.png') "
-          style="max-height: 100vh;"
-        />
+        :src="require('@/assets/login_bg.png')"
+        style="max-height: 100vh;"
+      />
     </div>
-    <div style="width: 800px;" class="bg-grey-2 column justify-center">
+    <div
+      style="width: 600px;"
+      class="bg-grey-2 column justify-center q-mx-auto"
+    >
       <q-card class="loginForm bg-grey-2 q-pa-lg" flat>
         <q-card-section class="column items-center q-gutter-y-md">
           <q-img
-            :src="require('@/assets/Logo_Ligno.png') "
+            :src="require('@/assets/Logo_Ligno.png')"
             style="max-width: 180px;"
           />
-          <div style="max-width: 50vh;" class="column" >
+          <div style="max-width: 50vh;" class="column">
             <div class="text-h4 text-weight-bold text-center">
-              Selamat Datang Di Ligno app <span style="color: #0288D1;">Purchase</span>
+              Selamat Datang Di Ligno app
+              <span style="color: #0288D1;">Purchase</span>
             </div>
             <div class="text-right">
               <q-img
-                :src="require('@/assets/Line.png') "
+                :src="require('@/assets/Line.png')"
                 style="max-width: 180px;"
               />
             </div>
@@ -51,28 +58,26 @@
               class="q-mt-xs bg-white"
               :type="isPwd ? 'password' : 'text'"
             >
-            <template v-slot:append>
-              <q-icon
-                :name="isPwd ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="isPwd = !isPwd"
-              />
-            </template>
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
             </q-input>
           </div>
 
           <q-btn
-          no-caps
-          dense
-          class="full-width no-border-radius q-mt-lg q-pa-xs"
-          label="Login"
-          @click="login"
-          color="blue-7"
-        />
+            no-caps
+            dense
+            class="full-width no-border-radius q-mt-lg q-pa-xs"
+            label="Login"
+            @click="login"
+            color="blue-7"
+          />
         </q-card-section>
-
-        
-    </q-card>
+      </q-card>
     </div>
   </div>
 </template>
@@ -112,7 +117,7 @@ export default {
             .then((resp) => {
               if (resp.data.is_purchasing == 1 || resp.data.username == "ceo")
                 this.$router.push("/dashboard");
-              else this.$router.push("/spp/create");
+              else this.$router.push("/");
             });
           this.$q.notify({ message: "Login Berhasil!", color: "positive" });
         })
@@ -123,7 +128,13 @@ export default {
   },
 };
 </script>
-
+<style lang="scss">
+.q-img__image {
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  background-position: center !important;
+}
+</style>
 <style lang="scss" scoped>
 .loginForm {
   min-width: 320px;
