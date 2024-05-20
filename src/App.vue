@@ -334,7 +334,7 @@
         <q-item
           clickable
           v-ripple
-          :active="$route.name == 'POList'"
+          :active="$route.name == 'POList' || $route.name == 'PODetail'"
           class="inactive-menu"
           :active-class="
             miniState ? 'text-primary' : 'text-primary active-menu'
@@ -343,7 +343,7 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon :name="`${$route.name == 'POList' ? '' : 'o_'}shopping_bag`" />
+            <q-icon :name="`${$route.name == 'POList' || $route.name == 'PODetail' ? '' : 'o_'}shopping_bag`" />
             <!-- <q-icon name="shopping_bag" /> -->
             <q-chip
               v-if="miniState && count.count_spp > 0"

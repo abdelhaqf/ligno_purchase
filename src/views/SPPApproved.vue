@@ -2,7 +2,7 @@
   <div class="row relative q-px-lg ">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- table control -->
-      <q-card-section class="row justify-between q-gutter-x-md">
+      <q-card-section class="row justify-between q-gutter-x-md no-wrap">
         <div>
           <q-input
             outlined
@@ -52,6 +52,7 @@
       <q-markup-table
         v-if="sppList.length"
         class="stickyTable"
+        wrap-cells
         style="height: calc(100vh - 280px);"
       >
         <!-- table head -->
@@ -63,10 +64,9 @@
             <th>User</th>
             <th>Divisi</th>
             <th>PIC</th>
-            <th>Tanggal Pengajuan</th>
-            <th>Deadline</th>
+            <th>Tanggal</th>
             <th>Barang</th>
-            <th>Jumlah</th>
+            <th>Keterangan</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -85,14 +85,50 @@
             <td class="text-left">
               {{ d.handler_name }}
             </td>
-            <td class="text-center" style="width:150px">
-              {{ d.create_at | moment("DD MMM YYYY") }}
+            <td class="text-left" style="width:150px">
+                <div class="text-grey">Pengajuan</div>
+                <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+                <div class="text-grey">Deadline</div>
+                <div>{{ d.deadline | moment("DD MMM YYYY") }}</div>
             </td>
-            <td class="text-center" style="width:150px">
-              {{ d.deadline | moment("DD MMM YYYY") }}
+            <td class="text-left">
+              <div class="l-wrap-cell" style="width: 200px !important;">
+                  <span>
+                    {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                  </span>
+                  <span v-if="d.item.length > 55" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ d.item }}</q-tooltip
+                    >
+                  </span>
+                </div>
+                <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
             </td>
-            <td class="text-left">{{ d.item }}</td>
-            <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
+            <td class="text-left">
+              <div
+                  class="l-wrap-cell"
+                  style="width: 200px !important;"
+                >
+                <span>
+                  {{
+                    d.description.length > 55
+                      ? d.description.slice(0, 50)
+                      : d.description
+                  }}
+                </span>
+                <span v-if="d.description.length > 55" class=" no-wrap ">
+                  ...
+                  <q-tooltip
+                    content-style="width:300px"
+                    content-class="l-text-detail bg-white text-black shadow-2"
+                    >{{ d.description }}</q-tooltip
+                  >
+                </span>
+              </div>
+            </td>
             <td class="text-center">
               <q-btn-dropdown flat dense dropdown-icon="more_horiz">
                 <q-list>
@@ -397,5 +433,10 @@ export default {
 .v-money:focus {
   outline: none;
   box-shadow: inset 0 0 0 1.5pt #0e84eb;
+}
+.l-wrap-cell {
+  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
+  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
+  word-break: break-all;
 }
 </style>
