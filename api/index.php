@@ -764,6 +764,16 @@ Flight::route('GET /yearly_data_report', function () {
             ";
   runQuery($q);
 });
+Flight::route('GET /yearly_data_report_by_month', function () {
+  $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, MONTH(spp.create_at) AS 'month' FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+           GROUP BY MONTH(spp.create_at)
+           ORDER BY MONTH(spp.create_at) ASC
+            ";
+  runQuery($q);
+});
 Flight::route('GET /yearly_total_price', function () {
   $q = " SELECT IFNULL(SUM(price),0) AS 'total' FROM `spp` 
            WHERE po_id IS NOT NULL

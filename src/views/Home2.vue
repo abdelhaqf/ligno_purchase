@@ -2,13 +2,12 @@
   <div class="q-pa-md my-font">
     <div class="row q-pa-sm justify-between items-center">
       <div class="text-h4 text-weight-bold">
-        Selamat Datang <span>{{ curUser ? curUser.name : "" }}</span>
+        Selamat Datang <span>{{ curUser ? curUser.username : "" }}</span>
       </div>
       <div>
         <q-select
           dense
           outlined
-          label="Tampilan Data"
           v-model="selectedShow"
           :options="showOption"
           map-options
@@ -94,9 +93,20 @@
       </q-card>
     </div>
 
-    <div class="row q-gutter-md q-pa-md l-grow">
-      <div class="bg-white" style="width: 500px;">text</div>
-      <q-card flat bordered class="l-grow">
+    <div class="row q-gutter-md q-pa-md l-grow no-wrap justify-between">
+      <q-card flat bordered style="width: 53%;">
+        <q-card-section>
+          <v-chart
+            ref="chart1"
+            :options="optionByAct"
+            theme="default"
+            :autoresize="true"
+            style="width: 100%;"
+            class="q-mx-auto"
+          />
+        </q-card-section>
+      </q-card>
+      <q-card flat bordered style="width: 45%;">
         <q-card-section>
           <v-chart
             ref="chart1"
@@ -111,24 +121,28 @@
       </q-card>
     </div>
 
-    <div class="row q-gutter-md q-pa-md l-grow">
-      <q-card flat bordered class="col">
+    <div class="row q-gutter-md q-pa-md l-grow no-wrap justify-between">
+      <q-card flat bordered style="width: 40%;">
         <q-card-section>
           <v-chart
             :options="option50"
             theme="default"
             :autoresize="true"
+            style="width: 100%;"
+            class="q-mx-auto"
             @click="handleClick50"
           />
         </q-card-section>
       </q-card>
 
-      <q-card flat bordered class="col">
+      <q-card flat bordered style="width: 58%;">
         <q-card-section>
           <v-chart
             :options="option80"
             theme="default"
             :autoresize="true"
+            style="width: 100%;"
+            class="q-mx-auto"
             @click="handleClick80"
           />
         </q-card-section>
@@ -256,8 +270,11 @@ export default {
 
       option50: {
         title: {
-          text: "DATA 50 % PENGELUARAN BELANJA",
+          text: "DATA 50 % PENGELUARAN",
           left: "left",
+          textStyle: {
+            fontSize: 24, // Adjust the font size as needed
+          },
         },
         tooltip: {
           trigger: "item",
@@ -284,114 +301,7 @@ export default {
           orient: "horizontal",
           bottom: 10,
           data: [],
-        },
-        series: [
-          {
-            type: "pie",
-            radius: ["45%", "70%"],
-            center: ["50%", "50%"],
-            selectedMode: "single",
-            data: [],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)",
-              },
-            },
-          },
-        ],
-        color: colorPalette,
-      },
-      report_50: [],
-      total_50: 0,
-
-      option80: {
-        title: {
-          text: "DATA 80 % PENGELUARAN BELANJA",
-          left: "left",
-        },
-        tooltip: {
-          trigger: "item",
-          // formatter: "{b}<br/>Rp {c} ({d}%)",
-          formatter: (param, ticket) => {
-            return (
-              param.name +
-              "<br>" +
-              this.setCurrency(param.value, "IDR") +
-              " (" +
-              param.percent +
-              "%)"
-            );
-          },
-        },
-        grid: {
-          left: "2%",
-          right: "5%",
-          bottom: "3%",
-          containLabel: true,
-        },
-        xAxis: {
-          type: "value",
-        },
-        yAxis: {
-          type: "category",
-          data: [],
-          axisLabel: {
-            interval: 0,
-            rotate: 0,
-          },
-        },
-        series: [
-          {
-            name: "Data",
-            type: "bar",
-            data: [],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)",
-              },
-            },
-          },
-        ],
-      },
-      report_80: [],
-      total_80: 0,
-
-      optionBydept: {
-        title: {
-          text: "Data Belanja Per Departemen",
-          left: "center",
-        },
-        legend: {
-          orient: "vertical",
-          x: "right",
-
-          data: [],
-        },
-
-        tooltip: {
-          trigger: "item",
-          // formatter: "{b}<br/>Rp {c} ({d}%)",
-          formatter: (param, ticket) => {
-            return (
-              param.name +
-              "<br>" +
-              this.setCurrency(param.value, "IDR") +
-              " (" +
-              param.percent +
-              "%)"
-            );
-          },
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: "20",
-            fontWeight: "bold",
-          },
+          itemGap: 20,
         },
         series: [
           {
@@ -415,10 +325,180 @@ export default {
             },
           },
         ],
+        color: ["#0288D1", "#8D47FF", "#47C8FF"],
+      },
+      report_50: [],
+      total_50: 0,
+
+      option80: {
+        title: {
+          text: "DATA 80 % PENGELUARAN",
+          left: "left",
+          textStyle: {
+            fontSize: 24, // Adjust the font size as needed
+          },
+        },
+        color: ["#0288D1"], 
+        tooltip: {
+          trigger: "item",
+          // formatter: "{b}<br/>Rp {c} ({d}%)",
+          formatter: (param, ticket) => {
+            return (
+              param.name +
+              "<br>" +
+              this.setCurrency(param.value, "IDR") +
+              " (" +
+              (param.value * 100 / this.total_80).toFixed(2) +
+              "%)"
+            );
+          },
+        },
+        grid: {
+          left: "5%",
+          right: "5%",
+          bottom: "3%",
+          containLabel: true,
+        },
+        xAxis: {
+          type: 'value',
+          max: 'dataMax',
+          // axisLine: { show: false },
+          // axisLabel: { show: false },
+          // axisTick: { show: false },
+          // splitLine: { show: false },
+        },
+        yAxis: {
+          type: "category",
+          data: [],
+          inverse: true,
+          // axisLine: { show: false },
+          // axisTick: { show: false },
+          // splitLine: { show: false },
+        },
+        series: [
+          {
+            name: "Data",
+            type: "bar",
+            data: [],
+            // label: {
+            //   show: true,
+            //   position: "insideRight",
+            //   formatter: "{c}", // Display the x-axis value as label
+            // },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+      },
+      report_80: [],
+      total_80: 0,
+
+      optionBydept: {
+        title: {
+          text: "Data Belanja Per Departemen",
+          left: "left",
+          textStyle: {
+            fontSize: 24, // Adjust the font size as needed
+          },
+        },
+        legend: {
+          orient: "vertical",
+          right: 15,
+          top: "center",
+          data: [],
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: (param, ticket) => {
+            return (
+              param.name +
+              "<br>" +
+              this.setCurrency(param.value, "IDR") +
+              " (" +
+              param.percent +
+              "%)"
+            );
+          },
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "20",
+            fontWeight: "bold",
+          },
+        },
+        series: [
+          {
+            type: "pie",
+            radius: ["45%", "70%"],
+            center: ['30%', '50%'],
+            selectedMode: "single",
+            data: [],
+            label: {
+              show: false,
+            },
+            labelLine: {
+              show: false,
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
         color: colorPalette,
       },
       report_bydept: [],
       total_bydept: 0,
+
+      optionByAct: {
+        title: {
+          text: "Aktivitas Pengeluaran",
+          left: "left",
+          textStyle: {
+            fontSize: 24,
+          },
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: (param, ticket) => {
+            return (
+              param.name +
+              "<br>" +
+              this.setCurrency(param.value, "IDR")
+            );
+          },
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: []
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: [],
+            type: 'line',
+            smooth: true,
+            // symbol: 'none',
+            lineStyle: {
+              color: '#0288D1',
+              width: 2
+            },
+          }
+        ]
+      },
+      report_byAct: [],
 
       report_byKat: [],
       total_byKat: 0,
@@ -476,6 +556,8 @@ export default {
       this.optionBydept.series[0].data = [];
       this.optionBydept.legend.data = [];
       this.report_byKat = [];
+      this.optionByAct.series[0].data = [];
+      this.report_byAct = [];
 
       var dt = new Date().getFullYear();
       if (dt == this.selectedShow) {
@@ -509,8 +591,8 @@ export default {
                 name: result.data[i].vendor,
               });
               this.option80.yAxis.data.push(
-                result.data[i].vendor.length > 15
-                  ? result.data[i].vendor.substring(0, 15) + "..."
+                result.data[i].vendor.length > 20
+                  ? result.data[i].vendor.substring(0, 20) + "..."
                   : result.data[i].vendor
               );
             }
@@ -525,18 +607,18 @@ export default {
               this.option50.legend.data.push(result.data[i].vendor);
             }
           }
-          this.option80.title.text =
-            "80% Pengeluaran (" +
-            this.setCurrency(this.total_80, "IDR") +
-            " dari " +
-            this.setCurrency(this.totalPrice, "IDR") +
-            " )";
-          this.option50.title.text =
-            "50% Pengeluaran (" +
-            this.setCurrency(this.total_50, "IDR") +
-            " dari " +
-            this.setCurrency(this.totalPrice, "IDR") +
-            " )";
+          // this.option80.title.text =
+          //   "80% Pengeluaran (" +
+          //   this.setCurrency(this.total_80, "IDR") +
+          //   " dari " +
+          //   this.setCurrency(this.totalPrice, "IDR") +
+          //   " )";
+          // this.option50.title.text =
+          //   "50% Pengeluaran (" +
+          //   this.setCurrency(this.total_50, "IDR") +
+          //   " dari " +
+          //   this.setCurrency(this.totalPrice, "IDR") +
+          //   " )";
         });
 
         this.$http.get("/yearly_dept_report", {}).then((resp) => {
@@ -556,6 +638,19 @@ export default {
           for (var i = 0; i < resp.data.length; i++) {
             this.report_byKat.push(resp.data[i]);
           }
+        });
+
+        const months = [
+          'January', 'February', 'March', 'April',
+          'May', 'June', 'July', 'August',
+          'September', 'October', 'November', 'December'
+        ];
+        this.$http.get("/yearly_data_report_by_month", {}).then((resp) => {
+          for (var i = 0; i < resp.data.length; i++) {
+            this.report_byAct.push(resp.data[i]);
+            this.optionByAct.series[0].data.push(parseInt(resp.data[i].price));
+            this.optionByAct.xAxis.data.push(months[parseInt(resp.data[i].month, 10) - 1]);
+          };
         });
       });
     },
@@ -594,18 +689,18 @@ export default {
               this.option50.legend.data.push(result.data[i].vendor);
             }
           }
-          this.option50.title.text =
-            "80% Pengeluaran (" +
-            this.setCurrency(this.total_80, "IDR") +
-            " dari " +
-            this.setCurrency(this.totalPrice, "IDR") +
-            " )";
-          this.option80.title.text =
-            "50% Pengeluaran (" +
-            this.setCurrency(this.total_50, "IDR") +
-            " dari " +
-            this.setCurrency(this.totalPrice, "IDR") +
-            " )";
+          // this.option50.title.text =
+          //   "80% Pengeluaran (" +
+          //   this.setCurrency(this.total_80, "IDR") +
+          //   " dari " +
+          //   this.setCurrency(this.totalPrice, "IDR") +
+          //   " )";
+          // this.option80.title.text =
+          //   "50% Pengeluaran (" +
+          //   this.setCurrency(this.total_50, "IDR") +
+          //   " dari " +
+          //   this.setCurrency(this.totalPrice, "IDR") +
+          //   " )";
         });
       });
     },
