@@ -13,22 +13,27 @@
             clearable
             @clear="searchTerm = ''"
           >
-          <template v-slot:prepend>
-            <q-icon name="search" />
-          </template>
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
           </q-input>
         </div>
-        <q-btn 
-          no-caps  
+        <q-btn
+          no-caps
           unelevated
-          color="primary" 
-          label="Add Template" 
-          @click="showDialogTemplate(null)">
+          color="primary"
+          label="Add Template"
+          @click="showDialogTemplate(null)"
+        >
         </q-btn>
       </q-card-section>
 
       <!-- table  -->
-      <q-markup-table flat class="stickyTable" style="height: calc(100vh - 320px);">
+      <q-markup-table
+        flat
+        class="stickyTable"
+        style="height: calc(100vh - 270px);"
+      >
         <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th>No</th>
@@ -51,15 +56,14 @@
               <span>
                 {{ d.details.length }} Item
                 <q-tooltip
-                    content-style="width:300px"
-                    content-class="l-text-detail bg-white text-black shadow-2"
-                    >
-                     <div v-for="(item, i) in d.details" :key="i" class="">
-                        <div>{{ item.item }} ({{ item.qty }} {{ item.unit }})</div>
-                     </div>
+                  content-style="width:300px"
+                  content-class="l-text-detail bg-white text-black shadow-2"
+                >
+                  <div v-for="(item, i) in d.details" :key="i" class="">
+                    <div>{{ item.item }} ({{ item.qty }} {{ item.unit }})</div>
+                  </div>
                 </q-tooltip>
               </span>
-              
             </td>
             <td>
               <div class="l-wrap-cell" v-if="d.notes">
@@ -83,24 +87,22 @@
                   <q-item
                     clickable
                     v-close-popup
-                    @click="showDialogTemplate(d.id)">
+                    @click="showDialogTemplate(d.id)"
+                  >
                     Detail
-                  </q-item>
-                  <q-item
-                   clickable
-                    v-close-popup
-                    @click="showDialogOrder(d.id)">
-                    Order
                   </q-item>
                   <q-item
                     clickable
                     v-close-popup
-                    @click="deleteTemplate(d)">
+                    @click="showDialogOrder(d.id)"
+                  >
+                    Order
+                  </q-item>
+                  <q-item clickable v-close-popup @click="deleteTemplate(d)">
                     Delete
                   </q-item>
                 </q-list>
               </q-btn-dropdown>
-              
             </td>
           </tr>
         </tbody>
@@ -129,19 +131,23 @@ export default {
   methods: {
     async fetchData() {
       this.template = [];
-      this.$http.get(`/template_list`, {}).then((result) => {
-        for (var i = 0; i < result.data.length; i++) {
-          this.template.push(result.data[i]);
-        }
-      });
+      this.$http
+        .get(
+          `/template_list?search=${this.searchTerm ? this.searchTerm : ""}`,
+          {}
+        )
+        .then((result) => {
+          this.template = JSON.parse(JSON.stringify(result.data));
+        });
     },
     showDialogTemplate(id) {
-      this.$q.dialog({
-        component: dialogAddTemplate,
-        parent: this,
-        id_template: id,
-      })
-      .onOk(() => {
+      this.$q
+        .dialog({
+          component: dialogAddTemplate,
+          parent: this,
+          id_template: id,
+        })
+        .onOk(() => {
           this.fetchData();
         });
     },
@@ -154,7 +160,7 @@ export default {
         })
         .onOk((val) => {
           console.log("OK was clicked on dialog: ", val);
-        })
+        });
     },
     deleteTemplate(item) {
       this.$http.put("/inactivate_template", item, {}).then((result) => {

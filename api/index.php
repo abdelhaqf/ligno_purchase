@@ -119,19 +119,13 @@ Flight::route('GET /spp/list/@id', function ($id) {
 });
 
 Flight::route('GET /template_list', function () {
-
   $query = Flight::request()->query;
-
-  $current = $query->current;
-  $limit = $query->limit;
-  $offset = ($current - 1) * $limit;
-
   $w_search = "";
   if ($query->search != "") {
-    $w_search = "AND spp.item LIKE '%$query->search%'";
+    $w_search = "AND name LIKE '%$query->search%'";
   }
 
-  $q = "SELECT * FROM template WHERE is_active = 1";
+  $q = "SELECT * FROM template WHERE is_active = 1 $w_search";
   $templates = getRows($q);
   for ($i = 0; $i < count($templates); $i++) {
     $template = $templates[$i];
