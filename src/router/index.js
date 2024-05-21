@@ -11,6 +11,12 @@ const routes = [
     meta: { access: ["PURCHASING", "CEO"] },
   },
   {
+    path: "/newdashboard",
+    name: "Home2",
+    component: () => import("../views/Home2.vue"),
+    meta: { access: ["PURCHASING", "CEO"] },
+  },
+  {
     path: "/login",
     name: "Login",
     component: () => import("../views/Login.vue"),

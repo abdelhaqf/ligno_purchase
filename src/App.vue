@@ -398,7 +398,7 @@
       :class="$route.name != 'Login' ? 'q-mx-auto q-py-md' : ''"
       :style="$route.name != 'Login' ? 'max-width: 1440px;' : ''"
     >
-      <q-card-section class="q-px-lg" v-if="$route.name != 'Login'">
+      <q-card-section class="q-px-lg" v-if="$route.name != 'Login' && $route.name != 'Home2'">
         <div>
           <q-breadcrumbs>
             <q-breadcrumbs-el
