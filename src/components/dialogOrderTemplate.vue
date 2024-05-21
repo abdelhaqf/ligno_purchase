@@ -1,11 +1,11 @@
 <template>
     <q-dialog ref="dialog" @hide="onDialogHide" persistent>
             <q-card class="my-font" style="min-width: 1200px !important;">
-                <q-card-section class="items-center">
-                    <div class="text-h6 text-weight-bold q-mb-sm">Order dari Template</div>
+                <q-card-section class="q-py-sm">
+                    <div class="text-h6 text-weight-bold">Order dari Template</div>
                 </q-card-section>
                 <q-separator/>
-                <q-card-section class="bg-grey-2 column q-gutter-y-md q-pt-none">
+                <q-card-section class="column q-gutter-y-md">
                     <div class="row items-center l-grow">
                         <div style="width: 125px;">Deadline</div>
                         <q-field dense outlined class="l-grow bg-white">
@@ -44,100 +44,103 @@
                             placeholder="Pilih Nama"
                         ></q-select>
                     </div>
-                    <q-markup-table
-                        wrap-cells
-                        flat
-                        bordered
-                        class="stickyTable"
-                        >
-                            <!-- table head -->
-                            <thead class="text-white">
-                            <tr>
-                                <th>No</th>
-                                <th>Nama Barang</th>
-                                <th>QTY</th>
-                                <th>Satuan</th>
-                                <th>Keterangan</th>             
-                                <th class="q-mx-sm">Action</th>
-                            </tr>
-                            </thead>
-                            <!-- table body  -->
-                            <tbody>
-                                <tr v-for="(d, i) in template.template_detail" :key="i">
-                                    <td>{{ i + 1 }}</td>
-                                    <td>
-                                        {{ d.item }}
-                                    </td>
-                                    <td style="min-width: 150px;">
-                                        <q-input
-                                            type="number"
-                                            outlined
-                                            v-model="d.qty"
-                                            dense
-                                            class="l-grow"
-                                            placeholder="0"
-                                        />
-                                    </td>
-                                    <td>
-                                        <!-- {{ d.unit }} -->
-                                        <q-input
-                                            outlined
-                                            v-model="d.unit"
-                                            dense
-                                            class="l-grow"
-                                            placeholder="e.g. kg / m / dus"
-                                        >
-                                        </q-input>
-                                    </td>
-                                    <td style="min-width: 180px;">
-                                        
-                                        <!-- {{ d.description }}    -->
-                                        <q-input
-                                                outlined
-                                                v-model="d.description"
-                                                dense
-                                                autogrow
-                                                class="l-grow"
-                                                />
-                                        <!-- <div class="l-wrap-cell" v-if="d.description">
-                                            <span>
-                                                {{ d.description.length > 40 ? d.description.slice(0, 33) : d.description }}
-                                            </span>
-                                            <span v-if="d.description.length > 40" class=" no-wrap ">
-                                                ...
-                                                <q-tooltip
-                                                content-style="width:300px"
-                                                content-class="l-text-detail bg-white text-black shadow-2"
-                                                >{{ d.description }}</q-tooltip
-                                                >
-                                            </span>
-                                        </div>
-                                        <div v-else class="text-center l-grow">-</div> -->
-                                    </td>
-                                    <td class="text-center">
-                                        <q-btn
-                                            label="Hapus"
-                                            flat
-                                            no-caps
-                                            color="negative"
-                                            dense
-                                            @click="deleteSPPItem(i)"
-                                        />
-                                    </td>
+                    <div class="row l-grow">
+                        <div style="width: 125px;">Barang</div>
+                        <q-markup-table
+                            wrap-cells
+                            flat
+                            bordered
+                            class="stickyTable l-grow"
+                            >
+                                <!-- table head -->
+                                <thead class="text-white">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Barang</th>
+                                    <th>QTY</th>
+                                    <th>Satuan</th>
+                                    <th>Keterangan</th>             
+                                    <th class="q-mx-sm">Action</th>
                                 </tr>
-                            </tbody>
-                    </q-markup-table>
+                                </thead>
+                                <!-- table body  -->
+                                <tbody>
+                                    <tr v-for="(d, i) in template.template_detail" :key="i">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>
+                                            {{ d.item }}
+                                        </td>
+                                        <td style="min-width: 150px;">
+                                            <q-input
+                                                type="number"
+                                                outlined
+                                                v-model="d.qty"
+                                                dense
+                                                class="l-grow"
+                                                placeholder="0"
+                                            />
+                                        </td>
+                                        <td>
+                                            <!-- {{ d.unit }} -->
+                                            <q-input
+                                                outlined
+                                                v-model="d.unit"
+                                                dense
+                                                class="l-grow"
+                                                placeholder="e.g. kg / m / dus"
+                                            >
+                                            </q-input>
+                                        </td>
+                                        <td style="min-width: 180px;">
+                                            
+                                            <!-- {{ d.description }}    -->
+                                            <q-input
+                                                    outlined
+                                                    v-model="d.description"
+                                                    dense
+                                                    autogrow
+                                                    class="l-grow"
+                                                    />
+                                            <!-- <div class="l-wrap-cell" v-if="d.description">
+                                                <span>
+                                                    {{ d.description.length > 40 ? d.description.slice(0, 33) : d.description }}
+                                                </span>
+                                                <span v-if="d.description.length > 40" class=" no-wrap ">
+                                                    ...
+                                                    <q-tooltip
+                                                    content-style="width:300px"
+                                                    content-class="l-text-detail bg-white text-black shadow-2"
+                                                    >{{ d.description }}</q-tooltip
+                                                    >
+                                                </span>
+                                            </div>
+                                            <div v-else class="text-center l-grow">-</div> -->
+                                        </td>
+                                        <td class="text-center">
+                                            <q-btn
+                                                label="Hapus"
+                                                flat
+                                                no-caps
+                                                color="negative"
+                                                dense
+                                                @click="deleteSPPItem(i)"
+                                            />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                        </q-markup-table>
+                    </div>
+                    
                 </q-card-section>
-                <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md">
+                <q-card-actions align="right" class="row q-gutter-x-sm q-pa-md">
                     <q-btn
                         outline
                         label="Tidak, Kembali"
                         dense
-                        class="l-grow q-py-sm text-weight-bold"
+                        class="q-pa-sm text-weight-bold"
                         color="black"
                         no-caps
                         @click="onCancelClick"
-                        style="width: 30%"
                     />
                     <q-btn
                         dense
@@ -145,8 +148,7 @@
                         no-caps
                         color="primary"
                         label="Ya, Buat SPP"
-                        class=" l-grow q-py-sm text-weight-bold"
-                        style="width: 40%"
+                        class="q-pa-sm text-weight-bold"
                         @click="onOKClick"
                     />
                     </q-card-actions>
