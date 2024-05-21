@@ -1,10 +1,13 @@
 <template>
   <q-dialog ref="dialog" @hide="onDialogHide" persistent>
-    <q-card class="q-dialog-plugin my-font" style="min-width: 900px; max-height: 90vh;">
+    <q-card
+      class="q-dialog-plugin my-font"
+      style="min-width: 900px; max-height: 90vh;"
+    >
       <q-card-section>
-        <div class="text-h6 text-weight-bold q-mb-sm">Form Template Baru </div>
+        <div class="text-h6 text-weight-bold q-mb-sm">Form Template Baru</div>
       </q-card-section>
-      <q-separator/>
+      <q-separator />
       <q-card-section class="bg-grey-2 column q-gutter-y-md q-pt-none">
         <div class="row items-center l-grow">
           <div style="width: 125px;">Nama Template</div>
@@ -27,12 +30,8 @@
             placeholder="e.g keperluan maintanance..."
           />
         </div>
-        
-        <q-markup-table
-            wrap-cells
-            flat
-            bordered
-            class="stickyTable">
+
+        <q-markup-table wrap-cells flat bordered class="stickyTable">
           <thead>
             <tr>
               <th>No</th>
@@ -64,12 +63,6 @@
                         icon="add"
                         keep-color
                       />
-                    </template>
-                    <template v-slot:label>
-                      1. Nama Barang
-                      <a class="q-px-sm bg-info text-white rounded-borders"
-                        >input baru</a
-                      >
                     </template>
                   </q-input>
                   <q-select
@@ -105,11 +98,16 @@
                     dense
                     type="number"
                     v-model="val.qty"
-                    
                   ></q-input>
                 </td>
-                <td><q-input outlined
-                    dense v-model="val.unit" style="width:200px"></q-input></td>
+                <td>
+                  <q-input
+                    outlined
+                    dense
+                    v-model="val.unit"
+                    style="width:200px"
+                  ></q-input>
+                </td>
                 <td>
                   <q-btn
                     label="Hapus"
@@ -142,7 +140,7 @@
                 </td>
               </q-tr>
             </tr>
-            <tr>
+            <tr class="cursor-pointer">
               <td
                 colspan="5"
                 class="text-center text-blue"
@@ -163,41 +161,49 @@
         </q-markup-table>
       </q-card-section>
 
-      <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md" v-if="!$props.id_template">
-        <q-btn 
+      <q-card-actions
+        align="between"
+        class="row q-gutter-x-sm q-pa-md"
+        v-if="!$props.id_template"
+      >
+        <q-btn
           class="l-grow text-weight-bold"
           outline
           no-caps
-          color="black" 
-          label="Kembali" 
+          color="black"
+          label="Kembali"
           @click="onCancelClick"
-          style="width: 30%" />
-        <q-btn 
+          style="width: 30%"
+        />
+        <q-btn
           class="l-grow text-weight-bold"
           unelevated
           no-caps
-          color="primary"  
-          label="Simpan" 
-          @click="createTemplate" 
-          style="width: 40%"/>
+          color="primary"
+          label="Simpan"
+          @click="createTemplate"
+          style="width: 40%"
+        />
       </q-card-actions>
       <q-card-actions align="between" class="row q-gutter-x-sm q-pa-md" v-else>
-        <q-btn 
+        <q-btn
           class="l-grow text-weight-bold"
           outline
           no-caps
-          color="black" 
-          label="Kembali" 
+          color="black"
+          label="Kembali"
           @click="onCancelClick"
-          style="width: 30%" />
-        <q-btn 
+          style="width: 30%"
+        />
+        <q-btn
           class="l-grow text-weight-bold"
           unelevated
           no-caps
-          color="primary"  
-          label="Edit Template" 
-          @click="updateTemplate" 
-          style="width: 40%"/>
+          color="primary"
+          label="Edit Template"
+          @click="updateTemplate"
+          style="width: 40%"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -224,7 +230,7 @@ export default {
     if (this.$props.id_template) {
       await this.getTemplate();
     }
-    
+
     await this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
       this.option = this.option.filter((obj) => obj.value !== "");
@@ -287,7 +293,7 @@ export default {
     },
 
     onOKClick() {
-      this.$emit("ok")
+      this.$emit("ok");
       this.hide();
     },
 

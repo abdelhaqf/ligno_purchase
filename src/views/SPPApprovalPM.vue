@@ -19,7 +19,7 @@
             </template>
           </q-input>
         </div>
-        
+
         <div class="row items-center q-gutter-x-sm">
           <q-select
             outlined
@@ -46,7 +46,6 @@
             style="width: 230px;"
           ></q-select>
         </div>
-        
       </q-card-section>
       <q-markup-table
         v-if="sppList.length"
@@ -61,33 +60,65 @@
             </th>
             <th>User</th>
             <th>Divisi</th>
-            <th>Tanggal Pengajuan</th>
-            <th>Deadline</th>
+            <th>Tanggal</th>
             <th>Barang</th>
-            <th>Jumlah</th>
+            <th>Keterangan</th>
             <th>Action</th>
           </tr>
         </thead>
         <!-- table body  -->
         <tbody>
           <tr v-for="(d, i) in sppList" :key="i">
-            <td>
+            <td style="vertical-align: top; padding-top: 0 !important;">
               <q-checkbox v-model="d.select" />
             </td>
-            <td class="text-left">
+            <td class="text-left" style="vertical-align: top;">
               {{ d.name }}
             </td>
-            <td class="text-left">
+            <td class="text-left" style="vertical-align: top;">
               {{ d.dept }}
             </td>
-            <td class="text-center" style="width:150px">
-              {{ d.create_at | moment("DD MMM YYYY") }}
+            <td class="text-left" style="width:150px; vertical-align: top;">
+              <div class="text-grey">Pengajuan</div>
+              <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+              <div class="text-grey">Deadline</div>
+              <div>{{ d.deadline | moment("DD MMM YYYY") }}</div>
             </td>
-            <td class="text-center" style="width:150px">
-              {{ d.deadline | moment("DD MMM YYYY") }}
+            <td class="text-left" style="vertical-align: top;">
+              <div class="l-wrap-cell" style="width: 200px !important;">
+                <span>
+                  {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                </span>
+                <span v-if="d.item.length > 55" class=" no-wrap ">
+                  ...
+                  <q-tooltip
+                    content-style="width:300px"
+                    content-class="l-text-detail bg-white text-black shadow-2"
+                    >{{ d.item }}</q-tooltip
+                  >
+                </span>
+              </div>
+              <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
             </td>
-            <td class="text-left">{{ d.item }}</td>
-            <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
+            <td class="text-left" style="vertical-align: top;">
+              <div class="l-wrap-cell" style="width: 200px !important;">
+                <span>
+                  {{
+                    d.description.length > 55
+                      ? d.description.slice(0, 50)
+                      : d.description
+                  }}
+                </span>
+                <span v-if="d.description.length > 55" class=" no-wrap ">
+                  ...
+                  <q-tooltip
+                    content-style="width:300px"
+                    content-class="l-text-detail bg-white text-black shadow-2"
+                    >{{ d.description }}</q-tooltip
+                  >
+                </span>
+              </div>
+            </td>
             <td class="text-center">
               <q-btn-dropdown flat dense dropdown-icon="more_horiz">
                 <q-list>
@@ -100,6 +131,7 @@
                   </q-item>
                   <q-item
                     clickable
+                    class="text-positive text-bold"
                     v-close-popup
                     @click="
                       clearSelect(i);
@@ -110,6 +142,7 @@
                   </q-item>
                   <q-item
                     clickable
+                    class="text-negative text-bold"
                     v-close-popup
                     @click="
                       clearSelect(i);
@@ -162,8 +195,8 @@
       </q-card-section>
     </q-footer>
 
-     <!-- persetujuan -->
-     <q-dialog v-model="confirmApprove" persistent>
+    <!-- persetujuan -->
+    <q-dialog v-model="confirmApprove" persistent>
       <q-card style="max-width: 400px;">
         <q-card-section class="column">
           <div class="l-text-subtitle text-bold">Pilih PIC</div>
@@ -296,7 +329,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
   </div>
 </template>
 
@@ -329,8 +361,8 @@ export default {
 
       searchTerm: "",
       check_all: false,
-      
-      optionKategori:[
+
+      optionKategori: [
         "Keperluan & Peralatan Produksi",
         "Packing Barang",
         "Makan & Minum",
@@ -349,7 +381,7 @@ export default {
         "Raw Material",
         "Perbaikan Gudang",
       ],
-      selKategori:null
+      selKategori: null,
     };
   },
   mounted() {
@@ -392,7 +424,7 @@ export default {
     },
     fetchData() {
       this.sppList = [];
-      console.log(this.selDivisi)
+      console.log(this.selDivisi);
       let q_filter = `?sort=${this.selSort}&search=${
         this.searchTerm ? this.searchTerm : ""
       }&dept=${this.selDivisi ? this.selDivisi : ""}`;
@@ -407,7 +439,7 @@ export default {
           }
         }
       });
-      this.$http.get("/list_user", {}).then(result => {
+      this.$http.get("/list_user", {}).then((result) => {
         this.option = result.data;
         this.handleBy = result.data[0];
       });
@@ -416,7 +448,7 @@ export default {
       // let resp = this.$http.get("/dept")
       this.$http.get("/dept").then((resp) => {
         let dept = resp.data.map((a) => a.dept);
-        this.optDept = dept
+        this.optDept = dept;
       });
     },
 
@@ -424,79 +456,78 @@ export default {
       var data = {
         purch_manager_approve: 1,
         handle_by: this.handleBy.value,
-        kategori : this.selKategori
+        kategori: this.selKategori,
       };
       await this.$http
         .put("/update_spp/" + val.spp_id, data, {})
-        .then(result => {});
+        .then((result) => {});
 
       var history = {
         spp_id: val.spp_id,
         status: "process",
         content:
           "Sudah disetujui manager purchasing, diproses oleh: " +
-          this.handleBy.label
+          this.handleBy.label,
       };
-      await this.$http.post("/new_history", history, {}).then(result => {});
+      await this.$http.post("/new_history", history, {}).then((result) => {});
       var notifikasi = {
         from_id: this.$store.state.currentUser.user_id,
         to_id: val.user_id,
         notif: "SPP Anda sudah disetujui manager purchasing",
         note: "Dalam proses pencarian vendor",
         spp_id: val.spp_id,
-        reference_page: "/spp/list"
+        reference_page: "/spp/list",
       };
-      this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
       notifikasi.to_id = this.handleBy.value;
       notifikasi.notif = "SPP Baru perlu di proses";
       notifikasi.reference_page = "/spp/approved";
       notifikasi.note = "";
 
-      this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
 
     async reject(val) {
       var data = {
         purch_manager_approve: -1,
-        note: this.content
+        note: this.content,
       };
       await this.$http
         .put("/update_spp/" + val.spp_id, data, {})
-        .then(result => {});
+        .then((result) => {});
 
       var history = {
         spp_id: val.spp_id,
         status: "rejected",
-        content: "SPP ditolak manager purchasing: " + this.content
+        content: "SPP ditolak manager purchasing: " + this.content,
       };
-      await this.$http.post("/new_history", history, {}).then(result => {});
+      await this.$http.post("/new_history", history, {}).then((result) => {});
       var notifikasi = {
         from_id: this.$store.state.currentUser.user_id,
         to_id: val.user_id,
         notif: "SPP Anda ditolak manager purchasing",
         note: val.note,
         spp_id: val.spp_id,
-        reference_page: "/spp/list"
+        reference_page: "/spp/list",
       };
-      this.$http.post("/notifikasi", notifikasi, {}).then(result => {});
+      this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },
 
     async approveSelected() {
       this.show_detail = false;
-      var data = this.sppList.filter(e => e.select === true);
+      var data = this.sppList.filter((e) => e.select === true);
       for (var i = 0; i < data.length; i++) {
-        
         await this.approve(data[i]);
       }
       await this.fetchData();
       await this.$root.$emit("refresh");
-      this.selKategori = null
+      this.selKategori = null;
       this.$q.notify("SPP berhasil disetujui!");
     },
 
     async rejectSelected() {
-      var data = this.sppList.filter(e => e.select === true);
+      var data = this.sppList.filter((e) => e.select === true);
       for (var i = 0; i < data.length; i++) {
         await this.reject(data[i]);
       }
@@ -508,7 +539,7 @@ export default {
     showHistory() {
       this.$http
         .get("/spp_history/" + this.selected.spp_id, {})
-        .then(result => {
+        .then((result) => {
           this.history = result.data;
         });
       this.show_history = true;
@@ -532,11 +563,11 @@ export default {
       else if (val == "created") return "library_add";
       else if (val == "canceled") return "close";
       else return "pending_actions";
-    }
+    },
   },
   computed: {
     selectCount() {
-      var data = this.sppList.filter(e => e.select === true);
+      var data = this.sppList.filter((e) => e.select === true);
       var count = data.length;
 
       if (data[0]) this.selected = data[0];
@@ -555,8 +586,8 @@ export default {
       } else {
         return "Sedang diproses oleh " + this.selected.handler_name;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

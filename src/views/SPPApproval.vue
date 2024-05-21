@@ -41,30 +41,66 @@
               <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
             </th>
             <th>User</th>
-            <th>Tanggal Pengajuan</th>
-            <th>Deadline</th>
+            <th>Divisi</th>
+            <th>Tanggal</th>
             <th>Barang</th>
-            <th>Jumlah</th>
+            <th>Keterangan</th>
             <th>Action</th>
           </tr>
         </thead>
         <!-- table body  -->
         <tbody>
           <tr v-for="(d, i) in sppList" :key="i">
-            <td>
+            <td style="vertical-align: top; padding-top: 0 !important;">
               <q-checkbox v-model="d.select" />
             </td>
-            <td class="text-left">
+            <td class="text-left" style="vertical-align: top;">
               {{ d.name }}
             </td>
-            <td class="text-center" style="width:150px">
-              {{ d.create_at | moment("DD MMM YYYY") }}
+            <td class="text-left" style="vertical-align: top;">
+              {{ d.dept }}
             </td>
-            <td class="text-center" style="width:150px">
-              {{ d.deadline | moment("DD MMM YYYY") }}
+            <td class="text-left" style="width:150px; vertical-align: top;">
+              <div class="text-grey">Pengajuan</div>
+              <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+              <div class="text-grey">Deadline</div>
+              <div>{{ d.deadline | moment("DD MMM YYYY") }}</div>
             </td>
-            <td class="text-left">{{ d.item }}</td>
-            <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
+            <td class="text-left" style="vertical-align: top;">
+              <div class="l-wrap-cell" style="width: 200px !important;">
+                <span>
+                  {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                </span>
+                <span v-if="d.item.length > 55" class=" no-wrap ">
+                  ...
+                  <q-tooltip
+                    content-style="width:300px"
+                    content-class="l-text-detail bg-white text-black shadow-2"
+                    >{{ d.item }}</q-tooltip
+                  >
+                </span>
+              </div>
+              <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
+            </td>
+            <td class="text-left" style="vertical-align: top;">
+              <div class="l-wrap-cell" style="width: 200px !important;">
+                <span>
+                  {{
+                    d.description.length > 55
+                      ? d.description.slice(0, 50)
+                      : d.description
+                  }}
+                </span>
+                <span v-if="d.description.length > 55" class=" no-wrap ">
+                  ...
+                  <q-tooltip
+                    content-style="width:300px"
+                    content-class="l-text-detail bg-white text-black shadow-2"
+                    >{{ d.description }}</q-tooltip
+                  >
+                </span>
+              </div>
+            </td>
             <td class="text-center">
               <q-btn-dropdown flat dense dropdown-icon="more_horiz">
                 <q-list>
@@ -84,6 +120,7 @@
                   </q-item> -->
                   <q-item
                     clickable
+                    class="text-positive text-bold"
                     v-close-popup
                     @click="
                       clearSelect(i);
@@ -94,6 +131,7 @@
                   </q-item>
                   <q-item
                     clickable
+                    class="text-negative text-bold"
                     v-close-popup
                     @click="
                       clearSelect(i);

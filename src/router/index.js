@@ -135,6 +135,8 @@ const router = new VueRouter({
 function checkAccess(user, access) {
   if (user?.dept == "IT" && user?.is_manager == "1") {
     return true;
+  } else if (user?.dept == "CEO" && user?.is_manager == "1") {
+    return true;
   } else if (access.includes("PURCHASING") && user?.is_purchasing == "1") {
     return true;
   } else if (access.includes("MANAGER") && user?.is_manager == "1") {
