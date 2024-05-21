@@ -44,7 +44,7 @@
             <th>Divisi</th>
             <th>Tanggal</th>
             <th>Barang</th>
-            <th>Keterangan</th>
+            <th style="width: 250px !important;">Keterangan</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -83,15 +83,18 @@
               <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
             </td>
             <td class="text-left" style="vertical-align: top;">
-              <div class="l-wrap-cell" style="width: 200px !important;">
+              <div
+                  class="l-wrap-cell"
+                  style="width: 250px !important;"
+                >
                 <span>
                   {{
-                    d.description.length > 55
-                      ? d.description.slice(0, 50)
+                    d.description.length > 140
+                      ? d.description.slice(0, 135)
                       : d.description
                   }}
                 </span>
-                <span v-if="d.description.length > 55" class=" no-wrap ">
+                <span v-if="d.description.length > 140" class=" no-wrap ">
                   ...
                   <q-tooltip
                     content-style="width:300px"
@@ -528,4 +531,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.l-wrap-cell {
+  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
+  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
+  word-break: break-all;
+}
+</style>

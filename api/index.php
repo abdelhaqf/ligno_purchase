@@ -781,7 +781,7 @@ Flight::route('GET /yearly_total_price', function () {
             ";
   runQuery2($q);
 });
-Flight::route('GET /MONTHLY_data_report', function () {
+Flight::route('GET /monthly_data_report', function () {
   $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, po.vendor FROM `spp` 
 		       INNER JOIN po ON po.po_id = spp.po_id
            WHERE spp.po_id IS NOT NULL
@@ -792,7 +792,7 @@ Flight::route('GET /MONTHLY_data_report', function () {
             ";
   runQuery($q);
 });
-Flight::route('GET /MONTHLY_total_price', function () {
+Flight::route('GET /monthly_total_price', function () {
   $q = " SELECT IFNULL(SUM(price),0) AS 'total' FROM `spp` 
            WHERE po_id IS NOT NULL
            AND MONTH(spp.create_at) = MONTH(CURRENT_DATE)
@@ -816,6 +816,21 @@ Flight::route('GET /yearly_dept_report', function () {
   runQuery($q);
 });
 
+Flight::route('GET /monthly_dept_report', function () {
+  $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, 
+            CASE WHEN spp.cost_category = '' THEN 'belum dikategorikan' 
+            ELSE  spp.cost_category END AS 'cost_category'
+         FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND MONTH(spp.create_at) = MONTH(CURRENT_DATE)
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)   
+           GROUP BY currency, spp.cost_category
+           ORDER BY price DESC
+            ";
+  runQuery($q);
+});
+
 Flight::route('GET /yearly_kat_report', function () {
   $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, 
             CASE WHEN spp.kategori = '' THEN 'belum dikategorikan' 
@@ -823,6 +838,21 @@ Flight::route('GET /yearly_kat_report', function () {
          FROM `spp` 
 		       INNER JOIN po ON po.po_id = spp.po_id
            WHERE spp.po_id IS NOT NULL
+           AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
+           GROUP BY currency, spp.kategori
+           ORDER BY price DESC
+            ";
+  runQuery($q);
+});
+
+Flight::route('GET /monthly_kat_report', function () {
+  $q = " SELECT IFNULL(SUM(price),0) AS 'price', currency, 
+            CASE WHEN spp.kategori = '' THEN 'belum dikategorikan' 
+            ELSE  spp.kategori END AS 'kategori'
+         FROM `spp` 
+		       INNER JOIN po ON po.po_id = spp.po_id
+           WHERE spp.po_id IS NOT NULL
+           AND MONTH(spp.create_at) = MONTH(CURRENT_DATE)
            AND YEAR(spp.create_at) = YEAR(CURRENT_DATE)
            GROUP BY currency, spp.kategori
            ORDER BY price DESC

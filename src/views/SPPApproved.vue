@@ -114,12 +114,12 @@
                 >
                 <span>
                   {{
-                    d.description.length > 55
-                      ? d.description.slice(0, 50)
+                    d.description.length > 125
+                      ? d.description.slice(0, 120)
                       : d.description
                   }}
                 </span>
-                <span v-if="d.description.length > 55" class=" no-wrap ">
+                <span v-if="d.description.length > 125" class=" no-wrap ">
                   ...
                   <q-tooltip
                     content-style="width:300px"

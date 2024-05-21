@@ -113,10 +113,11 @@
             :options="optionBydept"
             theme="default"
             :autoresize="true"
-            style="width: 100%;"
+            :style="optionBydept.series[0].data.length ? 'width: 100%;' : 'width: 100%; height: 200px;'"
             class="q-mx-auto"
             @click="handleClickByDept"
           />
+          <div v-if="!optionBydept.series[0].data.length" class="text-h5 text-bold text-center">Data Masih Kosong</div>
         </q-card-section>
       </q-card>
     </div>
@@ -128,10 +129,15 @@
             :options="option50"
             theme="default"
             :autoresize="true"
-            style="width: 100%;"
+            :style="optionBydept.series[0].data.length ? 'width: 100%;' : 'width: 100%; height: 35px;'"
             class="q-mx-auto"
             @click="handleClick50"
           />
+          <div v-if="!optionBydept.series[0].data.length" 
+          class="text-h5 text-bold row items-center justify-center" 
+            style="height: 200px; vertical-align: middle;">
+            <div>Data Masih Kosong</div>
+          </div>
         </q-card-section>
       </q-card>
 
@@ -141,10 +147,15 @@
             :options="option80"
             theme="default"
             :autoresize="true"
-            style="width: 100%;"
+            :style="optionBydept.series[0].data.length ? 'width: 100%;' : 'width: 100%; height: 35px;'"
             class="q-mx-auto"
             @click="handleClick80"
           />
+          <div v-if="!option80.series[0].data.length" 
+            class="text-h5 text-bold row items-center justify-center" 
+            style="height: 200px; vertical-align: middle;">
+            <div>Data Masih Kosong</div>
+          </div>
         </q-card-section>
       </q-card>
     </div>
@@ -165,7 +176,7 @@
             to="/approval/purchasing"
           />
         </q-card-section>
-        <q-card-section class="q-pa-none">
+        <q-card-section class="q-pa-none" v-if="sppList.length">
           <q-markup-table wrap-cells flat class="stickyTable">
             <thead class="text-white">
               <tr>
@@ -195,13 +206,22 @@
             </tbody>
           </q-markup-table>
         </q-card-section>
+        <q-card-section
+          class="text-center"
+          v-else
+        >
+          <div>
+            <q-img :src="`./empty.png`" style="width: 200px;"></q-img>
+          </div>
+          <div class="text-h6 text-bold">Data Masih Kosong</div>
+        </q-card-section>
       </q-card>
 
       <q-card flat bordered class="l-grow">
         <q-card-section class="q-pa-md text-h6 text-weight-bold">
           Pengeluaran Per Kategori
         </q-card-section>
-        <q-card-section class="q-pa-none">
+        <q-card-section class="q-pa-none" v-if="report_byKat.length">
           <q-markup-table wrap-cells flat class="stickyTable">
             <thead class="text-white">
               <tr>
@@ -226,6 +246,15 @@
               </tr>
             </tbody>
           </q-markup-table>
+        </q-card-section>
+        <q-card-section
+          class="text-center"
+          v-else
+        >
+          <div>
+            <q-img :src="`./empty.png`" style="width: 200px;"></q-img>
+          </div>
+          <div class="text-h6 text-bold">Data Masih Kosong</div>
         </q-card-section>
       </q-card>
     </div>
@@ -477,13 +506,34 @@ export default {
             );
           },
         },
+        grid: {
+          left: "5%",
+          right: "5%",
+          bottom: "3%",
+          containLabel: true,
+        },
         xAxis: {
           type: 'category',
           boundaryGap: false,
           data: []
         },
         yAxis: {
-          type: 'value'
+          type: 'value',
+          axisLabel: {
+            formatter: val => {
+              if(String(val).length < 7) {
+                return (val / 1000) + " Ribu"
+              }
+              else if (String(val).length >= 7 && String(val).length <= 9){
+                return (val / 1000000) + " Juta"
+              }
+              else if (String(val).length >= 10 && String(val).length <= 12){
+                return (val / 1000000000) + " Miliar"
+              } else {
+                return (val / 1000000000000) + " Triliun"
+              }
+            }
+          }
         },
         series: [
           {
@@ -552,15 +602,19 @@ export default {
       this.option50.series[0].data = [];
       this.report_80 = [];
       this.option80.series[0].data = [];
+      this.option80.yAxis.data = [];
       this.report_bydept = [];
       this.optionBydept.series[0].data = [];
       this.optionBydept.legend.data = [];
       this.report_byKat = [];
-      this.optionByAct.series[0].data = [];
-      this.report_byAct = [];
+      
 
       var dt = new Date().getFullYear();
       if (dt == this.selectedShow) {
+        this.optionByAct.series[0].data = [];
+        this.optionByAct.xAxis.data = [];
+        this.report_byAct = [];
+
         this.showByYear(this.selectedShow);
       } else {
         this.showByMonth(this.selectedShow);
@@ -607,18 +661,6 @@ export default {
               this.option50.legend.data.push(result.data[i].vendor);
             }
           }
-          // this.option80.title.text =
-          //   "80% Pengeluaran (" +
-          //   this.setCurrency(this.total_80, "IDR") +
-          //   " dari " +
-          //   this.setCurrency(this.totalPrice, "IDR") +
-          //   " )";
-          // this.option50.title.text =
-          //   "50% Pengeluaran (" +
-          //   this.setCurrency(this.total_50, "IDR") +
-          //   " dari " +
-          //   this.setCurrency(this.totalPrice, "IDR") +
-          //   " )";
         });
 
         this.$http.get("/yearly_dept_report", {}).then((resp) => {
@@ -646,10 +688,19 @@ export default {
           'September', 'October', 'November', 'December'
         ];
         this.$http.get("/yearly_data_report_by_month", {}).then((resp) => {
-          for (var i = 0; i < resp.data.length; i++) {
-            this.report_byAct.push(resp.data[i]);
-            this.optionByAct.series[0].data.push(parseInt(resp.data[i].price));
-            this.optionByAct.xAxis.data.push(months[parseInt(resp.data[i].month, 10) - 1]);
+          let max = Math.max(...resp.data.map(o => o.month))
+          for (var i = 0; i < months.length; i++) {
+            let temp = resp.data.find(el => parseInt(el.month) - 1 == i)
+            if(temp){
+              this.report_byAct.push(temp);
+              this.optionByAct.series[0].data.push(parseInt(temp.price));
+              this.optionByAct.xAxis.data.push(months[i]);
+            } else {
+              if(i < max){
+                this.optionByAct.series[0].data.push(0);
+              }
+              this.optionByAct.xAxis.data.push(months[i]);
+            }
           };
         });
       });
@@ -660,6 +711,7 @@ export default {
       });
 
       this.$http.get("/monthly_total_price", {}).then((result) => {
+        console.log(result.data);
         this.totalPrice = parseInt(result.data.total);
         var margin_80 = this.totalPrice * 0.8;
         var margin_50 = this.totalPrice * 0.5;
@@ -689,19 +741,27 @@ export default {
               this.option50.legend.data.push(result.data[i].vendor);
             }
           }
-          // this.option50.title.text =
-          //   "80% Pengeluaran (" +
-          //   this.setCurrency(this.total_80, "IDR") +
-          //   " dari " +
-          //   this.setCurrency(this.totalPrice, "IDR") +
-          //   " )";
-          // this.option80.title.text =
-          //   "50% Pengeluaran (" +
-          //   this.setCurrency(this.total_50, "IDR") +
-          //   " dari " +
-          //   this.setCurrency(this.totalPrice, "IDR") +
-          //   " )";
         });
+
+        this.$http.get("/monthly_dept_report", {}).then((resp) => {
+          for (var i = 0; i < resp.data.length; i++) {
+            this.report_bydept.push(resp.data[i]);
+            this.optionBydept.series[0].data.push({
+              value: resp.data[i].price,
+              name: resp.data[i].cost_category.toUpperCase(),
+            });
+            this.optionBydept.legend.data.push(
+              resp.data[i].cost_category.toUpperCase()
+            );
+          }
+        });
+
+        this.$http.get("/monthly_kat_report", {}).then((resp) => {
+          for (var i = 0; i < resp.data.length; i++) {
+            this.report_byKat.push(resp.data[i]);
+          }
+        });
+
       });
     },
     setCurrency(price, cur) {
