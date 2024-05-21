@@ -1,7 +1,9 @@
 <template>
   <div class="q-pa-md my-font">
     <div class="row q-pa-sm justify-between items-center">
-      <div class="text-h4 text-weight-bold">Selamat Datang <span>{{ curUser ? curUser.name : "" }}</span></div>
+      <div class="text-h4 text-weight-bold">
+        Selamat Datang <span>{{ curUser ? curUser.name : "" }}</span>
+      </div>
       <div>
         <q-select
           dense
@@ -20,17 +22,16 @@
 
     <div class="row q-pa-md q-gutter-md justify-between">
       <q-card flat bordered class="l-grow">
-        <q-card-section class="row justify-between text-left q-pb-none" style="min-width: 200px;">
+        <q-card-section
+          class="row justify-between text-left q-pb-none"
+          style="min-width: 200px;"
+        >
           <div>SPP Diproses</div>
           <div
             class="items-center text-center q-pa-xs"
             style="border-radius: 20%; background: #E0DCFE;"
           >
-            <q-icon
-              size="xs"
-              color="deep-purple-13"
-              name="list_alt"
-            />
+            <q-icon size="xs" color="deep-purple-13" name="list_alt" />
           </div>
         </q-card-section>
         <q-card-section class="text-left text-h4 text-weight-bold q-pt-sm">{{
@@ -39,17 +40,16 @@
       </q-card>
 
       <q-card flat bordered class="l-grow">
-        <q-card-section class="row justify-between text-left q-pb-none" style="min-width: 250px;">
+        <q-card-section
+          class="row justify-between text-left q-pb-none"
+          style="min-width: 250px;"
+        >
           <div>SPP Dalam Persetujuan</div>
           <div
             class="items-center text-center q-pa-xs"
             style="border-radius: 20%; background: #E7FAFE;"
           >
-            <q-icon
-              size="xs"
-              color="blue-12"
-              name="o_assignment_turned_in"
-            />
+            <q-icon size="xs" color="blue-12" name="o_assignment_turned_in" />
           </div>
         </q-card-section>
         <q-card-section class="text-left text-h4 text-weight-bold q-pt-sm">{{
@@ -58,17 +58,16 @@
       </q-card>
 
       <q-card flat bordered class="l-grow">
-        <q-card-section class="row justify-between text-left q-pb-none" style="min-width: 300px;">
+        <q-card-section
+          class="row justify-between text-left q-pb-none"
+          style="min-width: 300px;"
+        >
           <div>Pembelian (IDR)</div>
           <div
             class="items-center text-center q-pa-xs"
             style="border-radius: 20%; background: #FBEBEC;"
           >
-            <q-icon
-              size="xs"
-              color="red-6"
-              name="o_local_mall"
-            />
+            <q-icon size="xs" color="red-6" name="o_local_mall" />
           </div>
         </q-card-section>
         <q-card-section class="text-left text-h4 text-weight-bold q-pt-sm">{{
@@ -77,17 +76,16 @@
       </q-card>
 
       <q-card flat bordered class="l-grow">
-        <q-card-section class="row justify-between text-left q-pb-none" style="min-width: 250px;">
+        <q-card-section
+          class="row justify-between text-left q-pb-none"
+          style="min-width: 250px;"
+        >
           <div>Pembelian (USD)</div>
           <div
             class="items-center text-center q-pa-xs"
             style="border-radius: 20%; background: #EAF6EC;"
           >
-            <q-icon
-              size="xs"
-              color="green-6"
-              name="attach_money"
-            />
+            <q-icon size="xs" color="green-6" name="attach_money" />
           </div>
         </q-card-section>
         <q-card-section class="text-left text-h4 text-weight-bold q-pt-sm">{{
@@ -98,14 +96,15 @@
 
     <div class="row q-gutter-md q-pa-md l-grow">
       <div class="bg-white" style="width: 500px;">text</div>
-      <q-card flat bordered class="col">
+      <q-card flat bordered class="l-grow">
         <q-card-section>
           <v-chart
-            class="q-pa-md"
             ref="chart1"
             :options="optionBydept"
             theme="default"
             :autoresize="true"
+            style="width: 100%;"
+            class="q-mx-auto"
             @click="handleClickByDept"
           />
         </q-card-section>
@@ -124,8 +123,6 @@
         </q-card-section>
       </q-card>
 
-
-
       <q-card flat bordered class="col">
         <q-card-section>
           <v-chart
@@ -136,11 +133,10 @@
           />
         </q-card-section>
       </q-card>
-
     </div>
 
     <div class="row q-gutter-md q-pa-md l-grow no-wrap">
-      <q-card flat bordered class="l-grow"> 
+      <q-card flat bordered class="l-grow">
         <q-card-section class="q-pa-md row justify-between no-wrap">
           <div class="text-h6 text-weight-bold">
             Persetujuan Man. Purchasing
@@ -156,11 +152,7 @@
           />
         </q-card-section>
         <q-card-section class="q-pa-none">
-          <q-markup-table
-            wrap-cells
-            flat
-            class="stickyTable"
-          >
+          <q-markup-table wrap-cells flat class="stickyTable">
             <thead class="text-white">
               <tr>
                 <th class="q-px-xs">No</th>
@@ -191,16 +183,12 @@
         </q-card-section>
       </q-card>
 
-      <q-card flat bordered class="l-grow"> 
+      <q-card flat bordered class="l-grow">
         <q-card-section class="q-pa-md text-h6 text-weight-bold">
           Pengeluaran Per Kategori
         </q-card-section>
         <q-card-section class="q-pa-none">
-          <q-markup-table
-            wrap-cells
-            flat
-            class="stickyTable"
-          >
+          <q-markup-table wrap-cells flat class="stickyTable">
             <thead class="text-white">
               <tr>
                 <th class="q-px-xs">No</th>
@@ -215,13 +203,17 @@
                   {{ d.kategori }}
                 </td>
                 <td>
-                  {{ d.currency == "IDR" ? setCurrency(parseInt(d.price), "IDR") : setCurrency(parseInt(d.price), "USD") }}
+                  {{
+                    d.currency == "IDR"
+                      ? setCurrency(parseInt(d.price), "IDR")
+                      : setCurrency(parseInt(d.price), "USD")
+                  }}
                 </td>
               </tr>
             </tbody>
           </q-markup-table>
         </q-card-section>
-      </q-card>      
+      </q-card>
     </div>
   </div>
 </template>
@@ -256,7 +248,7 @@ export default {
         { value: new Date().getFullYear(), label: "Tahun Ini" },
         { value: new Date().getMonth() + 1, label: "Bulan Ini" },
       ],
-      selectedShow: new Date().getFullYear(),   
+      selectedShow: new Date().getFullYear(),
       summary: {},
 
       totalPrice: 0,
@@ -334,10 +326,10 @@ export default {
           },
         },
         grid: {
-          left: '2%',
-          right: '5%',
-          bottom: '3%',
-          containLabel: true
+          left: "2%",
+          right: "5%",
+          bottom: "3%",
+          containLabel: true,
         },
         xAxis: {
           type: "value",
@@ -347,8 +339,8 @@ export default {
           data: [],
           axisLabel: {
             interval: 0,
-            rotate: 0
-          }
+            rotate: 0,
+          },
         },
         series: [
           {
@@ -372,6 +364,12 @@ export default {
         title: {
           text: "Data Belanja Per Departemen",
           left: "center",
+        },
+        legend: {
+          orient: "vertical",
+          x: "right",
+
+          data: [],
         },
 
         tooltip: {
@@ -402,6 +400,12 @@ export default {
             center: ["50%", "50%"],
             selectedMode: "single",
             data: [],
+            label: {
+              show: false,
+            },
+            labelLine: {
+              show: false,
+            },
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -427,7 +431,7 @@ export default {
         return this.$store.state.currentUser;
       }
       return false;
-    }
+    },
   },
   mounted() {
     this.fetchData();
@@ -470,6 +474,7 @@ export default {
       this.option80.series[0].data = [];
       this.report_bydept = [];
       this.optionBydept.series[0].data = [];
+      this.optionBydept.legend.data = [];
       this.report_byKat = [];
 
       var dt = new Date().getFullYear();
@@ -503,7 +508,11 @@ export default {
                 value: result.data[i].price,
                 name: result.data[i].vendor,
               });
-              this.option80.yAxis.data.push(result.data[i].vendor.length > 15 ? result.data[i].vendor.substring(0, 15) + "..." : result.data[i].vendor);
+              this.option80.yAxis.data.push(
+                result.data[i].vendor.length > 15
+                  ? result.data[i].vendor.substring(0, 15) + "..."
+                  : result.data[i].vendor
+              );
             }
 
             if (this.total_50 < margin_50) {
@@ -537,6 +546,9 @@ export default {
               value: resp.data[i].price,
               name: resp.data[i].cost_category.toUpperCase(),
             });
+            this.optionBydept.legend.data.push(
+              resp.data[i].cost_category.toUpperCase()
+            );
           }
         });
 
@@ -616,9 +628,9 @@ export default {
         return formatter.format(price);
       }
     },
-    getManPruchasing(){
+    getManPruchasing() {
       this.sppList = [];
-      
+
       this.$http.get(`/spp-approval`, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
           if (
