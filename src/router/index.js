@@ -7,7 +7,7 @@ const routes = [
   {
     path: "/dashboard",
     name: "Home",
-    component: () => import("../views/Home.vue"),
+    component: () => import("../views/Home2.vue"),
     meta: { access: ["PURCHASING", "CEO"] },
   },
   {
@@ -154,7 +154,7 @@ function checkAccess(user, access) {
 router.beforeEach(async (to, from, next) => {
   let token = localStorage.getItem("token-purchase");
 
-  if (to.meta.noAuth) {
+  if (to.meta.noAuth && to.path != "/") {
     next();
   } else if (token === null) {
     next("/login");
@@ -166,11 +166,17 @@ router.beforeEach(async (to, from, next) => {
         },
       });
       to.meta.currentUser = resp.data;
+      if (to.path == "/") {
+        if (resp.data.is_purchasing == 1) {
+          next("/dashboard");
+        } else {
+          next("/spp/list");
+        }
+      }
       if (to.meta?.access == null) {
         next();
       } else {
         let access = checkAccess(resp.data, to.meta.access);
-        console.log(access);
         if (access) {
           next();
         } else {

@@ -113,11 +113,20 @@
             :options="optionBydept"
             theme="default"
             :autoresize="true"
-            :style="optionBydept.series[0].data.length ? 'width: 100%;' : 'width: 100%; height: 200px;'"
+            :style="
+              optionBydept.series[0].data.length
+                ? 'width: 100%;'
+                : 'width: 100%; height: 200px;'
+            "
             class="q-mx-auto"
             @click="handleClickByDept"
           />
-          <div v-if="!optionBydept.series[0].data.length" class="text-h5 text-bold text-center">Data Masih Kosong</div>
+          <div
+            v-if="!optionBydept.series[0].data.length"
+            class="text-h5 text-bold text-center"
+          >
+            Data Masih Kosong
+          </div>
         </q-card-section>
       </q-card>
     </div>
@@ -129,13 +138,19 @@
             :options="option50"
             theme="default"
             :autoresize="true"
-            :style="optionBydept.series[0].data.length ? 'width: 100%;' : 'width: 100%; height: 35px;'"
+            :style="
+              optionBydept.series[0].data.length
+                ? 'width: 100%;'
+                : 'width: 100%; height: 35px;'
+            "
             class="q-mx-auto"
             @click="handleClick50"
           />
-          <div v-if="!optionBydept.series[0].data.length" 
-          class="text-h5 text-bold row items-center justify-center" 
-            style="height: 200px; vertical-align: middle;">
+          <div
+            v-if="!optionBydept.series[0].data.length"
+            class="text-h5 text-bold row items-center justify-center"
+            style="height: 200px; vertical-align: middle;"
+          >
             <div>Data Masih Kosong</div>
           </div>
         </q-card-section>
@@ -147,13 +162,19 @@
             :options="option80"
             theme="default"
             :autoresize="true"
-            :style="optionBydept.series[0].data.length ? 'width: 100%;' : 'width: 100%; height: 35px;'"
+            :style="
+              optionBydept.series[0].data.length
+                ? 'width: 100%;'
+                : 'width: 100%; height: 35px;'
+            "
             class="q-mx-auto"
             @click="handleClick80"
           />
-          <div v-if="!option80.series[0].data.length" 
-            class="text-h5 text-bold row items-center justify-center" 
-            style="height: 200px; vertical-align: middle;">
+          <div
+            v-if="!option80.series[0].data.length"
+            class="text-h5 text-bold row items-center justify-center"
+            style="height: 200px; vertical-align: middle;"
+          >
             <div>Data Masih Kosong</div>
           </div>
         </q-card-section>
@@ -206,10 +227,7 @@
             </tbody>
           </q-markup-table>
         </q-card-section>
-        <q-card-section
-          class="text-center"
-          v-else
-        >
+        <q-card-section class="text-center" v-else>
           <div>
             <q-img :src="`./empty.png`" style="width: 200px;"></q-img>
           </div>
@@ -247,10 +265,7 @@
             </tbody>
           </q-markup-table>
         </q-card-section>
-        <q-card-section
-          class="text-center"
-          v-else
-        >
+        <q-card-section class="text-center" v-else>
           <div>
             <q-img :src="`./empty.png`" style="width: 200px;"></q-img>
           </div>
@@ -367,7 +382,7 @@ export default {
             fontSize: 24, // Adjust the font size as needed
           },
         },
-        color: ["#0288D1"], 
+        color: ["#0288D1"],
         tooltip: {
           trigger: "item",
           // formatter: "{b}<br/>Rp {c} ({d}%)",
@@ -377,7 +392,7 @@ export default {
               "<br>" +
               this.setCurrency(param.value, "IDR") +
               " (" +
-              (param.value * 100 / this.total_80).toFixed(2) +
+              ((param.value * 100) / this.total_80).toFixed(2) +
               "%)"
             );
           },
@@ -389,8 +404,8 @@ export default {
           containLabel: true,
         },
         xAxis: {
-          type: 'value',
-          max: 'dataMax',
+          type: "value",
+          max: "dataMax",
           // axisLine: { show: false },
           // axisLabel: { show: false },
           // axisTick: { show: false },
@@ -465,7 +480,7 @@ export default {
           {
             type: "pie",
             radius: ["45%", "70%"],
-            center: ['30%', '50%'],
+            center: ["30%", "50%"],
             selectedMode: "single",
             data: [],
             label: {
@@ -499,11 +514,7 @@ export default {
         tooltip: {
           trigger: "item",
           formatter: (param, ticket) => {
-            return (
-              param.name +
-              "<br>" +
-              this.setCurrency(param.value, "IDR")
-            );
+            return param.name + "<br>" + this.setCurrency(param.value, "IDR");
           },
         },
         grid: {
@@ -513,40 +524,38 @@ export default {
           containLabel: true,
         },
         xAxis: {
-          type: 'category',
+          type: "category",
           boundaryGap: false,
-          data: []
+          data: [],
         },
         yAxis: {
-          type: 'value',
+          type: "value",
           axisLabel: {
-            formatter: val => {
-              if(String(val).length < 7) {
-                return (val / 1000) + " Ribu"
-              }
-              else if (String(val).length >= 7 && String(val).length <= 9){
-                return (val / 1000000) + " Juta"
-              }
-              else if (String(val).length >= 10 && String(val).length <= 12){
-                return (val / 1000000000) + " Miliar"
+            formatter: (val) => {
+              if (String(val).length < 7) {
+                return val / 1000 + " Ribu";
+              } else if (String(val).length >= 7 && String(val).length <= 9) {
+                return val / 1000000 + " Juta";
+              } else if (String(val).length >= 10 && String(val).length <= 12) {
+                return val / 1000000000 + " Miliar";
               } else {
-                return (val / 1000000000000) + " Triliun"
+                return val / 1000000000000 + " Triliun";
               }
-            }
-          }
+            },
+          },
         },
         series: [
           {
             data: [],
-            type: 'line',
+            type: "line",
             smooth: true,
             // symbol: 'none',
             lineStyle: {
-              color: '#0288D1',
-              width: 2
+              color: "#0288D1",
+              width: 2,
             },
-          }
-        ]
+          },
+        ],
       },
       report_byAct: [],
 
@@ -557,8 +566,8 @@ export default {
   },
   computed: {
     curUser() {
-      if (this.$store.state.currentUser) {
-        return this.$store.state.currentUser;
+      if (this.$route.meta.currentUser) {
+        return this.$route.meta.currentUser;
       }
       return false;
     },
@@ -607,7 +616,6 @@ export default {
       this.optionBydept.series[0].data = [];
       this.optionBydept.legend.data = [];
       this.report_byKat = [];
-      
 
       var dt = new Date().getFullYear();
       if (dt == this.selectedShow) {
@@ -683,25 +691,34 @@ export default {
         });
 
         const months = [
-          'January', 'February', 'March', 'April',
-          'May', 'June', 'July', 'August',
-          'September', 'October', 'November', 'December'
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
         ];
         this.$http.get("/yearly_data_report_by_month", {}).then((resp) => {
-          let max = Math.max(...resp.data.map(o => o.month))
+          let max = Math.max(...resp.data.map((o) => o.month));
           for (var i = 0; i < months.length; i++) {
-            let temp = resp.data.find(el => parseInt(el.month) - 1 == i)
-            if(temp){
+            let temp = resp.data.find((el) => parseInt(el.month) - 1 == i);
+            if (temp) {
               this.report_byAct.push(temp);
               this.optionByAct.series[0].data.push(parseInt(temp.price));
               this.optionByAct.xAxis.data.push(months[i]);
             } else {
-              if(i < max){
+              if (i < max) {
                 this.optionByAct.series[0].data.push(0);
               }
               this.optionByAct.xAxis.data.push(months[i]);
             }
-          };
+          }
         });
       });
     },
@@ -761,7 +778,6 @@ export default {
             this.report_byKat.push(resp.data[i]);
           }
         });
-
       });
     },
     setCurrency(price, cur) {
