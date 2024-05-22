@@ -349,7 +349,7 @@ Flight::route('POST /po', function () {
 
   $w_kategori = "";
   if ($kategori != "") {
-    if ($kategori == "BELUM DIKATEGORIKAN") {
+    if (strtoupper(urldecode($kategori)) == "BELUM DIKATEGORIKAN") {
       $w_kategori = "AND kategori = ''";
     } else {
       $w_kategori = "AND kategori = '$kategori'";

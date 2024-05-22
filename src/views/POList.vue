@@ -467,6 +467,7 @@ export default {
       ],
 
       kategori: [
+        "BELUM DIKATEGORIKAN",
         "Keperluan & Peralatan Produksi",
         "Packing Barang",
         "Makan & Minum",
