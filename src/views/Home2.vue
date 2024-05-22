@@ -584,7 +584,7 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`/po/list/null/${name}/null/null`);
+      this.$router.push(`po/list?status=not&vendor=${name}&category=null&kategori=null&search=&date=`);
     },
     handleClick80(...args) {
       let temp = args[0];
@@ -594,7 +594,7 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`/po/list/null/${name}/null/null`);
+      this.$router.push(`po/list?status=not&vendor=${name}&category=null&kategori=null&search=&date=`);
     },
     handleClickByDept(...args) {
       let temp = args[0];
@@ -604,7 +604,7 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`/po/list/null/null/${name}/null`);
+      this.$router.push(`po/list?status=not&vendor=null&category=${name}&kategori=null&search=&date=`);
     },
     fetchData() {
       this.report_50 = [];
