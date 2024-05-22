@@ -1187,6 +1187,15 @@ function checkJWT()
   }
 }
 
+Flight::route('PUT /change_password', function () {
+  $link = getLink();
+  $data = Flight::request()->data;
+
+  $q = "UPDATE user SET password = '$data->newPass'
+    WHERE user_id = $data->id";
+  mysqli_query($link, $q) or die(mysqli_error($link));
+});
+
 Flight::route('OPTIONS *', function () {
 });
 Flight::route('/', function () {

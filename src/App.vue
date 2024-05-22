@@ -80,6 +80,7 @@
                 no-caps
                 align="left"
                 v-close-popup
+                @click="showDialogChangePass"
               />
               <q-separator size="1px" color="grey-4"></q-separator>
               <q-btn
@@ -433,6 +434,7 @@
 import axios from "axios";
 import { mapState, mapActions } from "vuex";
 import Favico from "favico.js";
+import dialogChangePassword from "./components/dialogChangePassword.vue";
 export default {
   data() {
     return {
@@ -682,6 +684,13 @@ export default {
       //   console.log(this.kurs);
       //   console.log(this.kurs.Jsondata);
       // });
+    },
+    showDialogChangePass() {
+      this.$q
+        .dialog({
+          component: dialogChangePassword,
+          parent: this,
+        })
     },
     logout() {
       localStorage.removeItem("token-purchase");
