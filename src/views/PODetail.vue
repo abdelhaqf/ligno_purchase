@@ -184,6 +184,7 @@
                   color="blue"
                   no-caps
                   @click="showDialogSync(d)"
+                  :disable="d.sync != null"
                 >
                 </q-btn>
               </td>
