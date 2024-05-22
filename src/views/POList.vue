@@ -134,13 +134,6 @@
             <tr
               v-for="(d, i) in poList"
               :key="i"
-              :class="{
-                'bg-red-2':
-                  isPastEstimation(d.est_arrival) &&
-                  (is_received == 'not' ||
-                    is_received == 'half' ||
-                    is_received == 'suspend'),
-              }"
             >
               <td class="text-center q-px-xs">
                 {{ (pagination.current - 1) * pagination.limit + i + 1 }}
@@ -194,8 +187,22 @@
               <td class="text-center">
                 {{ d.cost_category }}
               </td>
-              <td class="text-center">
-                {{ momentFormatDate(d.est_arrival) }}
+              <td class="text-center no-wrap" :style="isPastEstimation(d.est_arrival) &&
+                  (is_received == 'not' ||
+                    is_received == 'half' ||
+                    is_received == 'suspend') ? 'color: red; vertical-align: middle;' : ''">
+                    <q-icon
+                      v-if="isPastEstimation(d.est_arrival) &&
+                        (is_received == 'not' ||
+                        is_received == 'half' ||
+                        is_received == 'suspend')
+                      "
+                      style="color: white; background-color: red; border-radius: 50%; font-size: 10px;"
+                      name="priority_high"
+                      class="q-ma-sm q-pa-xs"
+                    ></q-icon>
+                    <span>{{ momentFormatDate(d.est_arrival) }}</span>
+                
               </td>
               <td class="text-center">
                 <!-- <q-btn
