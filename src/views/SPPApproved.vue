@@ -135,12 +135,24 @@
                   <q-item
                     clickable
                     v-close-popup
+                    class="text-positive text-bold"
                     @click="
                       clearSelect(i);
                       createPO();
                     "
                   >
                     Buat PO
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    class="text-negative text-bold"
+                    @click="
+                      clearSelect(i);
+                      confirmReject = true;
+                    "
+                  >
+                    Tolak
                   </q-item>
                   <q-item
                     clickable
@@ -194,6 +206,15 @@
           </q-btn>
           <q-btn
             unelevated
+            label="Tolak"
+            color="negative"
+            @click="confirmReject = true;"
+            icon="close"
+            no-caps
+          >
+          </q-btn>
+          <q-btn
+            unelevated
             label="Buat PO"
             color="blue"
             @click="createPO"
@@ -204,6 +225,65 @@
         </div>
       </q-card-section>
     </q-footer>
+
+    <!-- penolakan  -->
+    <q-dialog v-model="confirmReject" persistent>
+      <q-card style="min-width: 350px;">
+        <q-card-section class="row justify-center q-pb-none">
+          <q-avatar
+            color="grey-3"
+            text-color="negative"
+            size="75px"
+            font-size="35px"
+            icon="priority_high"
+          ></q-avatar>
+        </q-card-section>
+        <q-card-section class="q-pt-none text-center">
+          <div class="l-text-subtitle text-bold">Tolak SPP</div>
+          <div>
+            Apakah Anda yakin ingin menolak
+            <span class="text-bold">{{ selectCount }} SPP</span> terpilih?
+            Berikan Alasan Anda!
+          </div>
+        </q-card-section>
+
+        <q-separator></q-separator>
+        <q-card-section class="column q-gutter-y-xs">
+          <div class="text-black">Alasan</div>
+          <q-input
+            outlined
+            stack-label
+            v-model="content"
+            type="textarea"
+            placeholder="e.g. Stok Barang Masih Ada"
+          />
+        </q-card-section>
+
+        <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
+          <q-btn
+            outline
+            label="Batal"
+            dense
+            class="l-grow"
+            color="grey-8"
+            no-caps
+            v-close-popup
+            style="width: calc(50% - 16px)"
+          />
+          <q-btn
+            dense
+            unelevated
+            no-caps
+            color="primary"
+            label="Ya, Tolak SPP"
+            class=" l-grow"
+            @click="rejectSelected()"
+            v-close-popup
+            style="width: calc(50% - 16px)"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -217,7 +297,6 @@ export default {
   data() {
     return {
       sppList: [],
-      sppSelect: [],
       sppSelectID: [],
 
       show_detail: false,
@@ -278,6 +357,9 @@ export default {
       showInput: false,
       optVendor: [],
       filteredVD: [],
+
+      confirmReject: false,
+      content: "",
     };
   },
   async mounted() {
@@ -361,26 +443,6 @@ export default {
       let route = this.$router.resolve({ path: "/print" });
       window.open(`${route.href}/${JSON.stringify(result)}`);
     },
-    changeType() {
-      if (this.type == "PO")
-        this.po.po_id = `OP/CM/${moment().format("YY")}/${moment().format(
-          "MM"
-        )}/`;
-      else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
-    },
-    chgCurrency() {
-      for (var i = 0; i < this.sppSelect.length; i++) {
-        this.sppSelect[i].currency = this.curr;
-      }
-
-      if (this.curr == "IDR") {
-        this.money.precision = 0;
-        this.money.prefix = "Rp ";
-      } else {
-        this.money.precision = 2;
-        this.money.prefix = "$ ";
-      }
-    },
     createPO() {
       for (var i = 0; i < this.sppList.length; i++) {
         if (this.sppList[i].select == true) {
@@ -388,15 +450,37 @@ export default {
         }
       }
 
-      if (this.sppSelect.length > 0) {
-        this.changeType();
-
-        this.curr = "IDR";
-        this.chgCurrency();
-      }
-
       this.$router.push(`/po/create?ids=${this.sppSelectID.join(",")}`);
     },
+    cancelSPP(val) {
+      var data = {
+        purch_manager_cancel: 1,
+        note: this.content,
+      };
+      this.$http
+        .put("/update_spp/" + val.spp_id, data, {})
+        .then((result) => {
+          this.$root.$emit("refresh");
+          this.fetchData();
+        });
+
+      var history = {
+        spp_id: val.spp_id,
+        status: "canceled",
+        content: this.content,
+      };
+      this.$http.post("/new_history", history, {}).then((result) => {});
+      // this.$q.notify("SPP berhasil dibatalkan!");
+    },
+    rejectSelected() {
+      var data = this.sppList.filter((e) => e.select === true);
+      for (var i = 0; i < data.length; i++) {
+        this.cancelSPP(data[i]);
+      }
+      this.fetchData();
+      this.$root.$emit("refresh");
+      this.$q.notify("SPP ditolak!");
+    }
   },
   computed: {
     selectCount() {
