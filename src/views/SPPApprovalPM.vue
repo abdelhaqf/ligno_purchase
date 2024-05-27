@@ -101,10 +101,7 @@
               <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
             </td>
             <td class="text-left" style="vertical-align: top;">
-              <div
-                  class="l-wrap-cell"
-                  style="width: 250px !important;"
-                >
+              <div class="l-wrap-cell" style="width: 250px !important;">
                 <span>
                   {{
                     d.description.length > 140
@@ -261,6 +258,7 @@
             class=" l-grow"
             @click="approveSelected()"
             v-close-popup
+            :disable="!selKategori"
             style="width: calc(50% - 16px)"
           />
         </q-card-actions>

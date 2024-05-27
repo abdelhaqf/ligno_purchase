@@ -187,6 +187,7 @@
             class=" l-grow"
             @click="approve"
             v-close-popup
+            :disable="!selKategori"
             style="width: calc(50% - 16px)"
           />
         </q-card-actions>
