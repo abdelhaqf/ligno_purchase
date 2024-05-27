@@ -28,13 +28,65 @@
         </div>
         <div class="row justify-between items-center">
           <div class="text-grey-8" style="min-width: 150px ;">Vendor</div>
-          <div class="text-right">{{ po.vendor }}</div>
+          <div v-if="!isEdit" class="text-right">{{ po.vendor }}</div>
+          <div class="text-right" v-else>
+            <q-input
+              outlined
+              v-model="po.vendor"
+              dense
+              style="min-width: 350px ;"
+              class="bg-white"
+              v-if="showInput"
+            >
+              <template v-slot:append>
+                <q-toggle
+                  v-model="showInput"
+                  color="green"
+                  icon="add"
+                  keep-color
+                />
+              </template>
+              <template v-slot:label>
+                Nama Vendor
+                <a class="q-px-sm bg-info text-white rounded-borders"
+                  >input baru</a
+                >
+              </template>
+            </q-input>
+            <q-select
+              v-else
+              outlined
+              dense
+              v-model="po.vendor"
+              map-options
+              emit-value
+              use-input
+              hide-selected
+              fill-input
+              input-debounce="0"
+              :options="filteredVD"
+              @filter="filterVD"
+              @input-value="setModel"
+              style="min-width: 350px ;"
+              class="bg-white"
+            >
+              <template v-slot:append>
+                <q-toggle
+                  v-model="showInput"
+                  color="green"
+                  icon="add"
+                  keep-color
+                />
+              </template>
+            </q-select>
+          </div>
         </div>
         <div class="row justify-between items-center">
           <div class="text-grey-8" style="min-width: 150px ;">
             Kategori Biaya
           </div>
-          <div class="text-right">
+          <div v-if="!isEdit" class="text-right">{{ po.cost_category }}</div>
+          <div class="text-right" v-else>
             <q-select
               outlined
               v-model="po.cost_category"
@@ -46,6 +98,7 @@
               hide-selected
               fill-input
               dense
+              style="min-width: 350px ;"
             >
             </q-select>
           </div>
@@ -162,10 +215,13 @@
                   dense
                   autogrow
                   v-model="d.note"
-                  label="Note"
+                  placeholder="Masukkan Note"
                 />
               </td>
-              <td class="text-center">
+              <td v-if="!isEdit" class="text-center">
+                {{ isReceivedOption.find(option => option.value === d.is_received).label }}
+              </td>
+              <td v-else class="text-center">
                 <q-select
                   outlined
                   v-model="d.is_received"
@@ -181,7 +237,7 @@
                 <q-btn
                   unelevated
                   label="Sync"
-                  color="blue"
+                  color="primary"
                   no-caps
                   @click="showDialogSync(d)"
                   :disable="d.sync != null"
@@ -196,7 +252,18 @@
 
     <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
       <q-card-section class="row justify-end items-center">
-        <div class="row justify-end q-gutter-x-md">
+        <div class="row justify-end q-gutter-x-md" v-if="!isEdit">
+          <q-btn
+            unelevated
+            label="Re-Order"
+            color="primary"
+            no-caps
+            @click="
+              reorderList();
+              showDialogReorder();
+            "
+          >
+          </q-btn>
           <q-btn
             unelevated
             label="Edit"
@@ -205,26 +272,24 @@
             outline
             style="color: black;"
             no-caps
-            @click="isEdit = !isEdit"
+            @click="isEdit = true"
           >
+          </q-btn>
+        </div>
+        <div class="row justify-end q-gutter-x-md" v-else>
+          <q-btn
+            unelevated
+            label="Batal"
+            color="negative"
+            no-caps
+            @click="isEdit = false; fetchData();">
           </q-btn>
           <q-btn
             unelevated
             label="Simpan"
-            color="blue"
+            color="primary"
             no-caps
-            @click="updateSPP"
-          >
-          </q-btn>
-          <q-btn
-            unelevated
-            label="Re-Order"
-            color="blue"
-            no-caps
-            @click="
-              reorderList();
-              showDialogReorder();
-            "
+            @click="updateSPP_PO"
           >
           </q-btn>
         </div>
@@ -266,14 +331,21 @@ export default {
         { label: "Closed", value: "40000" },
       ],
       newSpp: [],
+      optVendor: [],
+      filteredVD: [],
+      showInput: false,
     };
   },
   async mounted() {
     await this.fetchData();
+    await this.getVendor();
   },
   watch: {},
   computed: {},
   methods: {
+    setModel(val) {
+      this.po.vendor = val;
+    },
     showDialogReorder() {
       this.$q
         .dialog({
@@ -385,7 +457,7 @@ export default {
         this.newSpp.push(temp);
       }
     },
-    async updateSPP() {
+    async updateSPP_PO() {
       for (var i = 0; i < this.po.spp.length; i++) {
         let data = {
           is_received: this.po.spp[i].is_received,
@@ -485,10 +557,35 @@ export default {
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
         }
       }
+
+      let data = {
+        vendor: this.po.vendor,
+      }
+
+      await this.$http
+          .put("/update_po/" + this.po.po_id, data, {})
+          .then((result) => {
+            
+          });
+
       this.show_detail = false;
       await this.fetchData();
-      this.$q.notify("Data PO berhasil diubah!");
+      this.$q.notify("Data PO dan SPP berhasil diubah!");
       this.isEdit = false;
+    },
+    filterVD(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filteredVD = this.optVendor.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    async getVendor() {
+      await this.$http.get("/list_vendor", {}).then((result) => {
+        this.optVendor = result.data;
+        this.filteredVD = result.data;
+      });
     },
   },
 };
