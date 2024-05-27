@@ -42,6 +42,10 @@
           </div>
         </div> -->
         <div class="row justify-between items-center">
+          <div class="text-grey-8" style="min-width: 150px ;">Urgency</div>
+          <div class="text-bold text-right">{{ spp.urgency ? spp.urgency : "-" }}</div>
+        </div>
+        <div class="row justify-between items-center">
           <div class="text-grey-8" style="min-width: 150px ;">
             Estimasi Ketibaan
           </div>

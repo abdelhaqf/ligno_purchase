@@ -26,6 +26,19 @@
             dense
             emit-value
             map-options
+            :options="optUrgency"
+            v-model="selUrgency"
+            clearable
+            @clear="selUrgency = ''"
+            @input="fetchData"
+            label="Pilih Urgency"
+            style="width: 230px;"
+          ></q-select>
+          <q-select
+            outlined
+            dense
+            emit-value
+            map-options
             :options="optDept"
             v-model="selDivisi"
             clearable
@@ -118,12 +131,12 @@
                 >
                 <span>
                   {{
-                    d.description.length > 125
-                      ? d.description.slice(0, 120)
+                    d.description.length > 55
+                      ? d.description.slice(0, 50)
                       : d.description
                   }}
                 </span>
-                <span v-if="d.description.length > 125" class=" no-wrap ">
+                <span v-if="d.description.length > 55" class=" no-wrap ">
                   ...
                   <q-tooltip
                     content-style="width:300px"
@@ -364,6 +377,13 @@ export default {
 
       confirmReject: false,
       content: "",
+
+      selUrgency: null,
+      optUrgency: [
+        "HIGH",
+        "MIDDLE",
+        "LOW",
+      ],
     };
   },
   async mounted() {
@@ -416,7 +436,8 @@ export default {
       this.sppList = [];
       let q_filter = `?sort=${this.selSort}&search=${
         this.searchTerm ? this.searchTerm : ""
-      }&dept=${this.selDivisi ? this.selDivisi : ""}`;
+      }&dept=${this.selDivisi ? this.selDivisi : ""
+      }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
 
       this.$http
         .get(

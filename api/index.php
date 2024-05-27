@@ -231,6 +231,9 @@ Flight::route('GET /spp-approval', function () {
   $w_dept = "";
   if ($query->dept != '') $w_dept = "AND user.dept LIKE '%{$query['dept']}%'";
 
+  $w_urgency = "";
+  if ($query->urgency != '') $w_urgency = "AND spp.urgency LIKE '%{$query['urgency']}%'";
+
   $sort = "";
   if ($query->sort) {
     $sort = "ORDER BY {$query['sort']}";
@@ -239,7 +242,7 @@ Flight::route('GET /spp-approval', function () {
   $q = "SELECT spp.*, user.name, user.dept, user.manager_id, hnd.name as 'handler_name' FROM spp
           INNER JOIN user ON spp.user_id = user.user_id
           LEFT JOIN user hnd on hnd.user_id = spp.handle_by
-          WHERE 1=1 $w_search $w_dept
+          WHERE 1=1 $w_search $w_dept $w_urgency
           $sort
     ";
   runQuery($q);
@@ -265,6 +268,9 @@ Flight::route('GET /spp_approved/@id/@ispurch', function ($id, $ispurch) {
   $w_dept = "";
   if ($query->dept != '') $w_dept = "AND user.dept LIKE '%{$query['dept']}%'";
 
+  $w_urgency = "";
+  if ($query->urgency != '') $w_urgency = "AND spp.urgency LIKE '%{$query['urgency']}%'";
+
   $sort = "";
   if ($query->sort) {
     $sort = "ORDER BY {$query['sort']}";
@@ -276,7 +282,7 @@ Flight::route('GET /spp_approved/@id/@ispurch', function ($id, $ispurch) {
           WHERE spp.po_id is null 
                 AND (spp.handle_by = $id OR $ispurch = 1)
                 AND spp.purch_manager_cancel = 0 AND spp.manager_approve = 1 AND spp.purch_manager_approve = 1 
-                $w_search $w_dept
+                $w_search $w_dept $w_urgency
                 
           $sort
     ";

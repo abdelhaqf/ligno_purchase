@@ -44,7 +44,7 @@
             <th>Divisi</th>
             <th>Tanggal</th>
             <th>Barang</th>
-            <th style="width: 250px !important;">Keterangan</th>
+            <th style="width: 200px !important;">Keterangan</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -85,16 +85,16 @@
             <td class="text-left" style="vertical-align: top;">
               <div
                   class="l-wrap-cell"
-                  style="width: 250px !important;"
+                  style="width: 200px !important;"
                 >
                 <span>
                   {{
-                    d.description.length > 140
-                      ? d.description.slice(0, 135)
+                    d.description.length > 55
+                      ? d.description.slice(0, 50)
                       : d.description
                   }}
                 </span>
-                <span v-if="d.description.length > 140" class=" no-wrap ">
+                <span v-if="d.description.length > 55" class=" no-wrap ">
                   ...
                   <q-tooltip
                     content-style="width:300px"

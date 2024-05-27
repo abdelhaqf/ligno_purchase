@@ -26,6 +26,19 @@
             dense
             emit-value
             map-options
+            :options="optUrgency"
+            v-model="selUrgency"
+            clearable
+            @clear="selUrgency = ''"
+            @input="fetchData"
+            label="Pilih Urgency"
+            style="width: 230px;"
+          ></q-select>
+          <q-select
+            outlined
+            dense
+            emit-value
+            map-options
             :options="optDept"
             v-model="selDivisi"
             clearable
@@ -63,7 +76,7 @@
             <th>Tanggal</th>
             <th>Urgency</th>
             <th>Barang</th>
-            <th style="width: 250px !important;">Keterangan</th>
+            <th style="width: 200px !important;">Keterangan</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -105,15 +118,15 @@
               <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
             </td>
             <td class="text-left" style="vertical-align: top;">
-              <div class="l-wrap-cell" style="width: 250px !important;">
+              <div class="l-wrap-cell" style="width: 200px !important;">
                 <span>
                   {{
-                    d.description.length > 140
-                      ? d.description.slice(0, 135)
+                    d.description.length > 55
+                      ? d.description.slice(0, 50)
                       : d.description
                   }}
                 </span>
-                <span v-if="d.description.length > 140" class=" no-wrap ">
+                <span v-if="d.description.length > 55" class=" no-wrap ">
                   ...
                   <q-tooltip
                     content-style="width:300px"
@@ -387,6 +400,13 @@ export default {
         "Perbaikan Gudang",
       ],
       selKategori: null,
+
+      selUrgency: null,
+      optUrgency: [
+        "HIGH",
+        "MIDDLE",
+        "LOW",
+      ],
     };
   },
   mounted() {
@@ -432,7 +452,8 @@ export default {
       console.log(this.selDivisi);
       let q_filter = `?sort=${this.selSort}&search=${
         this.searchTerm ? this.searchTerm : ""
-      }&dept=${this.selDivisi ? this.selDivisi : ""}`;
+      }&dept=${this.selDivisi ? this.selDivisi : ""
+      }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
       this.$http.get(`/spp-approval${q_filter}`, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
           if (
