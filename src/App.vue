@@ -150,7 +150,18 @@
         >
           <template v-slot:header>
             <q-item-section avatar>
-              <q-icon :name="`${$route.name == 'SPPList' || $route.name == 'SPPCreate' || $route.name == 'SPPTemplate' || $route.name == 'SPPDetail' ? '' : 'o_'}summarize`" />
+              <q-icon
+                :name="
+                  `${
+                    $route.name == 'SPPList' ||
+                    $route.name == 'SPPCreate' ||
+                    $route.name == 'SPPTemplate' ||
+                    $route.name == 'SPPDetail'
+                      ? ''
+                      : 'o_'
+                  }summarize`
+                "
+              />
             </q-item-section>
             <q-item-section>
               <q-item-label>SPP</q-item-label>
@@ -208,7 +219,15 @@
         >
           <template v-slot:header>
             <q-item-section avatar>
-              <q-icon :name="`${$route.name == 'SPPApprove' || $route.name == 'SPPApprovePM' ? '' : 'o_'}assignment_turned_in`" />
+              <q-icon
+                :name="
+                  `${
+                    $route.name == 'SPPApprove' || $route.name == 'SPPApprovePM'
+                      ? ''
+                      : 'o_'
+                  }assignment_turned_in`
+                "
+              />
               <!-- <q-icon name="o_assignment_turned_in"> </q-icon> -->
               <q-chip
                 v-if="
@@ -307,7 +326,9 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon :name="`${$route.name == 'SPPApproved' ? '' : 'o_'}fact_check`" />
+            <q-icon
+              :name="`${$route.name == 'SPPApproved' ? '' : 'o_'}fact_check`"
+            />
             <!-- <q-icon name="fact_check" /> -->
             <q-chip
               v-if="miniState && count.count_spp > 0"
@@ -344,7 +365,15 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon :name="`${$route.name == 'POList' || $route.name == 'PODetail' ? '' : 'o_'}shopping_bag`" />
+            <q-icon
+              :name="
+                `${
+                  $route.name == 'POList' || $route.name == 'PODetail'
+                    ? ''
+                    : 'o_'
+                }shopping_bag`
+              "
+            />
             <!-- <q-icon name="shopping_bag" /> -->
             <q-chip
               v-if="miniState && count.count_spp > 0"
@@ -381,7 +410,9 @@
           v-can="['PURCHASING', 'PURCHASING MANAGER']"
         >
           <q-item-section avatar>
-            <q-icon :name="`${$route.name == 'PriceList' ? '' : 'o_'}price_check`" />
+            <q-icon
+              :name="`${$route.name == 'PriceList' ? '' : 'o_'}price_check`"
+            />
             <!-- <q-icon name="price_check" /> -->
           </q-item-section>
           <q-item-section>
@@ -399,7 +430,11 @@
       :class="$route.name != 'Login' ? 'q-mx-auto q-py-md' : ''"
       :style="$route.name != 'Login' ? 'max-width: 1440px;' : ''"
     >
-      <q-card-section class="q-px-lg" v-if="$route.name != 'Login' && $route.name != 'Home'">
+      <q-card-section
+        class="q-px-lg"
+        :class="$route.name == 'print_preview' ? 'q-py-none' : ''"
+        v-if="$route.name != 'Login' && $route.name != 'Home'"
+      >
         <div>
           <q-breadcrumbs>
             <q-breadcrumbs-el
@@ -686,11 +721,10 @@ export default {
       // });
     },
     showDialogChangePass() {
-      this.$q
-        .dialog({
-          component: dialogChangePassword,
-          parent: this,
-        })
+      this.$q.dialog({
+        component: dialogChangePassword,
+        parent: this,
+      });
     },
     logout() {
       localStorage.removeItem("token-purchase");
