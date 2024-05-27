@@ -35,12 +35,12 @@
           <div class="text-grey-8" style="min-width: 150px ;">Pembuat</div>
           <div class="text-bold text-right">{{ spp.name }}</div>
         </div>
-        <div class="row justify-between items-center">
+        <!-- <div class="row justify-between items-center">
           <div class="text-grey-8" style="min-width: 150px ;">Deadline</div>
           <div class="text-bold text-right">
             {{ momentFormatDate(spp.deadline) }}
           </div>
-        </div>
+        </div> -->
         <div class="row justify-between items-center">
           <div class="text-grey-8" style="min-width: 150px ;">
             Estimasi Ketibaan
@@ -214,6 +214,15 @@
             <span class="text-bold">{{ spp.qty }} {{ spp.unit }}</span
             >?
           </div>
+          <div class="q-py-sm">
+            Pilih Tingkat Kepentingan
+            <q-select
+              outlined
+              dense
+              v-model="urgency"
+              :options="OptUrgency"
+            />
+          </div>
         </q-card-section>
 
         <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
@@ -235,6 +244,7 @@
             label="Ya, Setujui SPP"
             class=" l-grow"
             @click="approve"
+            :disable="urgency == ''"
             v-close-popup
             style="width: calc(50% - 16px)"
           />
@@ -346,6 +356,12 @@ export default {
       promptApprove: false,
       promptReject: false,
       content: "",
+      urgency: "",
+      OptUrgency: [
+        "HIGH",
+        "MIDDLE",
+        "LOW"
+      ],
     };
   },
   async mounted() {
@@ -441,6 +457,7 @@ export default {
       if (this.$route.query.approval == "manager") {
         data = {
           manager_approve: 1,
+          urgency: this.urgency,
         };
       } else if (this.$route.query.approval == "purchasing") {
         data = {
@@ -564,10 +581,10 @@ export default {
       temp.qty = this.spp.qty;
       temp.unit = this.spp.unit;
       temp.cc = this.spp.cc;
-      temp.deadline =
-        this.spp.deadline >= moment().format("YYYY-MM-DD")
-          ? moment(this.spp.deadline).format("YYYY/MM/DD")
-          : moment().format("YYYY/MM/DD");
+      // temp.deadline =
+      //   this.spp.deadline >= moment().format("YYYY-MM-DD")
+      //     ? moment(this.spp.deadline).format("YYYY/MM/DD")
+      //     : moment().format("YYYY/MM/DD");
       temp.description = this.spp.description;
       temp.user_id = this.$store.state.currentUser.user_id;
 

@@ -6,7 +6,7 @@
                 </q-card-section>
                 <q-separator/>
                 <q-card-section class="column q-gutter-y-md">
-                    <div class="row items-center l-grow">
+                    <!-- <div class="row items-center l-grow">
                         <div style="width: 125px;">Deadline</div>
                         <q-field dense outlined class="l-grow bg-white">
                             <template v-slot:prepend>
@@ -30,7 +30,7 @@
                             </q-date>
                             </q-popup-proxy>
                         </q-field>
-                    </div>
+                    </div> -->
                     <div class="row items-center l-grow">
                         <div style="width: 125px;">CC</div>
                         <q-select
@@ -166,7 +166,7 @@ props: ["id_template"],
         template: {},
         listUser: [],
         spp:[],
-        deadline: null,
+        // deadline: null,
         cc: "",
         };
     },
@@ -226,7 +226,7 @@ props: ["id_template"],
         createSPP() {
             for (var i = 0; i < this.template.template_detail.length; i++) {
                 this.template.template_detail[i].user_id = this.$store.state.currentUser.user_id;
-                this.template.template_detail[i].deadline = this.deadline;
+                // this.template.template_detail[i].deadline = this.deadline;
                 this.template.template_detail[i].cc = this.cc;
                 this.$http.post("/new_spp", this.template.template_detail[i], {}).then((result) => {
                     

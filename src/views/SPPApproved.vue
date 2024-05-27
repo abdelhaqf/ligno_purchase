@@ -65,6 +65,7 @@
             <th>Divisi</th>
             <th>PIC</th>
             <th>Tanggal</th>
+            <th>Urgency</th>
             <th>Barang</th>
             <th>Keterangan</th>
             <th>Action</th>
@@ -88,8 +89,11 @@
             <td class="text-left" style="width:150px; vertical-align: top;">
                 <div class="text-grey">Pengajuan</div>
                 <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
-                <div class="text-grey">Deadline</div>
-                <div>{{ d.deadline | moment("DD MMM YYYY") }}</div>
+                <!-- <div class="text-grey">Deadline</div>
+                <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
+            </td>
+            <td>
+              {{ d.urgency }}
             </td>
             <td class="text-left" style="vertical-align: top;">
               <div class="l-wrap-cell" style="width: 200px !important;">
@@ -312,12 +316,12 @@ export default {
       option: [],
 
       optSort: [
-        { label: "Deadline Terdekat", value: "deadline ASC" },
-        { label: "Deadline Terlama", value: "deadline DESC" },
+        // { label: "Deadline Terdekat", value: "deadline ASC" },
+        // { label: "Deadline Terlama", value: "deadline DESC" },
         { label: "Pengajuan Terdekat", value: "create_at ASC" },
         { label: "Pengajuan Terlama", value: "create_at DESC" },
       ],
-      selSort: "deadline ASC",
+      selSort: "create_at ASC",
 
       selDivisi: "",
       optDept: [],

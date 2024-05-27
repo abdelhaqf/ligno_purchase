@@ -58,7 +58,7 @@
           <tr>
             <th style="width:25px;">No</th>
             <th>Dibuat</th>
-            <th>Deadline</th>
+            <!-- <th>Deadline</th> -->
             <th>Barang</th>
             <th>Jumlah</th>
             <th style="width: 250px;">Ket</th>
@@ -75,9 +75,9 @@
             <td class="text-center">
               {{ d.create_at | moment("DD MMM YYYY") }}
             </td>
-            <td class="text-center">
+            <!-- <td class="text-center">
               {{ d.deadline | moment("DD MMM YYYY") }}
-            </td>
+            </td> -->
             <td class="text-left l-grow">{{ d.item }}</td>
             <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
             <td>

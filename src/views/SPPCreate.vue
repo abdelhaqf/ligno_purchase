@@ -88,7 +88,7 @@
               </q-input>
             </div>
           </div>
-          <div class="row items-center">
+          <!-- <div class="row items-center">
             <div style="width: 125px;">Deadline</div>
 
             <q-field dense outlined class="l-grow">
@@ -113,7 +113,7 @@
                 </q-date>
               </q-popup-proxy>
             </q-field>
-          </div>
+          </div> -->
           <div class="row items-center">
             <div style="width: 125px;">CC</div>
             <q-select
@@ -268,9 +268,9 @@ export default {
   data() {
     return {
       spp: {
-        deadline: moment()
-          .add(1, "days")
-          .format("YYYY/MM/DD"),
+        // deadline: moment()
+        //   .add(1, "days")
+        //   .format("YYYY/MM/DD"),
         item: "",
       },
       showInput: false,
@@ -291,11 +291,11 @@ export default {
     this.getUsers();
   },
   computed: {
-    date_model() {
-      if (!this.spp.deadline) return "Pilih Tanggal Dibutuhkan";
+    // date_model() {
+    //   if (!this.spp.deadline) return "Pilih Tanggal Dibutuhkan";
 
-      return moment(this.spp.deadline).format("DD MMMM YYYY");
-    },
+    //   return moment(this.spp.deadline).format("DD MMMM YYYY");
+    // },
   },
   methods: {
     setModel (val) {
@@ -303,9 +303,9 @@ export default {
     },
     resetForm() {
       this.spp = {
-        deadline: moment()
-          .add(1, "days")
-          .format("YYYY/MM/DD"),
+        // deadline: moment()
+        //   .add(1, "days")
+        //   .format("YYYY/MM/DD"),
         item: "",
       };
     },
@@ -325,9 +325,9 @@ export default {
       this.spp.user_id = this.$store.state.currentUser.user_id;
       this.$http.post("/new_spp", this.spp, {}).then((result) => {
         this.spp = {
-          deadline: moment()
-            .add(1, "days")
-            .format("YYYY/MM/DD"),
+          // deadline: moment()
+          //   .add(1, "days")
+          //   .format("YYYY/MM/DD"),
           item: "",
         };
 

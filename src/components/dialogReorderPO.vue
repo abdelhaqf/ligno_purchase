@@ -19,7 +19,7 @@
                                 <th>Nama Barang</th>
                                 <th>QTY</th>
                                 <th>Satuan</th>
-                                <th>Deadline</th>
+                                <!-- <th>Deadline</th> -->
                                 <th>CC</th>
                                 <th>Keterangan</th>             
                                 <th class="q-mx-sm" v-if="page == 'po_detail'">Action</th>
@@ -52,35 +52,8 @@
                                         >
                                         </q-input>
                                     </td>
-                                    <td style="min-width: 200px;">
-                                        <!-- <q-input
-                                            outlined
-                                            dense
-                                            bg-color="white"
-                                            v-model="d.deadline"
-                                            class="l-grow"
-                                        >
-                                            <template v-slot:append>
-                                            <q-icon name="event" class="cursor-pointer">
-                                                <q-popup-proxy
-                                                    ref="qDateProxy"
-                                                    transition-show="scale"
-                                                    transition-hide="scale"
-                                                >
-                                                    <q-date minimal v-model="d.deadline" :options="limitDate">
-                                                        <div class="row items-center justify-end">
-                                                        <q-btn
-                                                            v-close-popup
-                                                            label="Close"
-                                                            color="primary"
-                                                            flat
-                                                        />
-                                                        </div>
-                                                    </q-date>
-                                                </q-popup-proxy>
-                                            </q-icon>
-                                            </template>
-                                        </q-input> -->
+                                    <!-- <td style="min-width: 200px;">
+                                       
                                         <q-field dense outlined class="l-grow">
                                             <template v-slot:prepend>
                                             <q-icon name="date_range" />
@@ -103,7 +76,7 @@
                                             </q-date>
                                             </q-popup-proxy>
                                         </q-field>
-                                    </td>
+                                    </td> -->
                                     <td style="min-width: 170px;">
                                         <q-select
                                             outlined

@@ -63,8 +63,8 @@
             <td class="text-left" style="width:150px; vertical-align: top;">
               <div class="text-grey">Pengajuan</div>
               <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
-              <div class="text-grey">Deadline</div>
-              <div>{{ d.deadline | moment("DD MMM YYYY") }}</div>
+              <!-- <div class="text-grey">Deadline</div>
+              <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
             </td>
             <td class="text-left" style="vertical-align: top;">
               <div class="l-wrap-cell" style="width: 200px !important;">
@@ -212,6 +212,15 @@
             Apakah Anda yakin ingin menyetujui
             <span class="text-bold">{{ selectCount }} SPP</span> terpilih?
           </div>
+          <div class="q-py-sm">
+            Pilih Tingkat Kepentingan
+            <q-select
+              outlined
+              dense
+              v-model="urgency"
+              :options="OptUrgency"
+            />
+          </div>
         </q-card-section>
 
         <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
@@ -233,6 +242,7 @@
             label="Ya, Setujui SPP"
             class=" l-grow"
             @click="approveSelected()"
+            :disable="urgency == ''"
             v-close-popup
             style="width: calc(50% - 16px)"
           />
@@ -323,17 +333,24 @@ export default {
       option: [],
 
       optSort: [
-        { label: "Deadline Terdekat", value: "deadline ASC" },
-        { label: "Deadline Terlama", value: "deadline DESC" },
+        // { label: "Deadline Terdekat", value: "deadline ASC" },
+        // { label: "Deadline Terlama", value: "deadline DESC" },
         { label: "Pengajuan Terdekat", value: "create_at ASC" },
         { label: "Pengajuan Terlama", value: "create_at DESC" },
       ],
-      selSort: "deadline ASC",
+      selSort: "create_at ASC",
 
       searchTerm: "",
       check_all: false,
 
       optDept: [],
+
+      urgency: "",
+      OptUrgency: [
+        "HIGH",
+        "MIDDLE",
+        "LOW"
+      ],
     };
   },
   mounted() {
@@ -406,6 +423,7 @@ export default {
     async approve(val) {
       var data = {
         manager_approve: 1,
+        urgency: this.urgency,
       };
       await this.$http
         .put("/update_spp/" + val.spp_id, data, {})

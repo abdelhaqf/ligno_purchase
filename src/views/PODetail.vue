@@ -447,10 +447,10 @@ export default {
         temp.qty = this.po.spp[i].qty;
         temp.unit = this.po.spp[i].unit;
         temp.cc = this.po.spp[i].cc;
-        temp.deadline =
-          this.po.spp[i].deadline >= moment().format("YYYY-MM-DD")
-            ? moment(this.po.spp[i].deadline).format("YYYY/MM/DD")
-            : moment().format("YYYY/MM/DD");
+        // temp.deadline =
+        //   this.po.spp[i].deadline >= moment().format("YYYY-MM-DD")
+        //     ? moment(this.po.spp[i].deadline).format("YYYY/MM/DD")
+        //     : moment().format("YYYY/MM/DD");
         temp.description = this.po.spp[i].description;
         temp.user_id = this.$store.state.currentUser.user_id;
 
