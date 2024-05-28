@@ -21,6 +21,12 @@ Flight::route('GET /list/user', function () {
   ORDER BY dept, name";
   runQuery($q);
 });
+
+Flight::route('GET /kategori', function () {
+  $q = "SELECT * FROM kategori";
+  runQuery($q);
+});
+
 Flight::route('GET /current_user/@username', function ($username) {
 
   $q = "SELECT * FROM user WHERE username like '$username'";

@@ -352,6 +352,7 @@
 
 <script>
 import moment from "moment";
+import axios from "axios";
 export default {
   data() {
     return {
@@ -380,25 +381,7 @@ export default {
       searchTerm: "",
       check_all: false,
 
-      optionKategori: [
-        "Keperluan & Peralatan Produksi",
-        "Packing Barang",
-        "Makan & Minum",
-        "Perbaikan Kendaraan (Produksi/Gudang)",
-        "Perbaikan Kendaraan (Marketing)",
-        "Perbaikan Kendaraan (Umum & Adm)",
-        "Iklan & Promosi",
-        "Perjalanan Dinas",
-        "Entertainment",
-        "Pendidikan & Latihan",
-        "R&D",
-        "Materai & Fotocopy",
-        "ATK & Keperluan Kantor",
-        "Surat & Izin-izin",
-        "Sumbangan",
-        "Raw Material",
-        "Perbaikan Gudang",
-      ],
+      optionKategori: [],
       selKategori: null,
 
       selUrgency: null,
@@ -409,7 +392,9 @@ export default {
       ],
     };
   },
-  mounted() {
+  async mounted() {
+    this.getKategori();
+
     this.fetchData();
     this.getDept();
   },
@@ -432,6 +417,11 @@ export default {
     },
   },
   methods: {
+    async getKategori() {
+      let resp = await this.$http.get("/kategori");
+      let kategori = resp.data.map((a) => a["name"]);
+      this.optionKategori = kategori;
+    },
     clearSelect(idx) {
       let temp = JSON.parse(JSON.stringify(this.sppList));
       for (let i in temp) {
