@@ -78,7 +78,7 @@
               <th>User</th>
               <!-- <th>Divisi</th> -->
               <th>PIC</th>
-              <th>Tanggal</th>
+              <th>Tanggal Pengajuan</th>
               <th>Urgency</th>
               <th>Barang</th>
               <th>Keterangan</th>
@@ -88,20 +88,19 @@
           <!-- table body  -->
           <tbody>
             <tr v-for="(d, i) in sppList" :key="i">
-              <td style="vertical-align: top; padding-top: 0 !important;" >
+              <td>
                 <q-checkbox v-model="d.select" />
               </td>
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 {{ d.name }}
               </td>
               <!-- <td class="text-left" style="vertical-align: top;">
                 {{ d.dept }}
               </td> -->
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 {{ d.handler_name }}
               </td>
-              <td class="text-left" style="width:150px; vertical-align: top;">
-                  <div class="text-grey">Pengajuan</div>
+              <td class="text-center">
                   <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
                   <!-- <div class="text-grey">Deadline</div>
                   <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
@@ -109,7 +108,7 @@
               <td>
                 {{ d.urgency }}
               </td>
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 <div class="l-wrap-cell" style="width: 200px !important;">
                     <span>
                       {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
@@ -125,7 +124,7 @@
                   </div>
                   <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
               </td>
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 <div
                     class="l-wrap-cell"
                     style="width: 200px !important;"
@@ -153,7 +152,6 @@
                     <q-item
                       clickable
                       v-close-popup
-                      class="text-positive text-bold"
                       @click="
                         clearSelect(i);
                         createPO();
@@ -164,7 +162,6 @@
                     <q-item
                       clickable
                       v-close-popup
-                      class="text-orange text-bold"
                       @click="
                         clearSelect(i);
                         showDialogHistory();
@@ -175,7 +172,6 @@
                     <q-item
                       clickable
                       v-close-popup
-                      class="text-negative text-bold"
                       @click="
                         clearSelect(i);
                         confirmReject = true;

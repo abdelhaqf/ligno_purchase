@@ -43,7 +43,7 @@
               </th>
               <th>User</th>
               <!-- <th>Divisi</th> -->
-              <th>Tanggal</th>
+              <th>Tanggal Pengajuan</th>
               <th>Barang</th>
               <th style="width: 200px !important;">Keterangan</th>
               <th>Action</th>
@@ -52,22 +52,21 @@
           <!-- table body  -->
           <tbody>
             <tr v-for="(d, i) in sppList" :key="i">
-              <td style="vertical-align: top; padding-top: 0 !important;">
+              <td>
                 <q-checkbox v-model="d.select" />
               </td>
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 {{ d.name }}
               </td>
               <!-- <td class="text-left" style="vertical-align: top;">
                 {{ d.dept }}
               </td> -->
-              <td class="text-left" style="width:150px; vertical-align: top;">
-                <div class="text-grey">Pengajuan</div>
+              <td class="text-center">
                 <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
                 <!-- <div class="text-grey">Deadline</div>
                 <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
               </td>
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 <div class="l-wrap-cell" style="width: 200px !important;">
                   <span>
                     {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
@@ -83,7 +82,7 @@
                 </div>
                 <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
               </td>
-              <td class="text-left" style="vertical-align: top;">
+              <td class="text-left">
                 <div
                     class="l-wrap-cell"
                     style="width: 200px !important;"
@@ -169,6 +168,7 @@
         <div class="row justify-end items-center q-gutter-x-md">
           <q-btn
             unelevated
+            icon="close"
             label="Tolak"
             color="negative"
             @click="confirmReject = true"
@@ -176,6 +176,7 @@
           ></q-btn>
           <q-btn
             unelevated
+            icon="done"
             label="Setujui"
             color="positive"
             @click="confirmApprove = true"
@@ -238,16 +239,18 @@
             Apakah Anda yakin ingin menyetujui
             <span class="text-bold">{{ selectCount }} SPP</span> terpilih?
           </div>
-          <div class="q-py-sm">
-            Pilih Tingkat Kepentingan
-            <q-select
-              outlined
-              dense
-              v-model="urgency"
-              :options="OptUrgency"
-            />
-          </div>
         </q-card-section>
+        <q-separator/>
+        <q-card-section class="q-pt-none">
+          <div class="text-left q-py-sm">Urgency</div>
+          <q-select
+            outlined
+            dense
+            v-model="urgency"
+            :options="OptUrgency"
+          />
+        </q-card-section>
+        
 
         <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
           <q-btn
