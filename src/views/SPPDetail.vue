@@ -336,25 +336,7 @@ export default {
       handleBy: {},
       option: [],
 
-      optionKategori: [
-        "Keperluan & Peralatan Produksi",
-        "Packing Barang",
-        "Makan & Minum",
-        "Perbaikan Kendaraan (Produksi/Gudang)",
-        "Perbaikan Kendaraan (Marketing)",
-        "Perbaikan Kendaraan (Umum & Adm)",
-        "Iklan & Promosi",
-        "Perjalanan Dinas",
-        "Entertainment",
-        "Pendidikan & Latihan",
-        "R&D",
-        "Materai & Fotocopy",
-        "ATK & Keperluan Kantor",
-        "Surat & Izin-izin",
-        "Sumbangan",
-        "Raw Material",
-        "Perbaikan Gudang",
-      ],
+      optionKategori: [],
       selKategori: null,
 
       promptApprove: false,
@@ -369,6 +351,7 @@ export default {
     };
   },
   async mounted() {
+    await this.getKategori();
     await this.getSPP();
     if (this.$route.query.approval) {
       await this.getUser();
@@ -389,6 +372,11 @@ export default {
       );
       this.spp = result.data;
       this.isReceived = result.data.is_received;
+    },
+    async getKategori() {
+      let resp = await this.$http.get("/kategori");
+      let kategori = resp.data.map((a) => a["name"]);
+      this.optionKategori = kategori;
     },
     async updateStatus() {
       this.$q.loading.show();

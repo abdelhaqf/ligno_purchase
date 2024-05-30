@@ -34,7 +34,7 @@
             label="Pilih Urgency"
             style="width: 230px;"
           ></q-select>
-          <q-select
+          <!-- <q-select
             outlined
             dense
             emit-value
@@ -46,7 +46,7 @@
             @input="fetchData"
             label="Pilih Divisi"
             style="width: 230px;"
-          ></q-select>
+          ></q-select> -->
           <q-select
             outlined
             dense
@@ -72,7 +72,7 @@
               <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
             </th>
             <th>User</th>
-            <th>Divisi</th>
+            <!-- <th>Divisi</th> -->
             <th>Tanggal</th>
             <th>Urgency</th>
             <th>Barang</th>
@@ -89,9 +89,9 @@
             <td class="text-left" style="vertical-align: top;">
               {{ d.name }}
             </td>
-            <td class="text-left" style="vertical-align: top;">
+            <!-- <td class="text-left" style="vertical-align: top;">
               {{ d.dept }}
-            </td>
+            </td> -->
             <td class="text-left" style="width:150px; vertical-align: top;">
               <div class="text-grey">Pengajuan</div>
               <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
@@ -396,7 +396,7 @@ export default {
     this.getKategori();
 
     this.fetchData();
-    this.getDept();
+    // this.getDept();
   },
   watch: {
     sppList: {
@@ -441,8 +441,7 @@ export default {
       this.sppList = [];
       console.log(this.selDivisi);
       let q_filter = `?sort=${this.selSort}&search=${
-        this.searchTerm ? this.searchTerm : ""
-      }&dept=${this.selDivisi ? this.selDivisi : ""
+        this.searchTerm ? this.searchTerm : "" //}&dept=${this.selDivisi ? this.selDivisi : ""
       }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
       this.$http.get(`/spp-approval${q_filter}`, {}).then((result) => {
         for (var i = 0; i < result.data.length; i++) {
@@ -460,13 +459,13 @@ export default {
         this.handleBy = result.data[0];
       });
     },
-    async getDept() {
-      // let resp = this.$http.get("/dept")
-      this.$http.get("/dept").then((resp) => {
-        let dept = resp.data.map((a) => a.dept);
-        this.optDept = dept;
-      });
-    },
+    // async getDept() {
+    //   // let resp = this.$http.get("/dept")
+    //   this.$http.get("/dept").then((resp) => {
+    //     let dept = resp.data.map((a) => a.dept);
+    //     this.optDept = dept;
+    //   });
+    // },
 
     async approve(val) {
       var data = {

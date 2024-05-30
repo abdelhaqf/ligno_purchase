@@ -41,7 +41,7 @@
               <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
             </th>
             <th>User</th>
-            <th>Divisi</th>
+            <!-- <th>Divisi</th> -->
             <th>Tanggal</th>
             <th>Barang</th>
             <th style="width: 200px !important;">Keterangan</th>
@@ -57,9 +57,9 @@
             <td class="text-left" style="vertical-align: top;">
               {{ d.name }}
             </td>
-            <td class="text-left" style="vertical-align: top;">
+            <!-- <td class="text-left" style="vertical-align: top;">
               {{ d.dept }}
-            </td>
+            </td> -->
             <td class="text-left" style="width:150px; vertical-align: top;">
               <div class="text-grey">Pengajuan</div>
               <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>

@@ -34,7 +34,7 @@
             label="Pilih Urgency"
             style="width: 230px;"
           ></q-select>
-          <q-select
+          <!-- <q-select
             outlined
             dense
             emit-value
@@ -46,7 +46,7 @@
             @input="fetchData"
             label="Pilih Divisi"
             style="width: 230px;"
-          ></q-select>
+          ></q-select> -->
           <q-select
             outlined
             dense
@@ -75,7 +75,7 @@
               <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
             </th>
             <th>User</th>
-            <th>Divisi</th>
+            <!-- <th>Divisi</th> -->
             <th>PIC</th>
             <th>Tanggal</th>
             <th>Urgency</th>
@@ -93,9 +93,9 @@
             <td class="text-left" style="vertical-align: top;">
               {{ d.name }}
             </td>
-            <td class="text-left" style="vertical-align: top;">
+            <!-- <td class="text-left" style="vertical-align: top;">
               {{ d.dept }}
-            </td>
+            </td> -->
             <td class="text-left" style="vertical-align: top;">
               {{ d.handler_name }}
             </td>
@@ -159,6 +159,17 @@
                     "
                   >
                     Buat PO
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-close-popup
+                    class="text-orange text-bold"
+                    @click="
+                      clearSelect(i);
+                      showDialogHistory();
+                    "
+                  >
+                    History
                   </q-item>
                   <q-item
                     clickable
@@ -309,6 +320,7 @@ import moment from "moment";
 import { Money } from "v-money";
 import axios from "axios";
 import { mapActions } from "vuex";
+import dialogHistorySpp from '../components/dialogHistorySpp.vue';
 export default {
   components: { Money },
   data() {
@@ -388,7 +400,7 @@ export default {
   },
   async mounted() {
     this.fetchData();
-    this.getDept();
+    // this.getDept();
   },
   watch: {
     sppList: {
@@ -410,6 +422,27 @@ export default {
   },
   methods: {
     ...mapActions(["sendPrintData"]),
+    showDialogHistory() {
+      let temp = this.sppList.filter((val) => {
+        return val.select;
+      });
+
+      this.$q
+        .dialog({
+          component: dialogHistorySpp,
+          parent: this,
+          spp: temp,
+        })
+        .onOk((val) => {
+          console.log("OK was clicked on dialog: ", val);
+        })
+        .onCancel(() => {
+          console.log("Cancel was clicked on dialog");
+        })
+        .onDismiss(() => {
+          console.log("OK or cancel was clicked on dialog");
+        });
+    },
     clearSelect(idx) {
       let temp = JSON.parse(JSON.stringify(this.sppList));
       for (let i in temp) {
@@ -425,18 +458,17 @@ export default {
       }
       this.sppList = temp;
     },
-    async getDept() {
-      // let resp = this.$http.get("/dept")
-      this.$http.get("/dept").then((resp) => {
-        let dept = resp.data.map((a) => a.dept);
-        this.optDept = dept;
-      });
-    },
+    // async getDept() {
+    //   // let resp = this.$http.get("/dept")
+    //   this.$http.get("/dept").then((resp) => {
+    //     let dept = resp.data.map((a) => a.dept);
+    //     this.optDept = dept;
+    //   });
+    // },
     fetchData() {
       this.sppList = [];
       let q_filter = `?sort=${this.selSort}&search=${
-        this.searchTerm ? this.searchTerm : ""
-      }&dept=${this.selDivisi ? this.selDivisi : ""
+        this.searchTerm ? this.searchTerm : "" //}&dept=${this.selDivisi ? this.selDivisi : ""
       }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
 
       this.$http
