@@ -3,7 +3,7 @@
     <q-card flat bordered class="bg-white">
       <!-- form  -->
 
-      <q-scroll-area style="height:calc(100vh - 225px)">
+      <q-scroll-area style="height:calc(100vh - 235px)">
         <q-card-section class="q-gutter-y-md">
           <div class="row items-center">
             <div class="text-black" style="width: 125px;">
@@ -139,10 +139,8 @@
           </div>
         </q-card-section>
       </q-scroll-area>
-    </q-card>
-
-    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
-      <q-card-section class="row justify-between">
+      <q-separator size="1px"></q-separator>
+      <q-card-section class="row justify-between ">
         <q-btn
           outline
           label="Kembali"
@@ -162,6 +160,9 @@
           </q-btn>
         </div>
       </q-card-section>
+    </q-card>
+
+    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
     </q-footer>
 
     <q-dialog v-model="dialogStep">
@@ -285,7 +286,7 @@ export default {
   mounted() {
     this.$http.get("/list_item", {}).then((result) => {
       this.option = result.data;
-      this.option = this.option.filter(obj => obj.value !== "");
+      this.option = this.option.filter((obj) => obj.value !== "");
       if (this.option.length == 0) this.showInput = true;
     });
     this.getUsers();
@@ -293,13 +294,12 @@ export default {
   computed: {
     // date_model() {
     //   if (!this.spp.deadline) return "Pilih Tanggal Dibutuhkan";
-
     //   return moment(this.spp.deadline).format("DD MMMM YYYY");
     // },
   },
   methods: {
-    setModel (val) {
-      this.spp.item = val
+    setModel(val) {
+      this.spp.item = val;
     },
     resetForm() {
       this.spp = {
