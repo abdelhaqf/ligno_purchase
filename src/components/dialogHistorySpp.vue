@@ -25,8 +25,8 @@
                 <th>No PO</th>
                 <th>Tanggal PO</th>
                 <th>Nama Vendor</th>
+                <th>Jumlah Pembelian</th>
                 <th>Harga Item</th>
-                <th>Keterangan</th>             
             </tr>
             </thead>
             <tbody>
@@ -34,6 +34,7 @@
                 <td class="text-left">{{ p.po_id }}</td>
                 <td class="text-left">{{ momentFormatDate(p.po_date) }}</td>
                 <td class="text-left">{{ p.vendor }}</td>
+                <td>{{ p.qty }} {{ p.unit }}</td>
                 <td class="text-left">
                   {{
                     setCurrency(
@@ -42,30 +43,6 @@
                     )
                   }}
                   / {{ p.unit }}
-                </td>
-                <td>
-                  <div
-                    class="l-wrap-cell"
-                    v-if="p.description"
-                    style="width: 150px !important;"
-                  >
-                    <span>
-                      {{
-                        p.description.length > 45
-                          ? p.description.slice(0, 40)
-                          : p.description
-                      }}
-                    </span>
-                    <span v-if="p.description.length > 45" class=" no-wrap ">
-                      ...
-                      <q-tooltip
-                        content-style="width:200px"
-                        content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ p.description }}</q-tooltip
-                      >
-                    </span>
-                  </div>
-                  <div v-else class="l-grow text-center">-</div>
                 </td>
               </tr>
             </tbody>
@@ -158,11 +135,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.l-wrap-cell {
-  word-wrap: break-word !important; /* Ensures that words break and wrap to the next line */
-  white-space: normal !important; /* Overrides any contrary settings that prevent wrapping */
-  word-break: break-all;
-}
-</style>
