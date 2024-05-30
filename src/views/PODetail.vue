@@ -104,7 +104,7 @@
           </div>
         </div>
       </q-card-section>
-      <q-scroll-area style="height:calc(100vh - 490px)" class="q-px-md">
+      <q-scroll-area style="height:calc(100vh - 515px)" class="q-px-md">
         <q-markup-table
           wrap-cells
           flat
@@ -248,9 +248,7 @@
           </tbody>
         </q-markup-table>
       </q-scroll-area>
-    </q-card>
-
-    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
+      <q-separator size="1px"></q-separator>
       <q-card-section class="row justify-end items-center">
         <div class="row justify-end q-gutter-x-md" v-if="!isEdit">
           <q-btn
@@ -294,7 +292,53 @@
           </q-btn>
         </div>
       </q-card-section>
-    </q-footer>
+    </q-card>
+
+    <!-- <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
+      <q-card-section class="row justify-end items-center">
+        <div class="row justify-end q-gutter-x-md" v-if="!isEdit">
+          <q-btn
+            unelevated
+            label="Re-Order"
+            color="primary"
+            no-caps
+            @click="
+              reorderList();
+              showDialogReorder();
+            "
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Edit"
+            color="white"
+            text-color="black"
+            outline
+            style="color: black;"
+            no-caps
+            @click="isEdit = true"
+          >
+          </q-btn>
+        </div>
+        <div class="row justify-end q-gutter-x-md" v-else>
+          <q-btn
+            unelevated
+            label="Batal"
+            color="negative"
+            no-caps
+            @click="isEdit = false; fetchData();">
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Simpan"
+            color="primary"
+            no-caps
+            @click="updateSPP_PO"
+          >
+          </q-btn>
+        </div>
+      </q-card-section>
+    </q-footer> -->
   </div>
 </template>
 

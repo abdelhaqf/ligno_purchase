@@ -91,9 +91,47 @@
           </q-timeline-entry>
         </q-timeline>
       </q-scroll-area>
+      <q-separator/>
+      <q-card-section
+        v-if="
+          ($route.query.approval == 'manager' &&
+            $store.state.currentUser.user_id == spp.manager_id) ||
+            ($route.query.approval == 'purchasing' &&
+              $store.state.currentUser.is_purch_manager == 1)
+        "
+        class="row justify-end q-gutter-x-md"
+      >
+        <q-btn
+          unelevated
+          label="Tolak"
+          color="negative"
+          @click="promptReject = true"
+          no-caps
+        ></q-btn>
+        <q-btn
+          unelevated
+          label="Setujui"
+          color="positive"
+          @click="promptApprove = true"
+          no-caps
+        ></q-btn>
+      </q-card-section>
+      <q-card-section v-else class="row justify-end">
+        <q-btn
+          unelevated
+          color="primary"
+          text-color="white"
+          label="Ajukan Ulang"
+          @click="
+            reorderList();
+            showDialogReorder();
+          "
+          no-caps
+        ></q-btn>
+      </q-card-section>
     </q-card>
 
-    <q-footer
+    <!-- <q-footer
       class="atas-radius bg-white q-mx-auto"
       style="max-width: 1440px !important;"
     >
@@ -134,7 +172,7 @@
           no-caps
         ></q-btn>
       </q-card-section>
-    </q-footer>
+    </q-footer> -->
 
     <q-dialog v-model="promptApprove" persistent>
       <q-card

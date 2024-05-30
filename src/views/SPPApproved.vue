@@ -61,156 +61,197 @@
         </div>
       </q-card-section>
 
-      <!-- table header  -->
-      <q-markup-table
-        v-if="sppList.length"
-        class="stickyTable"
-        wrap-cells
-        style="height: calc(100vh - 280px);"
-      >
-        <!-- table head -->
-        <thead class="text-white">
-          <tr>
-            <th style="width:20px;">
-              <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
-            </th>
-            <th>User</th>
-            <!-- <th>Divisi</th> -->
-            <th>PIC</th>
-            <th>Tanggal</th>
-            <th>Urgency</th>
-            <th>Barang</th>
-            <th>Keterangan</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <!-- table body  -->
-        <tbody>
-          <tr v-for="(d, i) in sppList" :key="i">
-            <td style="vertical-align: top; padding-top: 0 !important;" >
-              <q-checkbox v-model="d.select" />
-            </td>
-            <td class="text-left" style="vertical-align: top;">
-              {{ d.name }}
-            </td>
-            <!-- <td class="text-left" style="vertical-align: top;">
-              {{ d.dept }}
-            </td> -->
-            <td class="text-left" style="vertical-align: top;">
-              {{ d.handler_name }}
-            </td>
-            <td class="text-left" style="width:150px; vertical-align: top;">
-                <div class="text-grey">Pengajuan</div>
-                <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
-                <!-- <div class="text-grey">Deadline</div>
-                <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
-            </td>
-            <td>
-              {{ d.urgency }}
-            </td>
-            <td class="text-left" style="vertical-align: top;">
-              <div class="l-wrap-cell" style="width: 200px !important;">
+      <q-card-section class="q-pa-none" v-if="sppList.length">
+        <!-- table header  -->
+        <q-markup-table
+          flat
+          class="stickyTable"
+          wrap-cells
+          :style="selectCount > 0? 'height: calc(100vh - 325px);' : 'height: calc(100vh - 250px);'"
+        >
+          <!-- table head -->
+          <thead class="text-white">
+            <tr>
+              <th style="width:20px;">
+                <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
+              </th>
+              <th>User</th>
+              <!-- <th>Divisi</th> -->
+              <th>PIC</th>
+              <th>Tanggal</th>
+              <th>Urgency</th>
+              <th>Barang</th>
+              <th>Keterangan</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <!-- table body  -->
+          <tbody>
+            <tr v-for="(d, i) in sppList" :key="i">
+              <td style="vertical-align: top; padding-top: 0 !important;" >
+                <q-checkbox v-model="d.select" />
+              </td>
+              <td class="text-left" style="vertical-align: top;">
+                {{ d.name }}
+              </td>
+              <!-- <td class="text-left" style="vertical-align: top;">
+                {{ d.dept }}
+              </td> -->
+              <td class="text-left" style="vertical-align: top;">
+                {{ d.handler_name }}
+              </td>
+              <td class="text-left" style="width:150px; vertical-align: top;">
+                  <div class="text-grey">Pengajuan</div>
+                  <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+                  <!-- <div class="text-grey">Deadline</div>
+                  <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
+              </td>
+              <td>
+                {{ d.urgency }}
+              </td>
+              <td class="text-left" style="vertical-align: top;">
+                <div class="l-wrap-cell" style="width: 200px !important;">
+                    <span>
+                      {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                    </span>
+                    <span v-if="d.item.length > 55" class=" no-wrap ">
+                      ...
+                      <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ d.item }}</q-tooltip
+                      >
+                    </span>
+                  </div>
+                  <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
+              </td>
+              <td class="text-left" style="vertical-align: top;">
+                <div
+                    class="l-wrap-cell"
+                    style="width: 200px !important;"
+                  >
                   <span>
-                    {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                    {{
+                      d.description.length > 55
+                        ? d.description.slice(0, 50)
+                        : d.description
+                    }}
                   </span>
-                  <span v-if="d.item.length > 55" class=" no-wrap ">
+                  <span v-if="d.description.length > 55" class=" no-wrap ">
                     ...
                     <q-tooltip
                       content-style="width:300px"
                       content-class="l-text-detail bg-white text-black shadow-2"
-                      >{{ d.item }}</q-tooltip
+                      >{{ d.description }}</q-tooltip
                     >
                   </span>
                 </div>
-                <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
-            </td>
-            <td class="text-left" style="vertical-align: top;">
-              <div
-                  class="l-wrap-cell"
-                  style="width: 200px !important;"
-                >
-                <span>
-                  {{
-                    d.description.length > 55
-                      ? d.description.slice(0, 50)
-                      : d.description
-                  }}
-                </span>
-                <span v-if="d.description.length > 55" class=" no-wrap ">
-                  ...
-                  <q-tooltip
-                    content-style="width:300px"
-                    content-class="l-text-detail bg-white text-black shadow-2"
-                    >{{ d.description }}</q-tooltip
-                  >
-                </span>
-              </div>
-            </td>
-            <td class="text-center">
-              <q-btn-dropdown flat dense dropdown-icon="more_horiz">
-                <q-list>
-                  <q-item
-                    clickable
-                    v-close-popup
-                    class="text-positive text-bold"
-                    @click="
-                      clearSelect(i);
-                      createPO();
-                    "
-                  >
-                    Buat PO
-                  </q-item>
-                  <q-item
-                    clickable
-                    v-close-popup
-                    class="text-orange text-bold"
-                    @click="
-                      clearSelect(i);
-                      showDialogHistory();
-                    "
-                  >
-                    History
-                  </q-item>
-                  <q-item
-                    clickable
-                    v-close-popup
-                    class="text-negative text-bold"
-                    @click="
-                      clearSelect(i);
-                      confirmReject = true;
-                    "
-                  >
-                    Tolak
-                  </q-item>
-                  <q-item
-                    clickable
-                    v-close-popup
-                    @click="
-                      clearSelect(i);
-                      toPreview();
-                    "
-                  >
-                    Print
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </td>
-          </tr>
-        </tbody>
-      </q-markup-table>
+              </td>
+              <td class="text-center">
+                <q-btn-dropdown flat dense dropdown-icon="more_horiz">
+                  <q-list>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      class="text-positive text-bold"
+                      @click="
+                        clearSelect(i);
+                        createPO();
+                      "
+                    >
+                      Buat PO
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      class="text-orange text-bold"
+                      @click="
+                        clearSelect(i);
+                        showDialogHistory();
+                      "
+                    >
+                      History
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      class="text-negative text-bold"
+                      @click="
+                        clearSelect(i);
+                        confirmReject = true;
+                      "
+                    >
+                      Tolak
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      @click="
+                        clearSelect(i);
+                        toPreview();
+                      "
+                    >
+                      Print
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-card-section>
+      <!-- table header  -->
+      
       <q-card-section
         class="column items-center justify-center"
-        style="height: calc(100vh - 275px);"
+        style="height: calc(100vh - 250px);"
         v-else
       >
         <q-img width="400px" :src="`./empty.png`"></q-img>
         <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
       </q-card-section>
 
-      <q-card-section></q-card-section>
+      <q-separator></q-separator>
+      <q-card-section v-if="selectCount > 0" class="row justify-between items-center">
+        <div class="l-text-subtitle text-bold text-black">
+          {{ selectCount }} PO Dipilih
+        </div>
+        <div class="row justify-end items-center q-gutter-x-md">
+          <q-btn
+            unelevated
+            label="Print"
+            color="white"
+            text-color="black"
+            outline
+            style="color: black;"
+            @click="toPreview"
+            no-caps
+            icon="print"
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Tolak"
+            color="negative"
+            @click="confirmReject = true;"
+            icon="close"
+            no-caps
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Buat PO"
+            color="blue"
+            @click="createPO"
+            no-caps
+            icon="edit"
+          >
+          </q-btn>
+        </div>
+      </q-card-section>
     </q-card>
 
-    <q-footer
+    <!-- <q-footer
       v-if="selectCount > 0"
       style="max-width: 1440px;"
       class="q-mx-auto atas-radius bg-white"
@@ -252,7 +293,7 @@
           </q-btn>
         </div>
       </q-card-section>
-    </q-footer>
+    </q-footer> -->
 
     <!-- penolakan  -->
     <q-dialog v-model="confirmReject" persistent>

@@ -3,7 +3,7 @@
     <q-card flat bordered class="bg-white">
       <!-- form  -->
 
-      <q-scroll-area style="height:calc(100vh - 235px)">
+      <q-scroll-area style="height:calc(100vh - 245px)">
         <q-card-section class="q-gutter-y-md">
           <div class="row items-center">
             <div class="text-black" style="width: 125px;">
@@ -162,8 +162,8 @@
       </q-card-section>
     </q-card>
 
-    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
-    </q-footer>
+    <!-- <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
+    </q-footer> -->
 
     <q-dialog v-model="dialogStep">
       <q-card>

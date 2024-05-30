@@ -1,265 +1,292 @@
 <template>
-  <div class="row relative q-px-lg" style="min-height: 550px">
-    <q-card flat bordered class="col-12 bg-white rounded-borders">
-      <!-- table control -->
-      <q-card-section class="column q-gutter-y-sm">
-        <div class="row items-center">
-          <div class="col-2">Jenis SPP</div>
-          <div class="q-gutter-sm">
-            <q-radio v-model="type" val="po" label="PO" />
-            <q-radio v-model="type" val="nonpo" label="Non-PO" />
+  <div class="q-px-lg rounded-borders full-width">
+    <q-card flat bordered class="bg-white">
+      <q-scroll-area style="height:calc(100vh - 240px)">
+        <q-card-section class="column q-gutter-y-sm">
+          <div class="row items-center">
+            <div class="col-2">Jenis SPP</div>
+            <div class="q-gutter-sm">
+              <q-radio v-model="type" val="po" label="PO" />
+              <q-radio v-model="type" val="nonpo" label="Non-PO" />
+            </div>
           </div>
-        </div>
-        <div class="row items-center">
-          <div class="col-2">Nomor SPP</div>
-          <q-input
-            outlined
-            v-model="po.po_id"
-            label="Nomor PO"
-            stack-label
-            dense
-            v-if="type == 'po'"
-            class="l-grow border-card"
-          />
-          <q-input
-            outlined
-            v-model="po.po_id"
-            label="Nomor non-PO"
-            readonly
-            stack-label
-            dense
-            v-else
-            class="l-grow border-card"
-          />
-        </div>
-        <div class="row items-center">
-          <div class="col-2">Nama Vendor</div>
-          <div class="l-grow">
+          <div class="row items-center">
+            <div class="col-2">Nomor SPP</div>
             <q-input
               outlined
-              v-model="po.vendor"
-              label="Nama Vendor"
+              v-model="po.po_id"
+              label="Nomor PO"
               stack-label
               dense
-              v-if="showInput"
-            >
-              <template v-slot:append>
-                <q-toggle
-                  v-model="showInput"
-                  color="green"
-                  icon="add"
-                  keep-color
-                />
-              </template>
-              <template v-slot:label>
-                Nama Vendor
-                <a class="q-px-sm bg-info text-white rounded-borders"
-                  >input baru</a
-                >
-              </template>
-            </q-input>
-            <q-select
-              v-else
-              stack-label
+              v-if="type == 'po'"
+              class="l-grow border-card"
+            />
+            <q-input
               outlined
+              v-model="po.po_id"
+              label="Nomor non-PO"
+              readonly
+              stack-label
               dense
-              v-model="po.vendor"
-              map-options
-              emit-value
-              use-input
-              hide-selected
-              fill-input
-              input-debounce="0"
-              :options="filteredVD"
-              @filter="filterVD"
-              @input-value="setModel"
-              label="Nama Vendor"
-            >
-              <template v-slot:append>
-                <q-toggle
-                  v-model="showInput"
-                  color="green"
-                  icon="add"
-                  keep-color
-                />
-              </template>
-            </q-select>
+              v-else
+              class="l-grow border-card"
+            />
           </div>
-        </div>
-        <div class="l-grow row items-center">
-          <div class="col-2">Tanggal PO</div>
-          <q-field dense outlined class="l-grow">
-            <template v-slot:prepend>
-              <q-icon name="date_range" />
-            </template>
-
-            <template v-slot:control>
-              <div class="self-center full-width no-outline" tabindex="0">
-                {{ date_model }}
-              </div>
-            </template>
-            <q-popup-proxy
-              style="width:fit-content"
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date v-model="po.po_date">
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Close" color="primary" flat />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-field>
-        </div>
-        <div class="l-grow row items-center">
-          <div class="col-2">Currency</div>
-          <div class="q-gutter-sm">
-            <q-radio v-model="curr" val="IDR" label="IDR" />
-            <q-radio v-model="curr" val="USD" label="USD" />
-          </div>
-        </div>
-        <div class="l-grow row items-start no-wrap">
-          <div class="col-2 q-pt-lg" style="height: fit-content;">
-            Daftar SPP
-          </div>
-          <div class="column q-gutter-y-sm">
-            <div
-              v-if="sppSelect.length > 1"
-              class="l-grow row justify-end items-center q-py-md bg-grey-2"
-            >
-              <div class="text-weight-thin l-grow q-mx-md">
-                Atur dan terapkan ke semua
-              </div>
-              <div class="q-px-md no-wrap q-mr-md" style="width:200px">
-                <money v-model="price" v-bind="money"></money>
-              </div>
-              <div class="q-px-md no-wrap" style="width:200px">
-                <q-input
-                  outlined
-                  v-model="date"
-                  mask="date"
-                  dense
-                  class="bg-white l-grow"
-                >
-                  <template v-slot:append>
-                    <q-icon name="event" class="cursor-pointer">
-                      <q-popup-proxy
-                        ref="qDateProxy"
-                        transition-show="scale"
-                        transition-hide="scale"
-                      >
-                        <q-date minimal v-model="date" :options="limitDate">
-                          <div class="row items-center justify-end">
-                            <q-btn
-                              v-close-popup
-                              label="Close"
-                              color="primary"
-                              flat
-                            />
-                          </div>
-                        </q-date>
-                      </q-popup-proxy>
-                    </q-icon>
-                  </template>
-                  <!-- <template v-slot:label>
-                    Tanggal PO
-                    <a
-                      v-if="po.po_date"
-                      class="q-px-sm bg-info text-white rounded-borders"
-                      >tahun / bulan / tanggal</a
-                    >
-                  </template> -->
-                </q-input>
-              </div>
-              <div class="q-px-md" style="width: 175px;">
-                <q-btn
-                  unelevated
-                  label="Ubah Massal"
-                  color="blue"
-                  no-caps
-                  @click="changeAll()"
-                >
-                </q-btn>
-              </div>
-            </div>
-
-            <q-markup-table class="stickyTable l-grow" flat bordered wrap-cells>
-              <!-- table head -->
-              <thead class="text-white">
-                <tr>
-                  <th>No</th>
-                  <th>Deadline</th>
-                  <th>Harga</th>
-                  <th>Est. Arrival</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <!-- table body  -->
-              <tbody>
-                <tr v-for="(x, i) in sppSelect" :key="i">
-                  <td class="text-center">{{ i + 1 }}</td>
-                  <td class="l-grow">
-                    {{ x.item }} ({{ x.qty }} {{ x.unit }})
-                  </td>
-                  <td style="width:200px;" class="items-center">
-                    <money
-                      v-model="x.price"
-                      v-bind="money"
-                      class="l-grow"
-                    ></money>
-                  </td>
-                  <td
-                    class="text-center items-center q-px-none"
-                    style="width:200px;"
+          <div class="row items-center">
+            <div class="col-2">Nama Vendor</div>
+            <div class="l-grow">
+              <q-input
+                outlined
+                v-model="po.vendor"
+                label="Nama Vendor"
+                stack-label
+                dense
+                v-if="showInput"
+              >
+                <template v-slot:append>
+                  <q-toggle
+                    v-model="showInput"
+                    color="green"
+                    icon="add"
+                    keep-color
+                  />
+                </template>
+                <template v-slot:label>
+                  Nama Vendor
+                  <a class="q-px-sm bg-info text-white rounded-borders"
+                    >input baru</a
                   >
-                    <q-input
-                      outlined
-                      dense
-                      bg-color="white"
-                      v-model="x.est_arrival"
-                      readonly
-                      class="l-grow"
-                    >
-                      <template v-slot:append>
-                        <q-icon name="event" class="cursor-pointer">
-                          <q-popup-proxy
-                            ref="qDateProxy"
-                            transition-show="scale"
-                            transition-hide="scale"
-                          >
-                            <q-date
-                              minimal
-                              v-model="x.est_arrival"
-                              :options="limitDate"
-                            >
-                              <div class="row items-center justify-end">
-                                <q-btn
-                                  v-close-popup
-                                  label="Close"
-                                  color="primary"
-                                  flat
-                                />
-                              </div>
-                            </q-date>
-                          </q-popup-proxy>
-                        </q-icon>
-                      </template>
-                    </q-input>
-                  </td>
-                  <td class="text-center" style="width: 175px;">
-                    <q-btn
-                      label="Hapus"
-                      flat
-                      no-caps
-                      color="blue"
-                      dense
-                      @click="deleteSPPItem(i)"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </q-markup-table>
+                </template>
+              </q-input>
+              <q-select
+                v-else
+                stack-label
+                outlined
+                dense
+                v-model="po.vendor"
+                map-options
+                emit-value
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                :options="filteredVD"
+                @filter="filterVD"
+                @input-value="setModel"
+                label="Nama Vendor"
+              >
+                <template v-slot:append>
+                  <q-toggle
+                    v-model="showInput"
+                    color="green"
+                    icon="add"
+                    keep-color
+                  />
+                </template>
+              </q-select>
+            </div>
           </div>
+          <div class="l-grow row items-center">
+            <div class="col-2">Tanggal PO</div>
+            <q-field dense outlined class="l-grow">
+              <template v-slot:prepend>
+                <q-icon name="date_range" />
+              </template>
+
+              <template v-slot:control>
+                <div class="self-center full-width no-outline" tabindex="0">
+                  {{ date_model }}
+                </div>
+              </template>
+              <q-popup-proxy
+                style="width:fit-content"
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-date v-model="po.po_date">
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Close" color="primary" flat />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-field>
+          </div>
+          <div class="l-grow row items-center">
+            <div class="col-2">Currency</div>
+            <div class="q-gutter-sm">
+              <q-radio v-model="curr" val="IDR" label="IDR" />
+              <q-radio v-model="curr" val="USD" label="USD" />
+            </div>
+          </div>
+          <div class="l-grow row items-start no-wrap">
+            <div class="col-2 q-pt-lg" style="height: fit-content;">
+              Daftar SPP
+            </div>
+            <div class="column q-gutter-y-sm">
+              <div
+                v-if="sppSelect.length > 1"
+                class="l-grow row justify-end items-center q-py-md bg-grey-2"
+              >
+                <div class="text-weight-thin l-grow q-mx-md">
+                  Atur dan terapkan ke semua
+                </div>
+                <div class="q-px-md no-wrap q-mr-md" style="width:200px">
+                  <money v-model="price" v-bind="money"></money>
+                </div>
+                <div class="q-px-md no-wrap" style="width:200px">
+                  <q-input
+                    outlined
+                    v-model="date"
+                    mask="date"
+                    dense
+                    class="bg-white l-grow"
+                  >
+                    <template v-slot:append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy
+                          ref="qDateProxy"
+                          transition-show="scale"
+                          transition-hide="scale"
+                        >
+                          <q-date minimal v-model="date" :options="limitDate">
+                            <div class="row items-center justify-end">
+                              <q-btn
+                                v-close-popup
+                                label="Close"
+                                color="primary"
+                                flat
+                              />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                    <!-- <template v-slot:label>
+                      Tanggal PO
+                      <a
+                        v-if="po.po_date"
+                        class="q-px-sm bg-info text-white rounded-borders"
+                        >tahun / bulan / tanggal</a
+                      >
+                    </template> -->
+                  </q-input>
+                </div>
+                <div class="q-px-md" style="width: 175px;">
+                  <q-btn
+                    unelevated
+                    label="Ubah Massal"
+                    color="blue"
+                    no-caps
+                    @click="changeAll()"
+                  >
+                  </q-btn>
+                </div>
+              </div>
+
+              <q-markup-table class="stickyTable l-grow" flat bordered wrap-cells>
+                <!-- table head -->
+                <thead class="text-white">
+                  <tr>
+                    <th>No</th>
+                    <th>Deadline</th>
+                    <th>Harga</th>
+                    <th>Est. Arrival</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <!-- table body  -->
+                <tbody>
+                  <tr v-for="(x, i) in sppSelect" :key="i">
+                    <td class="text-center">{{ i + 1 }}</td>
+                    <td class="l-grow">
+                      {{ x.item }} ({{ x.qty }} {{ x.unit }})
+                    </td>
+                    <td style="width:200px;" class="items-center">
+                      <money
+                        v-model="x.price"
+                        v-bind="money"
+                        class="l-grow"
+                      ></money>
+                    </td>
+                    <td
+                      class="text-center items-center q-px-none"
+                      style="width:200px;"
+                    >
+                      <q-input
+                        outlined
+                        dense
+                        bg-color="white"
+                        v-model="x.est_arrival"
+                        readonly
+                        class="l-grow"
+                      >
+                        <template v-slot:append>
+                          <q-icon name="event" class="cursor-pointer">
+                            <q-popup-proxy
+                              ref="qDateProxy"
+                              transition-show="scale"
+                              transition-hide="scale"
+                            >
+                              <q-date
+                                minimal
+                                v-model="x.est_arrival"
+                                :options="limitDate"
+                              >
+                                <div class="row items-center justify-end">
+                                  <q-btn
+                                    v-close-popup
+                                    label="Close"
+                                    color="primary"
+                                    flat
+                                  />
+                                </div>
+                              </q-date>
+                            </q-popup-proxy>
+                          </q-icon>
+                        </template>
+                      </q-input>
+                    </td>
+                    <td class="text-center" style="width: 175px;">
+                      <q-btn
+                        label="Hapus"
+                        flat
+                        no-caps
+                        color="blue"
+                        dense
+                        @click="deleteSPPItem(i)"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </q-markup-table>
+            </div>
+          </div>
+        </q-card-section>
+      </q-scroll-area>
+      
+      <q-separator/>
+      <q-card-section class="row justify-end items-center">
+        <div class="row justify-end items-center q-gutter-x-md">
+          <q-btn
+            unelevated
+            label="Kembali"
+            color="white"
+            text-color="black"
+            outline
+            style="color: black;"
+            @click="$router.go(-1)"
+            no-caps
+          >
+          </q-btn>
+          <q-btn
+            unelevated
+            label="Submit"
+            color="blue"
+            no-caps
+            @click="createPO()"
+            :disable="!isValid"
+          >
+          </q-btn>
         </div>
       </q-card-section>
     </q-card>
@@ -297,7 +324,7 @@
       </q-card>
     </q-dialog> -->
 
-    <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
+    <!-- <q-footer style="max-width: 1440px;" class="q-mx-auto atas-radius bg-white">
       <q-card-section class="row justify-end items-center">
         <div class="row justify-end items-center q-gutter-x-md">
           <q-btn
@@ -322,7 +349,7 @@
           </q-btn>
         </div>
       </q-card-section>
-    </q-footer>
+    </q-footer> -->
   </div>
 </template>
 

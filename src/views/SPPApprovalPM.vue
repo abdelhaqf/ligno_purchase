@@ -60,131 +60,158 @@
           ></q-select>
         </div>
       </q-card-section>
-      <q-markup-table
-        v-if="sppList.length"
-        class="stickyTable"
-        style="height: calc(100vh - 275px);"
-      >
-        <!-- table head -->
-        <thead class="text-white">
-          <tr>
-            <th style="width:20px;">
-              <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
-            </th>
-            <th>User</th>
-            <!-- <th>Divisi</th> -->
-            <th>Tanggal</th>
-            <th>Urgency</th>
-            <th>Barang</th>
-            <th style="width: 200px !important;">Keterangan</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <!-- table body  -->
-        <tbody>
-          <tr v-for="(d, i) in sppList" :key="i">
-            <td style="vertical-align: top; padding-top: 0 !important;">
-              <q-checkbox v-model="d.select" />
-            </td>
-            <td class="text-left" style="vertical-align: top;">
-              {{ d.name }}
-            </td>
-            <!-- <td class="text-left" style="vertical-align: top;">
-              {{ d.dept }}
-            </td> -->
-            <td class="text-left" style="width:150px; vertical-align: top;">
-              <div class="text-grey">Pengajuan</div>
-              <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
-              <!-- <div class="text-grey">Deadline</div>
-              <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
-            </td>
-            <td>
-              {{ d.urgency }}
-            </td>
-            <td class="text-left" style="vertical-align: top;">
-              <div class="l-wrap-cell" style="width: 200px !important;">
-                <span>
-                  {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
-                </span>
-                <span v-if="d.item.length > 55" class=" no-wrap ">
-                  ...
-                  <q-tooltip
-                    content-style="width:300px"
-                    content-class="l-text-detail bg-white text-black shadow-2"
-                    >{{ d.item }}</q-tooltip
-                  >
-                </span>
-              </div>
-              <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
-            </td>
-            <td class="text-left" style="vertical-align: top;">
-              <div class="l-wrap-cell" style="width: 200px !important;">
-                <span>
-                  {{
-                    d.description.length > 55
-                      ? d.description.slice(0, 50)
-                      : d.description
-                  }}
-                </span>
-                <span v-if="d.description.length > 55" class=" no-wrap ">
-                  ...
-                  <q-tooltip
-                    content-style="width:300px"
-                    content-class="l-text-detail bg-white text-black shadow-2"
-                    >{{ d.description }}</q-tooltip
-                  >
-                </span>
-              </div>
-            </td>
-            <td class="text-center">
-              <q-btn-dropdown flat dense dropdown-icon="more_horiz">
-                <q-list>
-                  <q-item
-                    :to="`/spp/detail/${d.spp_id}?approval=purchasing`"
-                    clickable
-                    v-close-popup
-                  >
-                    Detail
-                  </q-item>
-                  <q-item
-                    clickable
-                    class="text-positive text-bold"
-                    v-close-popup
-                    @click="
-                      clearSelect(i);
-                      confirmApprove = true;
-                    "
-                  >
-                    Setujui
-                  </q-item>
-                  <q-item
-                    clickable
-                    class="text-negative text-bold"
-                    v-close-popup
-                    @click="
-                      clearSelect(i);
-                      confirmReject = true;
-                    "
-                  >
-                    Tolak
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </td>
-          </tr>
-        </tbody>
-      </q-markup-table>
+      <q-card-section class="q-pa-none" v-if="sppList.length">
+        <q-markup-table
+          flat
+          class="stickyTable"
+          :style="selectCount > 0? 'height: calc(100vh - 325px);' : 'height: calc(100vh - 250px);'"
+        >
+          <!-- table head -->
+          <thead class="text-white">
+            <tr>
+              <th style="width:20px;">
+                <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
+              </th>
+              <th>User</th>
+              <!-- <th>Divisi</th> -->
+              <th>Tanggal</th>
+              <th>Urgency</th>
+              <th>Barang</th>
+              <th style="width: 200px !important;">Keterangan</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <!-- table body  -->
+          <tbody>
+            <tr v-for="(d, i) in sppList" :key="i">
+              <td style="vertical-align: top; padding-top: 0 !important;">
+                <q-checkbox v-model="d.select" />
+              </td>
+              <td class="text-left" style="vertical-align: top;">
+                {{ d.name }}
+              </td>
+              <!-- <td class="text-left" style="vertical-align: top;">
+                {{ d.dept }}
+              </td> -->
+              <td class="text-left" style="width:150px; vertical-align: top;">
+                <div class="text-grey">Pengajuan</div>
+                <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+                <!-- <div class="text-grey">Deadline</div>
+                <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
+              </td>
+              <td>
+                {{ d.urgency }}
+              </td>
+              <td class="text-left" style="vertical-align: top;">
+                <div class="l-wrap-cell" style="width: 200px !important;">
+                  <span>
+                    {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                  </span>
+                  <span v-if="d.item.length > 55" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ d.item }}</q-tooltip
+                    >
+                  </span>
+                </div>
+                <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
+              </td>
+              <td class="text-left" style="vertical-align: top;">
+                <div class="l-wrap-cell" style="width: 200px !important;">
+                  <span>
+                    {{
+                      d.description.length > 55
+                        ? d.description.slice(0, 50)
+                        : d.description
+                    }}
+                  </span>
+                  <span v-if="d.description.length > 55" class=" no-wrap ">
+                    ...
+                    <q-tooltip
+                      content-style="width:300px"
+                      content-class="l-text-detail bg-white text-black shadow-2"
+                      >{{ d.description }}</q-tooltip
+                    >
+                  </span>
+                </div>
+              </td>
+              <td class="text-center">
+                <q-btn-dropdown flat dense dropdown-icon="more_horiz">
+                  <q-list>
+                    <q-item
+                      :to="`/spp/detail/${d.spp_id}?approval=purchasing`"
+                      clickable
+                      v-close-popup
+                    >
+                      Detail
+                    </q-item>
+                    <q-item
+                      clickable
+                      class="text-positive text-bold"
+                      v-close-popup
+                      @click="
+                        clearSelect(i);
+                        confirmApprove = true;
+                      "
+                    >
+                      Setujui
+                    </q-item>
+                    <q-item
+                      clickable
+                      class="text-negative text-bold"
+                      v-close-popup
+                      @click="
+                        clearSelect(i);
+                        confirmReject = true;
+                      "
+                    >
+                      Tolak
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-card-section>
+      
       <q-card-section
         class="column items-center justify-center"
-        style="height: calc(100vh - 275px);"
+        style="height: calc(100vh - 250px);"
         v-else
       >
         <q-img width="400px" :src="`./empty.png`"></q-img>
         <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
       </q-card-section>
+
+      <q-separator></q-separator>
+      <q-card-section v-if="selectCount > 0" class="row justify-between items-center">
+        <div class="l-text-subtitle text-bold text-black">
+          {{ selectCount }} PO Dipilih
+        </div>
+        <div class="row justify-end items-center q-gutter-x-md">
+          <q-btn
+            unelevated
+            label="Tolak"
+            color="negative"
+            @click="confirmReject = true"
+            no-caps
+          ></q-btn>
+          <q-btn
+            unelevated
+            label="Setujui"
+            color="positive"
+            @click="confirmApprove = true"
+            no-caps
+          ></q-btn>
+        </div>
+      </q-card-section>
+
     </q-card>
 
-    <q-footer
+    <!-- <q-footer
       v-if="selectCount > 0"
       style="max-width: 1440px;"
       class="q-mx-auto atas-radius bg-white"
@@ -210,7 +237,7 @@
           ></q-btn>
         </div>
       </q-card-section>
-    </q-footer>
+    </q-footer> -->
 
     <!-- persetujuan -->
     <q-dialog v-model="confirmApprove" persistent>

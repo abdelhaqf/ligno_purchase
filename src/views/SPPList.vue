@@ -1,6 +1,6 @@
 <template>
-  <div class="row relative q-px-lg ">
-    <q-card flat square class="col-12 bg-white rounded-borders">
+  <div class="q-px-lg rounded-borders full-width">
+    <q-card flat bordered class="bg-white">
       <!-- toolbar -->
       <q-card-section class="row justify-between items-center">
         <div class="row q-gutter-x-md">
@@ -53,7 +53,7 @@
       </q-card-section>
 
       <!-- table  -->
-      <q-markup-table class="stickyTable" style="height: calc(100vh - 320px);">
+      <q-markup-table class="stickyTable" style="height: calc(100vh - 310px);">
         <thead class="bg-blue-grey-14 text-white">
           <tr>
             <th style="width:25px;">No</th>
