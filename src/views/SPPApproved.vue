@@ -35,7 +35,7 @@
             style="width: 230px;"
           ></q-select>
           <!-- <q-select
-            outlined
+            outlinedfetchData
             dense
             emit-value
             map-options
@@ -62,19 +62,28 @@
       </q-card-section>
 
       <q-card-section class="q-pa-none" v-if="sppList.length">
-        <q-scroll-area style="height: 200px; width: 100%;">
-          <!-- table header  -->
-          <q-markup-table
-            flat
-            class="stickyTable"
-            wrap-cells
-            :style="selectCount > 0? 'height: calc(100vh - 325px);' : 'height: calc(100vh - 250px);'"
-          >
+        <!-- table header  -->
+
+        <q-scroll-area
+          @scroll="getpos"
+          class="l-grow q-pa-none"
+          style="width: 100% !important;"
+          :style="
+            selectCount > 0
+              ? 'height: calc(100vh - 380px);'
+              : 'height: calc(100vh - 305px);'
+          "
+          ref="tableScroll"
+        >
+          <q-markup-table flat class="stickyTable" wrap-cells>
             <!-- table head -->
             <thead class="text-white">
               <tr>
                 <th style="width:20px;">
-                  <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
+                  <q-checkbox
+                    v-model="check_all"
+                    @input="checkAll"
+                  ></q-checkbox>
                 </th>
                 <th>User</th>
                 <!-- <th>Divisi</th> -->
@@ -86,7 +95,7 @@
                 <th>Action</th>
               </tr>
             </thead>
-            <!-- table body  -->
+
             <tbody>
               <tr v-for="(d, i) in sppList" :key="i">
                 <td>
@@ -96,40 +105,37 @@
                   {{ d.name }}
                 </td>
                 <!-- <td class="text-left" style="vertical-align: top;">
-                  {{ d.dept }}
-                </td> -->
+          {{ d.dept }}
+        </td> -->
                 <td class="text-left">
                   {{ d.handler_name }}
                 </td>
                 <td class="text-center">
-                    <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
-                    <!-- <div class="text-grey">Deadline</div>
-                    <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
+                  <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+                  <!-- <div class="text-grey">Deadline</div>
+            <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
                 </td>
                 <td>
                   {{ d.urgency }}
                 </td>
                 <td class="text-left">
                   <div class="l-wrap-cell" style="width: 200px !important;">
-                      <span>
-                        {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
-                      </span>
-                      <span v-if="d.item.length > 55" class=" no-wrap ">
-                        ...
-                        <q-tooltip
-                          content-style="width:300px"
-                          content-class="l-text-detail bg-white text-black shadow-2"
-                          >{{ d.item }}</q-tooltip
-                        >
-                      </span>
-                    </div>
-                    <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
+                    <span>
+                      {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                    </span>
+                    <span v-if="d.item.length > 55" class=" no-wrap ">
+                      ...
+                      <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ d.item }}</q-tooltip
+                      >
+                    </span>
+                  </div>
+                  <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
                 </td>
                 <td class="text-left">
-                  <div
-                      class="l-wrap-cell"
-                      style="width: 200px !important;"
-                    >
+                  <div class="l-wrap-cell" style="width: 200px !important;">
                     <span>
                       {{
                         d.description.length > 55
@@ -197,10 +203,9 @@
             </tbody>
           </q-markup-table>
         </q-scroll-area>
-        
       </q-card-section>
       <!-- table header  -->
-      
+
       <q-card-section
         class="column items-center justify-center"
         style="height: calc(100vh - 250px);"
@@ -211,7 +216,10 @@
       </q-card-section>
 
       <q-separator></q-separator>
-      <q-card-section v-if="selectCount > 0" class="row justify-between items-center">
+      <q-card-section
+        v-if="selectCount > 0"
+        class="row justify-between items-center"
+      >
         <div class="l-text-subtitle text-bold text-black">
           {{ selectCount }} PO Dipilih
         </div>
@@ -232,7 +240,7 @@
             unelevated
             label="Tolak"
             color="negative"
-            @click="confirmReject = true;"
+            @click="confirmReject = true"
             icon="close"
             no-caps
           >
@@ -360,7 +368,7 @@ import moment from "moment";
 import { Money } from "v-money";
 import axios from "axios";
 import { mapActions } from "vuex";
-import dialogHistorySpp from '../components/dialogHistorySpp.vue';
+import dialogHistorySpp from "../components/dialogHistorySpp.vue";
 export default {
   components: { Money },
   data() {
@@ -431,15 +439,16 @@ export default {
       content: "",
 
       selUrgency: null,
-      optUrgency: [
-        "HIGH",
-        "MIDDLE",
-        "LOW",
-      ],
+      optUrgency: ["HIGH", "MIDDLE", "LOW"],
+
+      myTimeout: null,
     };
   },
   async mounted() {
-    this.fetchData();
+    await this.fetchData();
+    if (this.$route.query.scroll) {
+      this.$refs.tableScroll.setScrollPercentage(this.$route.query.scroll);
+    }
     // this.getDept();
   },
   watch: {
@@ -462,6 +471,19 @@ export default {
   },
   methods: {
     ...mapActions(["sendPrintData"]),
+    getpos(pos) {
+      try {
+        this.$router
+          .replace({
+            path: `/spp/approved?scroll=${pos.verticalPercentage}`,
+          })
+          .catch((failure) => {
+            return true;
+          });
+      } catch (err) {
+        return true;
+      }
+    },
     showDialogHistory() {
       let temp = this.sppList.filter((val) => {
         return val.select;
@@ -505,13 +527,13 @@ export default {
     //     this.optDept = dept;
     //   });
     // },
-    fetchData() {
+    async fetchData() {
       this.sppList = [];
       let q_filter = `?sort=${this.selSort}&search=${
         this.searchTerm ? this.searchTerm : "" //}&dept=${this.selDivisi ? this.selDivisi : ""
       }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
 
-      this.$http
+      await this.$http
         .get(
           "/spp_approved/" +
             this.$store.state.currentUser.user_id +
@@ -526,6 +548,18 @@ export default {
             result.data[i].select = false;
             this.sppList.push(result.data[i]);
           }
+          // for (var i = 0; i < result.data.length; i++) {
+          //   result.data[i].select = false;
+          //   this.sppList.push(result.data[i]);
+          // }
+          // for (var i = 0; i < result.data.length; i++) {
+          //   result.data[i].select = false;
+          //   this.sppList.push(result.data[i]);
+          // }
+          // for (var i = 0; i < result.data.length; i++) {
+          //   result.data[i].select = false;
+          //   this.sppList.push(result.data[i]);
+          // }
         });
     },
     async toPreview() {
@@ -554,12 +588,10 @@ export default {
         purch_manager_cancel: 1,
         note: this.content,
       };
-      this.$http
-        .put("/update_spp/" + val.spp_id, data, {})
-        .then((result) => {
-          this.$root.$emit("refresh");
-          this.fetchData();
-        });
+      this.$http.put("/update_spp/" + val.spp_id, data, {}).then((result) => {
+        this.$root.$emit("refresh");
+        this.fetchData();
+      });
 
       var history = {
         spp_id: val.spp_id,
@@ -577,7 +609,7 @@ export default {
       this.fetchData();
       this.$root.$emit("refresh");
       this.$q.notify("SPP ditolak!");
-    }
+    },
   },
   computed: {
     selectCount() {
