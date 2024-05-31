@@ -70,8 +70,8 @@
           style="width: 100% !important;"
           :style="
             selectCount > 0
-              ? 'height: calc(100vh - 380px);'
-              : 'height: calc(100vh - 305px);'
+              ? 'height: calc(100vh - 325px);'
+              : 'height: calc(100vh - 248px);'
           "
           ref="tableScroll"
         >
@@ -115,7 +115,7 @@
                   <!-- <div class="text-grey">Deadline</div>
             <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
                 </td>
-                <td>
+                <td class="text-center">
                   {{ d.urgency }}
                 </td>
                 <td class="text-left">
@@ -215,7 +215,7 @@
         <div class="l-text-title text-bold">Data Tidak Ditemukan</div>
       </q-card-section>
 
-      <q-separator></q-separator>
+      <q-separator v-if="selectCount > 0" />
       <q-card-section
         v-if="selectCount > 0"
         class="row justify-between items-center"
@@ -548,18 +548,6 @@ export default {
             result.data[i].select = false;
             this.sppList.push(result.data[i]);
           }
-          // for (var i = 0; i < result.data.length; i++) {
-          //   result.data[i].select = false;
-          //   this.sppList.push(result.data[i]);
-          // }
-          // for (var i = 0; i < result.data.length; i++) {
-          //   result.data[i].select = false;
-          //   this.sppList.push(result.data[i]);
-          // }
-          // for (var i = 0; i < result.data.length; i++) {
-          //   result.data[i].select = false;
-          //   this.sppList.push(result.data[i]);
-          // }
         });
     },
     async toPreview() {
