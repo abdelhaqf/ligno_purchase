@@ -219,7 +219,11 @@
                 />
               </td>
               <td v-if="!isEdit" class="text-center">
-                {{ isReceivedOption.find(option => option.value === d.is_received).label }}
+                {{
+                  isReceivedOption.find(
+                    (option) => option.value === d.is_received
+                  ).label
+                }}
               </td>
               <td v-else class="text-center">
                 <q-select
@@ -280,7 +284,11 @@
             label="Batal"
             color="negative"
             no-caps
-            @click="isEdit = false; fetchData();">
+            @click="
+              isEdit = false;
+              fetchData();
+            "
+          >
           </q-btn>
           <q-btn
             unelevated
@@ -604,13 +612,10 @@ export default {
 
       let data = {
         vendor: this.po.vendor,
-      }
+        po_id: this.po.po_id,
+      };
 
-      await this.$http
-          .put("/update_po/" + this.po.po_id, data, {})
-          .then((result) => {
-            
-          });
+      await this.$http.put("/update_po", data, {}).then((result) => {});
 
       this.show_detail = false;
       await this.fetchData();

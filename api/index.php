@@ -976,9 +976,10 @@ Flight::route('PUT /update_spp/@spp_id', function ($spp_id) {
 
   runQuery3('PUT', 'spp', $data, 'spp_id', $spp_id);
 });
-Flight::route('PUT /update_po/@po_id', function ($po_id) {
+Flight::route('PUT /update_po', function () {
   $data = Flight::request()->getBody();
   $data = (array) json_decode($data);
+  $po_id = $data["po_id"];
 
   runQuery3('PUT', 'po', $data, 'po_id', $po_id);
 });
