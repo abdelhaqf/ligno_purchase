@@ -46,12 +46,6 @@
                   keep-color
                 />
               </template>
-              <template v-slot:label>
-                Nama Vendor
-                <a class="q-px-sm bg-info text-white rounded-borders"
-                  >input baru</a
-                >
-              </template>
             </q-input>
             <q-select
               v-else
@@ -122,8 +116,8 @@
               <th>Value</th>
               <th>Est. Arrival</th>
               <th>Note</th>
-              <th>Received</th>
-              <th class="q-mx-sm">Action</th>
+              <th v-if="!isEdit">Received</th>
+              <th v-if="!isEdit" class="q-mx-sm">Action</th>
             </tr>
           </thead>
           <!-- table body  -->
@@ -209,7 +203,7 @@
                 </div>
                 <div v-else class="text-center l-grow">-</div>
               </td>
-              <td v-else class="text-center" style="width: 200px;">
+              <td v-else class="text-center" style="min-width: 200px;">
                 <q-input
                   outlined
                   dense
@@ -218,14 +212,7 @@
                   placeholder="Masukkan Note"
                 />
               </td>
-              <td v-if="!isEdit" class="text-center">
-                {{
-                  isReceivedOption.find(
-                    (option) => option.value === d.is_received
-                  ).label
-                }}
-              </td>
-              <td v-else class="text-center">
+              <td class="text-center" v-if="!isEdit">
                 <q-select
                   outlined
                   v-model="d.is_received"
@@ -234,10 +221,11 @@
                   map-options
                   emit-value
                   dense
+                  @input="updateIsReceived(d);"
                 >
                 </q-select>
               </td>
-              <td class="text-center">
+              <td class="text-center" v-if="!isEdit">
                 <q-btn
                   unelevated
                   label="Sync"
@@ -509,10 +497,62 @@ export default {
         this.newSpp.push(temp);
       }
     },
+    async updateIsReceived(spp){
+      let data = {
+          is_received: spp.is_received
+      }
+      
+      await this.$http
+          .put("/update_spp/" + spp.spp_id, data, {})
+          .then((result) => {
+
+            var info = `${this.$store.state.currentUser.username} mengubah status penerimaan SPP ${spp.spp_id}`;
+
+            let history = {
+              spp_id: spp.spp_id,
+              status: "process",
+              content: info,
+            };
+            if (spp.is_received == 2) {
+              history.status = "done";
+            }
+            if (spp.is_received == 300) {
+              history.status = "suspended";
+            }
+            if (spp.is_received == 40000) {
+              history.status = "closed";
+            }
+            this.$http.post("/new_history", history, {}).then((result) => {});
+
+            if (spp.is_received == 2)
+              info = "barang sudah diterima penuh";
+            if (spp.is_received == 1)
+              info = "barang sudah diterima sebagian";
+            if (spp.is_received == 300) info = "PO sementara di suspend";
+            if (spp.is_received == 40000) info = "PO dinyatakan closed";
+
+            var notifikasi = {
+              from_id: this.$store.state.currentUser.user_id,
+              to_id: spp.user_id,
+              notif: "Perubahan Status SPP",
+              note: info,
+              spp_id: spp.spp_id,
+              reference_page: "/spp/list",
+            };
+            if (info != "") {
+              this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+
+              notifikasi.to_id = 4; // Notif ke Manager purchasing
+              this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+            }
+
+            this.$q.notify("Status SPP berhasil diubah!");
+          });
+    },
     async updateSPP_PO() {
       for (var i = 0; i < this.po.spp.length; i++) {
         let data = {
-          is_received: this.po.spp[i].is_received,
+          // is_received: this.po.spp[i].is_received,
           coa: this.po.spp[i].coa,
           note: this.po.spp[i].note,
           cost_category: this.po.cost_category,
@@ -587,25 +627,19 @@ export default {
         }
         this.$http.post("/new_history", history, {}).then((result) => {});
 
-        var info = "";
-        if (this.po.spp[i].is_received == 2)
-          info = "barang sudah diterima penuh";
-        if (this.po.spp[i].is_received == 1)
-          info = "barang sudah diterima sebagian";
-        if (this.po.spp[i].is_received == 300) info = "PO sementara di suspend";
-        if (this.po.spp[i].is_received == 40000) info = "PO dinyatakan closed";
+        var info = `${this.$store.state.currentUser.username} telah melakukan perubahan pada SPP ${this.po.spp[i].spp_id}`;
         var notifikasi = {
           from_id: this.$store.state.currentUser.user_id,
           to_id: this.po.spp[i].user_id,
-          notif: "Konfirmasi Penerimaan barang",
+          notif: "Perubahan Detail SPP",
           note: info,
           spp_id: this.po.spp[i].spp_id,
           reference_page: "/spp/list",
         };
-        if (info != 0) {
+        if (info != "") {
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
-          notifikasi.to_id = 1; // Notif ke Manager purchasing
+          notifikasi.to_id = 4; // Notif ke Manager purchasing
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
         }
       }

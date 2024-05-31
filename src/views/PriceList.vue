@@ -10,7 +10,9 @@
           @clear="searchTerm = ''"
           placeholder="Cari Nama Barang"
           style="width: 30%;"
-          @input="pagination.current = 1; change();"
+          @input="pagination.current = 1; 
+                  replaceRoute();
+                  change();"
         >
           <template v-slot:prepend>
             <q-icon name="search"></q-icon>
@@ -23,7 +25,9 @@
           dense
           outlined
           style="width: 33%;"
-          @clear="pagination.current = 1; change()"
+          @clear="pagination.current = 1; 
+                  replaceRoute();
+                  change();"
         >
           <template v-slot:prepend>
             <q-icon name="date_range" />
@@ -39,7 +43,9 @@
             transition-show="scale"
             transition-hide="scale"
           >
-            <q-date v-model="date" @input="pagination.current = 1; change()" range>
+            <q-date v-model="date" @input="pagination.current = 1; 
+                                          replaceRoute();
+                                          change();" range>
               <div class="row items-center justify-end">
                 <q-btn v-close-popup label="Close" color="primary" flat />
               </div>
@@ -61,7 +67,9 @@
           @filter="filterVD"
           label="Pilih Vendor"
           style="width:33%"
-          @input="change()"
+          @input="pagination.current = 1; 
+                  replaceRoute();
+                  change();"
         >
           <template v-slot:no-option>
             <q-item>
@@ -75,6 +83,8 @@
               dense
               @click="
                 selectVendor = null;
+                pagination.current = 1; 
+                replaceRoute();
                 change();
               "
               flat
@@ -204,7 +214,8 @@
             v-model="pagination.current"
             :max="pagination.max"
             input
-            @input="change()"
+            @input="replaceRoute();
+                    change();"
           ></q-pagination>
         </q-card-actions>
       </div>
@@ -245,11 +256,12 @@ export default {
   },
   async mounted() {
     await this.fetchData();
+    await this.replaceFilter();
     await this.change();
   },
   computed: {
     date_model() {
-      if (!this.date) return "Pilih Tanggal Dibuat";
+      if (!this.date) return "Pilih Tanggal PO";
 
       if (this.date.from) {
         return (
@@ -297,7 +309,7 @@ export default {
       try {
         this.$q.loading.show();
         let payload = {
-          vendor: this.selectVendor,
+          vendor: this.selectVendor ? this.selectVendor : "",
           current: this.pagination.current,
           search: this.searchTerm ? this.searchTerm : "",
           // date: this.date ? moment(this.date).format("YYYY-MM-DD") : "",
@@ -344,6 +356,44 @@ export default {
         return moment(date).format("DD MMM YYYY");
       }
       return "-";
+    },
+    replaceRoute(){
+      this.$router.replace({
+        path: `/price/list?vendor=${
+          encodeURIComponent(this.selectVendor)
+        }&search=${this.searchTerm ? encodeURIComponent(this.searchTerm) : ""}&date=${
+          this.date
+            ? typeof this.date === "string"
+              ? moment(this.date).format("YYYY-MM-DD")
+              : moment(this.date.from).format("YYYY-MM-DD") +
+                "to" +
+                moment(this.date.to).format("YYYY-MM-DD")
+            : ""
+        }&page=${this.pagination.current}`,
+      });
+    },
+    async replaceFilter() {
+      if (this.$route.query?.vendor) {
+        this.selectVendor =
+          this.$route.query.vendor == "null" ? null : this.$route.query.vendor;
+      }
+
+      if (this.$route.query?.search) {
+        this.searchTerm = this.$route.query.search;
+      }
+
+      if (this.$route.query?.date) {
+        // this.date = this.$route.query.date;
+        this.date = this.$route.query.date.includes("to")
+          ? {
+              from: this.$route.query.date.split("to")[0],
+              to: this.$route.query.date.split("to")[1],
+            }
+          : this.$route.query.date;
+      }
+      if (this.$route.query?.page) {
+        this.pagination.current = this.$route.query.page;
+      } 
     },
   },
 };

@@ -275,7 +275,8 @@
             input
             :max="pagination.max"
             v-model="pagination.current"
-            @input="fetchData"
+            @input="replaceRoute();
+                    fetchData();"
           ></q-pagination>
         </q-card-section>
       </div>
@@ -466,26 +467,7 @@ export default {
         "Maintenance",
       ],
 
-      kategori: [
-        "BELUM DIKATEGORIKAN",
-        "Keperluan & Peralatan Produksi",
-        "Packing Barang",
-        "Makan & Minum",
-        "Perbaikan Kendaraan (Produksi/Gudang)",
-        "Perbaikan Kendaraan (Marketing)",
-        "Perbaikan Kendaraan (Umum & Adm)",
-        "Iklan & Promosi",
-        "Perjalanan Dinas",
-        "Entertainment",
-        "Pendidikan & Latihan",
-        "R&D",
-        "Materai & Fotocopy",
-        "ATK & Keperluan Kantor",
-        "Surat & Izin-izin",
-        "Sumbangan",
-        "Raw Material",
-        "Perbaikan Gudang",
-      ],
+      kategori: [],
 
       optVendor: [],
       filVendor: [],
@@ -510,6 +492,7 @@ export default {
   },
   async created() {
     await this.replaceFilter();
+    await this.getKategori();
 
     await this.$http
       .get("/list_month_po", {
@@ -544,6 +527,11 @@ export default {
     //   else if (label == "closed") return "dark";
     //   else return "primary";
     // },
+    async getKategori() {
+      let resp = await this.$http.get("/kategori");
+      let kategori = resp.data.map((a) => a["name"]);
+      this.kategori = kategori;
+    },
     isPastEstimation(est_date) {
       if (moment().isAfter(moment(est_date))) return true;
       return false;
@@ -645,10 +633,10 @@ export default {
 
       this.$router.replace({
         path: `/po/list?status=${this.is_received}&vendor=${
-          this.selVendor
+          encodeURIComponent(this.selVendor)
         }&category=${this.selCat ? category : null}&kategori=${
-          this.selKategori
-        }&search=${this.searchTerm ? this.searchTerm : ""}&date=${
+          encodeURIComponent(this.selKategori)
+        }&search=${this.searchTerm ? encodeURIComponent(this.searchTerm) : ""}&date=${
           this.date
             ? typeof this.date === "string"
               ? moment(this.date).format("YYYY-MM-DD")
@@ -656,7 +644,7 @@ export default {
                 "to" +
                 moment(this.date.to).format("YYYY-MM-DD")
             : ""
-        }`,
+        }&page=${this.pagination.current}`,
       });
     },
     async replaceFilter() {
@@ -696,6 +684,9 @@ export default {
             }
           : this.$route.query.date;
       }
+      if (this.$route.query?.page) {
+        this.pagination.current = this.$route.query.page;
+      } 
     },
   },
   computed: {

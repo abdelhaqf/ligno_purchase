@@ -62,139 +62,142 @@
       </q-card-section>
 
       <q-card-section class="q-pa-none" v-if="sppList.length">
-        <!-- table header  -->
-        <q-markup-table
-          flat
-          class="stickyTable"
-          wrap-cells
-          :style="selectCount > 0? 'height: calc(100vh - 325px);' : 'height: calc(100vh - 250px);'"
-        >
-          <!-- table head -->
-          <thead class="text-white">
-            <tr>
-              <th style="width:20px;">
-                <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
-              </th>
-              <th>User</th>
-              <!-- <th>Divisi</th> -->
-              <th>PIC</th>
-              <th>Tanggal Pengajuan</th>
-              <th>Urgency</th>
-              <th>Barang</th>
-              <th>Keterangan</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <!-- table body  -->
-          <tbody>
-            <tr v-for="(d, i) in sppList" :key="i">
-              <td>
-                <q-checkbox v-model="d.select" />
-              </td>
-              <td class="text-left">
-                {{ d.name }}
-              </td>
-              <!-- <td class="text-left" style="vertical-align: top;">
-                {{ d.dept }}
-              </td> -->
-              <td class="text-left">
-                {{ d.handler_name }}
-              </td>
-              <td class="text-center">
-                  <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
-                  <!-- <div class="text-grey">Deadline</div>
-                  <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
-              </td>
-              <td>
-                {{ d.urgency }}
-              </td>
-              <td class="text-left">
-                <div class="l-wrap-cell" style="width: 200px !important;">
+        <q-scroll-area style="height: 200px; width: 100%;">
+          <!-- table header  -->
+          <q-markup-table
+            flat
+            class="stickyTable"
+            wrap-cells
+            :style="selectCount > 0? 'height: calc(100vh - 325px);' : 'height: calc(100vh - 250px);'"
+          >
+            <!-- table head -->
+            <thead class="text-white">
+              <tr>
+                <th style="width:20px;">
+                  <q-checkbox v-model="check_all" @input="checkAll"></q-checkbox>
+                </th>
+                <th>User</th>
+                <!-- <th>Divisi</th> -->
+                <th>PIC</th>
+                <th>Tanggal Pengajuan</th>
+                <th>Urgency</th>
+                <th>Barang</th>
+                <th>Keterangan</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <!-- table body  -->
+            <tbody>
+              <tr v-for="(d, i) in sppList" :key="i">
+                <td>
+                  <q-checkbox v-model="d.select" />
+                </td>
+                <td class="text-left">
+                  {{ d.name }}
+                </td>
+                <!-- <td class="text-left" style="vertical-align: top;">
+                  {{ d.dept }}
+                </td> -->
+                <td class="text-left">
+                  {{ d.handler_name }}
+                </td>
+                <td class="text-center">
+                    <div>{{ d.create_at | moment("DD MMM YYYY") }}</div>
+                    <!-- <div class="text-grey">Deadline</div>
+                    <div>{{ d.deadline | moment("DD MMM YYYY") }}</div> -->
+                </td>
+                <td>
+                  {{ d.urgency }}
+                </td>
+                <td class="text-left">
+                  <div class="l-wrap-cell" style="width: 200px !important;">
+                      <span>
+                        {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                      </span>
+                      <span v-if="d.item.length > 55" class=" no-wrap ">
+                        ...
+                        <q-tooltip
+                          content-style="width:300px"
+                          content-class="l-text-detail bg-white text-black shadow-2"
+                          >{{ d.item }}</q-tooltip
+                        >
+                      </span>
+                    </div>
+                    <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
+                </td>
+                <td class="text-left">
+                  <div
+                      class="l-wrap-cell"
+                      style="width: 200px !important;"
+                    >
                     <span>
-                      {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
+                      {{
+                        d.description.length > 55
+                          ? d.description.slice(0, 50)
+                          : d.description
+                      }}
                     </span>
-                    <span v-if="d.item.length > 55" class=" no-wrap ">
+                    <span v-if="d.description.length > 55" class=" no-wrap ">
                       ...
                       <q-tooltip
                         content-style="width:300px"
                         content-class="l-text-detail bg-white text-black shadow-2"
-                        >{{ d.item }}</q-tooltip
+                        >{{ d.description }}</q-tooltip
                       >
                     </span>
                   </div>
-                  <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
-              </td>
-              <td class="text-left">
-                <div
-                    class="l-wrap-cell"
-                    style="width: 200px !important;"
-                  >
-                  <span>
-                    {{
-                      d.description.length > 55
-                        ? d.description.slice(0, 50)
-                        : d.description
-                    }}
-                  </span>
-                  <span v-if="d.description.length > 55" class=" no-wrap ">
-                    ...
-                    <q-tooltip
-                      content-style="width:300px"
-                      content-class="l-text-detail bg-white text-black shadow-2"
-                      >{{ d.description }}</q-tooltip
-                    >
-                  </span>
-                </div>
-              </td>
-              <td class="text-center">
-                <q-btn-dropdown flat dense dropdown-icon="more_horiz">
-                  <q-list>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="
-                        clearSelect(i);
-                        createPO();
-                      "
-                    >
-                      Buat PO
-                    </q-item>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="
-                        clearSelect(i);
-                        showDialogHistory();
-                      "
-                    >
-                      History
-                    </q-item>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="
-                        clearSelect(i);
-                        confirmReject = true;
-                      "
-                    >
-                      Tolak
-                    </q-item>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="
-                        clearSelect(i);
-                        toPreview();
-                      "
-                    >
-                      Print
-                    </q-item>
-                  </q-list>
-                </q-btn-dropdown>
-              </td>
-            </tr>
-          </tbody>
-        </q-markup-table>
+                </td>
+                <td class="text-center">
+                  <q-btn-dropdown flat dense dropdown-icon="more_horiz">
+                    <q-list>
+                      <q-item
+                        clickable
+                        v-close-popup
+                        @click="
+                          clearSelect(i);
+                          createPO();
+                        "
+                      >
+                        Buat PO
+                      </q-item>
+                      <q-item
+                        clickable
+                        v-close-popup
+                        @click="
+                          clearSelect(i);
+                          showDialogHistory();
+                        "
+                      >
+                        History
+                      </q-item>
+                      <q-item
+                        clickable
+                        v-close-popup
+                        @click="
+                          clearSelect(i);
+                          confirmReject = true;
+                        "
+                      >
+                        Tolak
+                      </q-item>
+                      <q-item
+                        clickable
+                        v-close-popup
+                        @click="
+                          clearSelect(i);
+                          toPreview();
+                        "
+                      >
+                        Print
+                      </q-item>
+                    </q-list>
+                  </q-btn-dropdown>
+                </td>
+              </tr>
+            </tbody>
+          </q-markup-table>
+        </q-scroll-area>
+        
       </q-card-section>
       <!-- table header  -->
       

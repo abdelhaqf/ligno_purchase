@@ -26,12 +26,6 @@
                     keep-color
                   />
                 </template>
-                <template v-slot:label>
-                  1. Nama Barang
-                  <a class="q-px-sm bg-info text-white rounded-borders"
-                    >input baru</a
-                  >
-                </template>
               </q-input>
               <q-select
                 v-else

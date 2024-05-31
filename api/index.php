@@ -400,7 +400,8 @@ Flight::route('POST /po', function () {
                   INNER JOIN `user` usr on usr.user_id = po.user_id
                   GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
       WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search
-      LIMIT $limit OFFSET $offset
+      ORDER BY po_date DESC
+      LIMIT $limit OFFSET $offset  
     
     ";
 
