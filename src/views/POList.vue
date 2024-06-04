@@ -47,7 +47,7 @@
           clearable
           @clear="searchTerm = ''"
           placeholder="Cari Nomor PO"
-          style="width: 30%;"
+          style="width: 20%;"
         >
           <template v-slot:prepend>
             <q-icon name="search"></q-icon>
@@ -59,7 +59,7 @@
           clearable
           dense
           outlined
-          style="width: 30%;"
+          style="width: 20%;"
           @clear="
             pagination.current = 1;
             replaceRoute();
@@ -95,6 +95,20 @@
             </q-date>
           </q-popup-proxy>
         </q-field>
+        <q-select
+            outlined
+            dense
+            emit-value
+            map-options
+            :options="optSort"
+            v-model="selSort"
+            @input="
+                pagination.current = 1;
+                fetchData();
+              "
+            label="Urutkan"
+            style="width: 20%;"
+          ></q-select>
         <q-btn
           unelevated
           label="Filter"
@@ -488,6 +502,15 @@ export default {
       },
 
       show_detail: false,
+      optSort: [
+        { label: "Tanggal PO Terdekat", value: "po_date DESC" },
+        { label: "Tanggal PO Terlama", value: "po_date ASC" },
+        { label: "Nomor PO Terkecil", value: "po_id ASC" },
+        { label: "Nomor PO Terbesar", value: "po_id DESC" },
+        { label: "Est. Arrival Terdekat", value: "est_arrival ASC" },
+        { label: "Est. Arrival Terlama", value: "est_arrival DESC" },
+      ],
+      selSort: "po_date DESC",
     };
   },
   async created() {
@@ -576,6 +599,7 @@ export default {
           : "",
         current: this.pagination.current,
         limit: this.pagination.limit,
+        sort:  this.selSort,
       };
 
       await this.$http

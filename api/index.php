@@ -313,6 +313,7 @@ Flight::route('POST /po', function () {
   $current = $data["current"];
   $limit =  $data["limit"];
   $offset = ($current - 1) * $limit;
+  $sort = $data["sort"];
 
   // var_dump($date);
 
@@ -331,15 +332,8 @@ Flight::route('POST /po', function () {
   }
 
   $w_src = "";
-  $w_order = "";
   if ($is_rcv != "null") {
     $w_src = "AND is_received LIKE '%$is_rcv%'";
-    if ($is_rcv == "not" || $is_rcv == "half" || $is_rcv == "suspend") {
-      $w_order = "ORDER BY po_date ASC";
-      
-    } else {
-      $w_order = "ORDER BY po_date DESC";
-    }
   }
 
   $w_cat = "";
@@ -407,7 +401,7 @@ Flight::route('POST /po', function () {
                   INNER JOIN `user` usr on usr.user_id = po.user_id
                   GROUP BY po.po_id, po.user_id, po.po_date, usr.name, po.vendor, spp.currency) tb1
       WHERE 1 = 1 $w_src $w_cat $w_vendor $w_kategori $w_search
-      $w_order
+      ORDER BY $sort
       LIMIT $limit OFFSET $offset  
     
     ";
