@@ -33,7 +33,11 @@
         <q-markup-table
           flat
           class="stickyTable"
-          :style="selectCount > 0? 'height: calc(100vh - 325px);' : 'height: calc(100vh - 250px);'"
+          :style="
+            selectCount > 0
+              ? 'height: calc(100vh - 325px);'
+              : 'height: calc(100vh - 250px);'
+          "
         >
           <!-- table head -->
           <thead class="text-white">
@@ -83,10 +87,7 @@
                 <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
               </td>
               <td class="text-left">
-                <div
-                    class="l-wrap-cell"
-                    style="width: 200px !important;"
-                  >
+                <div class="l-wrap-cell" style="width: 200px !important;">
                   <span>
                     {{
                       d.description.length > 55
@@ -150,7 +151,7 @@
           </tbody>
         </q-markup-table>
       </q-card-section>
-      
+
       <q-card-section
         class="column items-center justify-center"
         style="height: calc(100vh - 250px);"
@@ -161,7 +162,10 @@
       </q-card-section>
 
       <q-separator></q-separator>
-      <q-card-section v-if="selectCount > 0" class="row justify-between items-center">
+      <q-card-section
+        v-if="selectCount > 0"
+        class="row justify-between items-center"
+      >
         <div class="l-text-subtitle text-bold text-black">
           {{ selectCount }} SPP Dipilih
         </div>
@@ -240,17 +244,20 @@
             <span class="text-bold">{{ selectCount }} SPP</span> terpilih?
           </div>
         </q-card-section>
-        <q-separator/>
+        <q-separator />
         <q-card-section class="q-pt-none">
-          <div class="text-left q-py-sm">Urgency</div>
+          <div class="text-left q-py-sm">
+            Pilih Kategori Urgency Pengadaan Barang
+          </div>
           <q-select
             outlined
             dense
             v-model="urgency"
             :options="OptUrgency"
+            map-options
+            emit-value
           />
         </q-card-section>
-        
 
         <q-card-actions align="between" class="q-gutter-x-sm bg-grey-3 q-pa-md">
           <q-btn
@@ -376,9 +383,9 @@ export default {
 
       urgency: "",
       OptUrgency: [
-        "HIGH",
-        "MIDDLE",
-        "LOW"
+        { label: "HIGH (1 Hari)", value: "HIGH" },
+        { label: "MIDDLE (2-3 Hari)", value: "MIDDLE" },
+        { label: "LOW (4-7 Hari)", value: "LOW" },
       ],
     };
   },

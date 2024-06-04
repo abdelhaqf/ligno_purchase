@@ -221,7 +221,7 @@
                   map-options
                   emit-value
                   dense
-                  @input="updateIsReceived(d);"
+                  @input="updateIsReceived(d)"
                 >
                 </q-select>
               </td>
@@ -471,7 +471,7 @@ export default {
         money.decimal = ",";
         money.thousands = ".";
       } else {
-        money.precision = 0;
+        money.precision = 2;
         money.prefix = "$ ";
         money.decimal = ".";
         money.thousands = ",";
@@ -497,57 +497,54 @@ export default {
         this.newSpp.push(temp);
       }
     },
-    async updateIsReceived(spp){
+    async updateIsReceived(spp) {
       let data = {
-          is_received: spp.is_received
-      }
-      
+        is_received: spp.is_received,
+      };
+
       await this.$http
-          .put("/update_spp/" + spp.spp_id, data, {})
-          .then((result) => {
+        .put("/update_spp/" + spp.spp_id, data, {})
+        .then((result) => {
+          var info = `${this.$store.state.currentUser.username} mengubah status penerimaan SPP ${spp.spp_id}`;
 
-            var info = `${this.$store.state.currentUser.username} mengubah status penerimaan SPP ${spp.spp_id}`;
+          let history = {
+            spp_id: spp.spp_id,
+            status: "process",
+            content: info,
+          };
+          if (spp.is_received == 2) {
+            history.status = "done";
+          }
+          if (spp.is_received == 300) {
+            history.status = "suspended";
+          }
+          if (spp.is_received == 40000) {
+            history.status = "closed";
+          }
+          this.$http.post("/new_history", history, {}).then((result) => {});
 
-            let history = {
-              spp_id: spp.spp_id,
-              status: "process",
-              content: info,
-            };
-            if (spp.is_received == 2) {
-              history.status = "done";
-            }
-            if (spp.is_received == 300) {
-              history.status = "suspended";
-            }
-            if (spp.is_received == 40000) {
-              history.status = "closed";
-            }
-            this.$http.post("/new_history", history, {}).then((result) => {});
+          if (spp.is_received == 2) info = "barang sudah diterima penuh";
+          if (spp.is_received == 1) info = "barang sudah diterima sebagian";
+          if (spp.is_received == 300) info = "PO sementara di suspend";
+          if (spp.is_received == 40000) info = "PO dinyatakan closed";
 
-            if (spp.is_received == 2)
-              info = "barang sudah diterima penuh";
-            if (spp.is_received == 1)
-              info = "barang sudah diterima sebagian";
-            if (spp.is_received == 300) info = "PO sementara di suspend";
-            if (spp.is_received == 40000) info = "PO dinyatakan closed";
+          var notifikasi = {
+            from_id: this.$store.state.currentUser.user_id,
+            to_id: spp.user_id,
+            notif: "Perubahan Status SPP",
+            note: info,
+            spp_id: spp.spp_id,
+            reference_page: "/spp/list",
+          };
+          if (info != "") {
+            this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
-            var notifikasi = {
-              from_id: this.$store.state.currentUser.user_id,
-              to_id: spp.user_id,
-              notif: "Perubahan Status SPP",
-              note: info,
-              spp_id: spp.spp_id,
-              reference_page: "/spp/list",
-            };
-            if (info != "") {
-              this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+            notifikasi.to_id = 4; // Notif ke Manager purchasing
+            this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+          }
 
-              notifikasi.to_id = 4; // Notif ke Manager purchasing
-              this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-            }
-
-            this.$q.notify("Status SPP berhasil diubah!");
-          });
+          this.$q.notify("Status SPP berhasil diubah!");
+        });
     },
     async updateSPP_PO() {
       for (var i = 0; i < this.po.spp.length; i++) {

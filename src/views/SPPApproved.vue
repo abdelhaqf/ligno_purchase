@@ -159,6 +159,13 @@
                       <q-item
                         clickable
                         v-close-popup
+                        :to="`/spp/detail/${d.spp_id}`"
+                      >
+                        Detail
+                      </q-item>
+                      <q-item
+                        clickable
+                        v-close-popup
                         @click="
                           clearSelect(i);
                           createPO();
@@ -186,6 +193,7 @@
                       >
                         Tolak
                       </q-item>
+
                       <q-item
                         clickable
                         v-close-popup
