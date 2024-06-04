@@ -340,7 +340,7 @@ export default {
           notif: this.$store.state.currentUser.username + " membuat SPP baru",
           note: "",
           spp_id: result.data,
-          reference_page: "/spp/approval",
+          reference_page: "/approval/manager",
         };
         this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
       });

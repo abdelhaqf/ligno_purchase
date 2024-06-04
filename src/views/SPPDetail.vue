@@ -444,14 +444,14 @@ export default {
           var notifikasi = {
             from_id: this.$store.state.currentUser.user_id,
             to_id: this.spp.handle_by,
-            notif: "Konfimrasi penerimaan oleh pemohon",
+            notif: "Konfirmasi penerimaan oleh pemohon",
             note: info,
             spp_id: this.spp.spp_id,
             reference_page: "/po/list",
           };
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
-          notifikasi.to_id = 1; // Notif ke Manager purchasing
+          notifikasi.to_id = 4; // Notif ke Manager purchasing
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
           this.$q.notify({
@@ -529,7 +529,7 @@ export default {
           notif: "SPP dari " + this.spp.name + " menunggu persetujuan",
           note: this.spp.note,
           spp_id: this.spp.spp_id,
-          reference_page: "/spp/approval-pm",
+          reference_page: "/approval/purchasing",
         };
       }
       if (this.$route.query.approval == "purchasing") {

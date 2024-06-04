@@ -474,11 +474,11 @@ export default {
 
       var notifikasi = {
         from_id: this.$store.state.currentUser.user_id,
-        to_id: 1, //Diisi dengan user_id menager purchasing
+        to_id: 4, //Diisi dengan user_id menager purchasing
         notif: "SPP dari " + val.name + " menunggu persetujuan",
         note: val.note,
         spp_id: val.spp_id,
-        reference_page: "/spp/approval-pm",
+        reference_page: "/approval/purchasing",
       };
       this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
     },

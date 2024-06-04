@@ -43,7 +43,7 @@
             clearable
             @clear="searchTerm = ''"
           >
-            <template class="q-pt-none" v-slot:prepend>
+            <template v-slot:prepend>
               <q-icon name="search"></q-icon>
             </template>
           </q-input>
@@ -404,7 +404,7 @@ export default {
           };
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
-          notifikasi.to_id = 1; // Notif ke Manager purchasing
+          notifikasi.to_id = 4; // Notif ke Manager purchasing
           this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
 
           this.$q.notify({

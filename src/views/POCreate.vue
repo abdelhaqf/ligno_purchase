@@ -569,6 +569,7 @@ export default {
               notif: "PO telah dibuat",
               note: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
               spp_id: this.sppSelect[i].spp_id,
+              reference_page: "/spp/list",
             };
             this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
           }

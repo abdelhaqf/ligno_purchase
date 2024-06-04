@@ -240,12 +240,12 @@ props: ["id_template"],
                     this.$q.notify("SPP Berhasil Dibuat!");
 
                     var notifikasi = {
-                    from_id: this.$store.state.currentUser.user_id,
-                    to_id: this.$store.state.currentUser.manager_id,
-                    notif: this.$store.state.currentUser.username + " membuat SPP baru",
-                    note: "",
-                    spp_id: result.data,
-                    reference_page: "/spp/list",
+                        from_id: this.$store.state.currentUser.user_id,
+                        to_id: this.$store.state.currentUser.manager_id,
+                        notif: this.$store.state.currentUser.username + " membuat SPP baru",
+                        note: "",
+                        spp_id: result.data,
+                        reference_page: "/approval/manager",
                     };
                     this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
                 });
