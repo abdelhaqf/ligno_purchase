@@ -11,14 +11,57 @@
             </div>
           </div>
           <div class="row items-center">
-            <div style="width: 150px;">Nomor {{ type == 'po'? "PO" : "Non-PO" }}</div>
+            <div style="width: 150px;">
+              Nomor {{ type == "po" ? "PO" : "Non-PO" }}
+            </div>
             <q-input
               outlined
               v-model="po.po_id"
               dense
-              v-if="type == 'po'"
+              @input="onSearch()"
               class="l-grow border-card"
-            />
+              placeholder="Pilih request code"
+              @focus="isSearch = true"
+              @blur="isSearch = false"
+            >
+              <q-scroll-area
+                class="shadow-5 suggestions-list"
+                style="height: 250px;"
+                v-if="isSearch"
+              >
+                <q-list bordered>
+                  <q-infinite-scroll
+                    @load="onLoad"
+                    ref="searchBar"
+                    :offset="100"
+                  >
+                    <q-item
+                      v-for="(suggestion, index) in suggestions"
+                      :key="index"
+                      clickable
+                      @click="selectSuggestion(suggestion)"
+                    >
+                      <q-item-section>
+                        <q-item-label>{{ suggestion.po_id }}</q-item-label>
+                        <q-item-label caption>{{
+                          suggestion.vendor
+                        }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item v-if="suggestions.length == 0">
+                      <q-item-section>PO tidak ditemukan</q-item-section>
+                    </q-item>
+                    <template v-slot:loading>
+                      <div class="row justify-center q-my-md">
+                        <q-spinner-dots color="primary" size="40px" />
+                      </div>
+                    </template>
+                  </q-infinite-scroll>
+                </q-list>
+              </q-scroll-area>
+            </q-input>
+            <!--
+              v-if="type == 'po'"
             <q-input
               outlined
               v-model="po.po_id"
@@ -27,16 +70,12 @@
               v-else
               class="l-grow border-card"
             />
+            -->
           </div>
           <div class="row items-center">
             <div style="width: 150px;">Nama Vendor</div>
             <div class="l-grow">
-              <q-input
-                outlined
-                v-model="po.vendor"
-                dense
-                v-if="showInput"
-              >
+              <q-input outlined v-model="po.vendor" dense v-if="showInput">
                 <template v-slot:append>
                   <q-toggle
                     v-model="showInput"
@@ -72,23 +111,9 @@
               </q-select>
             </div>
           </div>
-          <div class="row items-center">
+          <!-- <div class="row items-center">
             <div style="width: 150px;">Kategori Biaya</div>
-            <div class="l-grow">
-              <q-select
-                outlined
-                v-model="cost_category"
-                :options="cost_ctg"
-                class="bg-white"
-                map-options
-                emit-value
-                use-input
-                hide-selected
-                fill-input
-                dense
-              >
-              </q-select>
-            </div>
+            <div class="l-grow"></div>
           </div>
           <div class="l-grow row items-center">
             <div style="width: 150px;">Tanggal PO</div>
@@ -114,7 +139,7 @@
                 </q-date>
               </q-popup-proxy>
             </q-field>
-          </div>
+          </div> -->
           <div class="l-grow row items-center">
             <div style="width: 150px;">Currency</div>
             <div class="q-gutter-sm">
@@ -179,12 +204,13 @@
                 </div>
               </div>
 
-              <q-markup-table class="stickyTable l-grow" flat bordered wrap-cells>
+              <q-markup-table class=" l-grow" flat bordered wrap-cells>
                 <!-- table head -->
-                <thead class="text-white">
+                <thead class="text-black text-bold">
                   <tr>
                     <th>No</th>
-                    <th>Deadline</th>
+                    <th>Nama Barang</th>
+                    <th>Kategori Biaya</th>
                     <th>Harga</th>
                     <th>Est. Arrival</th>
                     <th>Action</th>
@@ -196,6 +222,21 @@
                     <td class="text-center">{{ i + 1 }}</td>
                     <td class="l-grow">
                       {{ x.item }} ({{ x.qty }} {{ x.unit }})
+                    </td>
+                    <td>
+                      <q-select
+                        outlined
+                        v-model="x.cost_category"
+                        :options="cost_ctg"
+                        class="bg-white"
+                        map-options
+                        emit-value
+                        use-input
+                        hide-selected
+                        fill-input
+                        dense
+                      >
+                      </q-select>
                     </td>
                     <td style="width:200px;" class="items-center">
                       <money
@@ -259,8 +300,8 @@
           </div>
         </q-card-section>
       </q-scroll-area>
-      
-      <q-separator/>
+
+      <q-separator />
       <q-card-section class="row justify-end items-center">
         <div class="row justify-end items-center q-gutter-x-md">
           <q-btn
@@ -400,6 +441,12 @@ export default {
       filteredVD: [],
       allowed: false,
       dialogConfirm: false,
+
+      // Search Area
+      isSearch: false,
+      suggestions: [],
+      limit: 25,
+      last_id: 0,
     };
   },
   async mounted() {
@@ -415,6 +462,9 @@ export default {
             "MM"
           )}/`;
         else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
+
+        this.last_id = 0;
+        this.suggestions = JSON.parse(JSON.stringify([]));
       },
     },
     curr: {
@@ -450,7 +500,11 @@ export default {
       return moment(this.date).format("DD MMMM YYYY");
     },
     isValid() {
-      if (this.po.po_id == "" || this.po.vendor == "" || this.cost_category == "") {
+      if (
+        this.po.po_id == "" ||
+        this.po.vendor == "" ||
+        this.cost_category == ""
+      ) {
         return false;
       } else {
         return true;
@@ -479,6 +533,7 @@ export default {
           est_arrival: moment()
             .add(1, "days")
             .format("YYYY/MM/DD"),
+          cost_category: "",
         };
         this.sppSelect.push(data);
         // this.sppSelect.push(result.data);
@@ -545,24 +600,20 @@ export default {
         await this.$http.post("/new_po", this.po, {}).then(async (result) => {
           for (var i = 0; i < this.sppSelect.length; i++) {
             this.sppSelect[i].po_id = this.po.po_id;
-            this.sppSelect[i].cost_category = this.cost_category;
-
+            // this.sppSelect[i].cost_category = this.cost_category;
             let temp = JSON.parse(JSON.stringify(this.sppSelect[i]));
             if (temp.id_rm) {
               delete temp.id_rm;
             }
-
             await this.$http
               .put("/update_spp/" + this.sppSelect[i].spp_id, temp, {})
               .then((result) => {});
-
             var history = {
               spp_id: this.sppSelect[i].spp_id,
               status: "process",
               content: "Sudah dibuat PO dengan nomor: " + this.po.po_id,
             };
             this.$http.post("/new_history", history, {}).then((result) => {});
-
             var notifikasi = {
               from_id: this.$store.state.currentUser.user_id,
               to_id: this.sppSelect[i].user_id,
@@ -577,7 +628,7 @@ export default {
 
         this.$q.loading.hide();
         this.$q.notify({ message: "Berhasil membuat PO!", color: "positive" });
-        this.$router.push("/spp/approved");
+        // this.$router.push("/spp/approved");
       } catch (err) {
         console.log(err);
         this.$q.loading.hide();
@@ -593,12 +644,35 @@ export default {
     dateHistory(dt) {
       return moment(dt).format("DD MMMM YYYY");
     },
-    changeType() {
-      if (this.type == "PO")
-        this.po.po_id = `OP/CM/${moment().format("YY")}/${moment().format(
-          "MM"
-        )}/`;
-      else this.po.po_id = "NON-PO/" + this.sppSelect[0].spp_id;
+
+    async onLoad(index, done) {
+      if (this.last_id == null) return;
+      let resp = await this.$http.get(
+        `/po/search?limit=${this.limit}&last_id=${this.last_id}&search=${this.po.po_id}`
+      );
+
+      let temp = JSON.parse(JSON.stringify(this.suggestions));
+
+      console.log("before", temp);
+      temp = temp.concat(resp.data.rows);
+      console.log("after", temp);
+
+      this.suggestions = JSON.parse(JSON.stringify(temp));
+      console.log("the suges", this.suggestions);
+      this.last_id = resp.data.next == false ? null : resp.data.next;
+      done();
+    },
+
+    onSearch() {
+      // this.$refs.searchBar.reset();
+      this.last_id = 0;
+      this.suggestions = JSON.parse(JSON.stringify([]));
+      this.isSearch = true;
+    },
+
+    selectSuggestion(suggestion) {
+      this.po.po_id = suggestion.po_id;
+      this.isSearch = false;
     },
   },
 };
@@ -616,5 +690,12 @@ export default {
 .v-money:focus {
   outline: none;
   box-shadow: inset 0 0 0 1.5pt #0e84eb;
+}
+.suggestions-list {
+  margin-top: 40px;
+  position: absolute;
+  z-index: 1;
+  background-color: white;
+  width: 100%;
 }
 </style>

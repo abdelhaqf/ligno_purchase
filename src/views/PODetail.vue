@@ -75,7 +75,7 @@
             </q-select>
           </div>
         </div>
-        <div class="row justify-between items-center">
+        <!-- <div class="row justify-between items-center">
           <div class="text-grey-8" style="min-width: 150px ;">
             Kategori Biaya
           </div>
@@ -96,15 +96,15 @@
             >
             </q-select>
           </div>
-        </div>
+        </div> -->
       </q-card-section>
-      <q-scroll-area style="height:calc(100vh - 515px)" class="q-px-md">
+      <q-card-section class="q-py-none">
         <q-markup-table
           wrap-cells
           flat
           bordered
           class="stickyTable"
-          style="max-height: calc(100vh - 375px);"
+          style="height: calc(100vh - 495px);"
         >
           <!-- table head -->
           <thead class="text-white">
@@ -115,9 +115,10 @@
               <th>QTY</th>
               <th>Value</th>
               <th>Est. Arrival</th>
+              <th>Kategori Biaya</th>
               <th>Note</th>
               <th v-if="!isEdit">Received</th>
-              <th v-if="!isEdit" class="q-mx-sm">Action</th>
+              <th class="q-mx-sm">Action</th>
             </tr>
           </thead>
           <!-- table body  -->
@@ -186,6 +187,23 @@
                   </template>
                 </q-input>
               </td>
+              <td>
+                <q-select
+                  outlined
+                  v-model="d.cost_category"
+                  :options="cost_ctg"
+                  class="bg-white"
+                  map-options
+                  emit-value
+                  use-input
+                  hide-selected
+                  fill-input
+                  dense
+                  v-if="isEdit"
+                >
+                </q-select>
+                <div v-else>{{ d.cost_category }}</div>
+              </td>
               <td v-if="!isEdit" class="text-left" style="max-width: 150px;">
                 <!-- {{d.note}} -->
                 <div class="l-wrap-cell" v-if="d.note">
@@ -225,8 +243,18 @@
                 >
                 </q-select>
               </td>
-              <td class="text-center" v-if="!isEdit">
+              <td class="text-center">
                 <q-btn
+                  v-if="isEdit"
+                  unelevated
+                  label="Hapus SPP"
+                  color="negative"
+                  no-caps
+                  @click="showDialogDelSPP(d)"
+                >
+                </q-btn>
+                <q-btn
+                  v-else
                   unelevated
                   label="Sync"
                   color="primary"
@@ -239,7 +267,7 @@
             </tr>
           </tbody>
         </q-markup-table>
-      </q-scroll-area>
+      </q-card-section>
       <q-separator size="1px"></q-separator>
       <q-card-section class="row justify-end items-center">
         <div class="row justify-end q-gutter-x-md" v-if="!isEdit">
@@ -268,9 +296,8 @@
         </div>
         <div class="row justify-end q-gutter-x-md" v-else>
           <q-btn
-            unelevated
+            outline
             label="Batal"
-            color="negative"
             no-caps
             @click="
               isEdit = false;
@@ -344,6 +371,7 @@ moment.locale("id");
 import { Money } from "v-money";
 import dialogReorderPO from "../components/dialogReorderPO.vue";
 import dialogSyncRM from "../components/dialogSyncRM.vue";
+import dialogDeleteSPP from "../components/dialogDeleteSPP.vue";
 export default {
   components: { Money },
   data() {
@@ -419,6 +447,19 @@ export default {
         })
         .onOk(async () => {
           await this.fetchData();
+        });
+    },
+    showDialogDelSPP(spp) {
+      let payload = JSON.parse(JSON.stringify(spp));
+
+      this.$q
+        .dialog({
+          component: dialogDeleteSPP,
+          parent: this,
+          spp: payload,
+        })
+        .onOk(async () => {
+          this.$router.go(-1);
         });
     },
     async fetchData() {
@@ -552,7 +593,7 @@ export default {
           // is_received: this.po.spp[i].is_received,
           coa: this.po.spp[i].coa,
           note: this.po.spp[i].note,
-          cost_category: this.po.cost_category,
+          cost_category: this.po.spp[i].cost_category,
 
           item: this.po.spp[i].item,
           qty: this.po.spp[i].qty,

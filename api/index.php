@@ -948,14 +948,92 @@ Flight::route('POST /new_spp', function () {
   $data = Flight::request()->getBody();
   $data = (array) json_decode($data);
 
+  $link = getLink();
+  foreach ($data as $x) {
+    $x = mysqli_real_escape_string($link, $x);
+  }
+
   runQuery3('POST', 'spp', $data, '');
 });
-Flight::route('POST /new_po', function () {
-  $data = Flight::request()->getBody();
-  $data = (array) json_decode($data);
+// Flight::route('POST /new_po', function () {
+//   $data = Flight::request()->getBody();
+//   $data = (array) json_decode($data);
 
-  runQuery3('POST', 'po', $data, '');
+//   runQuery3('POST', 'po', $data, '');
+// });
+Flight::route('POST /new_po', function () {
+  $data = Flight::request()->data;
+
+  $q = "INSERT INTO po SET
+  po_id = '{$data['po_id']}',
+  user_id = '{$data['user_id']}',
+  vendor = '{$data['vendor']}',
+  po_date = '{$data['po_date']}'
+  ON DUPLICATE KEY UPDATE
+  user_id = '{$data['user_id']}',
+  vendor = '{$data['vendor']}',
+  po_date = '{$data['po_date']}'";
+  $resp = runQuery($q);
+  Flight::json($resp);
 });
+
+Flight::route('GET /po/search', function () {
+  $query = Flight::request()->query;
+
+  $limit = $query->limit;
+  $last_id = isset($query->last_id) ? $query->last_id : 0;
+  $q_search = isset($query->search) ? $query->search : "";
+
+  $w_id = "";
+  if ($last_id > 0) {
+    $w_id = "AND id > $last_id";
+  }
+
+  $w_search = "";
+  if ($q_search != "") {
+    $w_search = "AND po_id LIKE '%$q_search%'";
+  }
+
+  $sql = "WITH numbered_row AS (
+    SELECT *, ROW_NUMBER() OVER (ORDER BY create_at) AS id
+    FROM po
+    WHERE 1=1 $w_search  
+    ORDER BY create_at
+  )
+  SELECT * FROM numbered_row WHERE 1=1 $w_id LIMIT $limit";
+  $rows = getRows($sql);
+
+  //   SELECT *, ROW_NUMBER() OVER (ORDER BY po_id) AS id
+  // FROM po
+  // WHERE 1=1 
+  //   $w_search 
+  //   $w_id 
+  // ORDER BY id ASC
+  // ;
+
+  $ret = array(
+    "rows" => $rows,
+    "next" => count($rows) > 0 ? $rows[count($rows) - 1]['id'] : false,
+  );
+  Flight::json($ret);
+});
+
+Flight::route('POST /po/delspp', function () {
+  $data = Flight::request()->data;
+
+  $link = getLink();
+  $sql = "UPDATE spp SET
+  po_id = NULL,
+  price = 0,
+  currency = '',
+  cost_category = '',
+  revision = '{$data['revision']}',
+  est_arrival = NULL
+  WHERE spp_id = {$data['spp_id']}
+  ";
+  mysqli_query($link, $sql) or die(mysqli_error($link));
+});
+
 Flight::route('POST /new_history', function () {
   $data = Flight::request()->getBody();
   $data = (array) json_decode($data);
@@ -1217,8 +1295,7 @@ Flight::route('PUT /change_password', function () {
   mysqli_query($link, $q) or die(mysqli_error($link));
 });
 
-Flight::route('OPTIONS *', function () {
-});
+Flight::route('OPTIONS *', function () {});
 Flight::route('/', function () {
   echo 'halo dunia!';
 });
