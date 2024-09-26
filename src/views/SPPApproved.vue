@@ -565,8 +565,6 @@ export default {
 
       let result = temp.map((a) => a.spp_id);
 
-      console.log(result);
-
       let route = this.$router.resolve({ path: "/print" });
       window.open(`${route.href}/${JSON.stringify(result)}`);
     },

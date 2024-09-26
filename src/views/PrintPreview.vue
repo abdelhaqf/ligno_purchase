@@ -21,7 +21,7 @@
           </div>
           <div class="text-center" style="width: 60%">
             <span class="text-blue-10 text-bold" style="font-size: 1.25rem">
-              PT. LIGNO SPECIALITY CHEMICALS
+              PT. LIGNO SPECIALTY CHEMICALS
             </span>
           </div>
           <div class="row justify-end" style="width: 20%"></div>
@@ -57,7 +57,7 @@
           </q-markup-table>
         </div>
 
-        <q-markup-table flal separator="none" class="q-mt-md" dense>
+        <q-markup-table flal separator="none" class="q-mt-md" dense wrap-cells>
           <thead>
             <tr>
               <th class="text-center trow" style="font-weight: 600;">
@@ -67,7 +67,7 @@
                 class="text-center trow"
                 style="font-weight: 600;width:100px;"
               >
-                Deadline
+                Urgency
               </th>
               <th
                 class="text-center trow"
@@ -86,7 +86,8 @@
           <tbody>
             <tr>
               <td>{{ val.item }}</td>
-              <td>{{ momentMask(val.deadline) }}</td>
+              <!-- <td>{{ momentMask(val.deadline) }}</td> -->
+              <td class="text-center">{{ val.urgency }}</td>
               <td>{{ `${val.qty} ${val.unit}` }}</td>
               <td class="text-capitalize">{{ val.handler_name }}</td>
               <td class="text-center">{{ val.kategori }}</td>
