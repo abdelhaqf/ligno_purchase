@@ -962,19 +962,52 @@ Flight::route('POST /new_spp', function () {
 //   runQuery3('POST', 'po', $data, '');
 // });
 Flight::route('POST /new_po', function () {
+  // $data = Flight::request()->data;
+
+  // $q = "INSERT INTO po SET
+  //   po_id = '{$data['po_id']}',
+  //   user_id = '{$data['user_id']}',
+  //   vendor = '{$data['vendor']}',
+  //   po_date = '{$data['po_date']}'
+  // ON DUPLICATE KEY UPDATE
+  //   user_id = '{$data['user_id']}',
+  //   vendor = '{$data['vendor']}',
+  //   po_date = '{$data['po_date']}';";
+  // // var_dump($q);
+  // // $resp = runQuery($q);
+
+  // $link = getLink();
+  // $res = mysqli_query($link, $q) or die(mysqli_error($link));
+
+  // $resp = mysqli_fetch_assoc($res);
+  // Flight::json($resp);
+
   $data = Flight::request()->data;
 
-  $q = "INSERT INTO po SET
-  po_id = '{$data['po_id']}',
-  user_id = '{$data['user_id']}',
-  vendor = '{$data['vendor']}',
-  po_date = '{$data['po_date']}'
-  ON DUPLICATE KEY UPDATE
-  user_id = '{$data['user_id']}',
-  vendor = '{$data['vendor']}',
-  po_date = '{$data['po_date']}'";
-  $resp = runQuery($q);
-  Flight::json($resp);
+    $q = "INSERT INTO po SET
+        po_id = '{$data['po_id']}',
+        user_id = '{$data['user_id']}',
+        vendor = '{$data['vendor']}',
+        po_date = '{$data['po_date']}'
+    ON DUPLICATE KEY UPDATE
+        user_id = '{$data['user_id']}',
+        vendor = '{$data['vendor']}',
+        po_date = '{$data['po_date']}';";
+
+    $link = getLink();
+    $res = mysqli_query($link, $q);
+
+    if (!$res) {
+        $error_message = mysqli_error($link);
+        Flight::json(['error' => 'Database query failed', 'details' => $error_message], 500);
+        return;
+    }
+
+    if (mysqli_affected_rows($link) > 0) {
+        Flight::json(['message' => 'Record inserted/updated successfully']);
+    } else {
+        Flight::json(['message' => 'No changes made'], 200);
+    }
 });
 
 Flight::route('GET /po/search', function () {
@@ -1160,6 +1193,23 @@ function runQuery($q)
   while ($row = mysqli_fetch_assoc($res)) {
     $arr[] = $row;
   }
+
+  // // Check if the query is a SELECT statement
+  // if (is_bool($res)) {
+  //   // For non-SELECT queries like INSERT, UPDATE, DELETE
+  //   if ($res === true) {
+  //       $arr['status'] = 'success';
+  //       $arr['affected_rows'] = mysqli_affected_rows($link);
+  //       $arr['insert_id'] = mysqli_insert_id($link);  // If it's an INSERT query
+  //   } else {
+  //       $arr['status'] = 'error';
+  //   }
+  // } else {
+  //     // For SELECT queries, fetch the results
+  //     while ($row = mysqli_fetch_assoc($res)) {
+  //         $arr[] = $row;
+  //     }
+  // }
 
   $date2 = new DateTime();
   log_query($link, $q, $date1, $date2);

@@ -637,10 +637,18 @@ export default {
         if (this.po.spp[i].note != this.old.spp[i].note) {
           note_add =
             note_add +
-            ", harga: " +
+            ", note: " +
             this.old.spp[i].note +
             " => " +
             this.po.spp[i].note;
+        }
+        if (this.po.spp[i].cost_category != this.old.spp[i].cost_category) {
+          note_add =
+            note_add +
+            ", kategori biaya: " +
+            this.old.spp[i].cost_category +
+            " => " +
+            this.po.spp[i].cost_category;
         }
         if (note_add != "")
           data.revision = this.$store.state.currentUser.username;

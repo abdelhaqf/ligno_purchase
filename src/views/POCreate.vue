@@ -18,7 +18,7 @@
               outlined
               v-model="po.po_id"
               dense
-              @input="onSearch()"
+              @input="onSearch"
               class="l-grow border-card"
               placeholder="Pilih request code"
               @focus="isSearch = true"
@@ -160,6 +160,21 @@
                   Atur dan terapkan ke semua
                 </div>
                 <div class="q-px-md no-wrap q-mr-md" style="width:200px">
+                  <q-select
+                    outlined
+                    v-model="cost_category"
+                    :options="cost_ctg"
+                    class="bg-white l-grow"
+                    map-options
+                    emit-value
+                    use-input
+                    hide-selected
+                    fill-input
+                    dense
+                  >
+                  </q-select>
+                </div>
+                <div class="q-px-md no-wrap q-mr-md" style="width:200px">
                   <money v-model="price" v-bind="money"></money>
                 </div>
                 <div class="q-px-md no-wrap" style="width:200px">
@@ -223,7 +238,7 @@
                     <td class="l-grow">
                       {{ x.item }} ({{ x.qty }} {{ x.unit }})
                     </td>
-                    <td>
+                    <td style="width:200px;" class="text-center">
                       <q-select
                         outlined
                         v-model="x.cost_category"
@@ -500,11 +515,7 @@ export default {
       return moment(this.date).format("DD MMMM YYYY");
     },
     isValid() {
-      if (
-        this.po.po_id == "" ||
-        this.po.vendor == "" ||
-        this.cost_category == ""
-      ) {
+      if (this.po.po_id == "" || this.po.vendor == "") {
         return false;
       } else {
         return true;
@@ -588,9 +599,13 @@ export default {
         if (this.price > 0) {
           this.sppSelect[i].price = this.price;
         }
+        if (this.cost_category != "") {
+          this.sppSelect[i].cost_category = this.cost_category;
+        }
       }
       this.date = null;
       this.price = 0;
+      this.cost_category = "";
     },
     async createPO() {
       this.po.user_id = this.$store.state.currentUser.user_id;
@@ -628,7 +643,7 @@ export default {
 
         this.$q.loading.hide();
         this.$q.notify({ message: "Berhasil membuat PO!", color: "positive" });
-        // this.$router.push("/spp/approved");
+        this.$router.push("/spp/approved");
       } catch (err) {
         console.log(err);
         this.$q.loading.hide();
@@ -646,7 +661,10 @@ export default {
     },
 
     async onLoad(index, done) {
-      if (this.last_id == null) return;
+      if (this.last_id == null) {
+        done();
+        return;
+      }
       let resp = await this.$http.get(
         `/po/search?limit=${this.limit}&last_id=${this.last_id}&search=${this.po.po_id}`
       );
@@ -668,10 +686,12 @@ export default {
       this.last_id = 0;
       this.suggestions = JSON.parse(JSON.stringify([]));
       this.isSearch = true;
+      this.onLoad();
     },
 
     selectSuggestion(suggestion) {
       this.po.po_id = suggestion.po_id;
+      this.po.vendor = suggestion.vendor;
       this.isSearch = false;
     },
   },
