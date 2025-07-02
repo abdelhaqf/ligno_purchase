@@ -2,15 +2,10 @@
   <q-dialog ref="dialog" @hide="onDialogHide" persistent>
     <q-card class="my-font" style="min-width: 800px !important;">
       <q-card-section class="q-py-sm row justify-between items-center">
-          <div class="text-h6 text-weight-bold">History Pembelian Barang</div>
-          <q-btn
-            dense
-            flat
-            icon="close"
-            @click="onCancelClick()"
-          />
+        <div class="text-h6 text-weight-bold">History Pembelian Barang</div>
+        <q-btn dense flat icon="close" @click="onCancelClick()" />
       </q-card-section>
-      <q-separator/>
+      <q-separator />
       <q-card-section>
         <q-markup-table
           v-if="priceList.length"
@@ -18,34 +13,34 @@
           flat
           bordered
           class="stickyTable l-grow"
-          >
-           <!-- table head -->
-           <thead class="text-white">
+        >
+          <!-- table head -->
+          <thead class="text-white">
             <tr>
-                <th>No PO</th>
-                <th>Tanggal PO</th>
-                <th>Nama Vendor</th>
-                <th>Jumlah Pembelian</th>
-                <th>Harga Item</th>
+              <th>No PO</th>
+              <th>Tanggal PO</th>
+              <th>Nama Vendor</th>
+              <th>Jumlah Pembelian</th>
+              <th>Harga Item</th>
             </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(p, i) in priceList" :key="i">
-                <td class="text-left">{{ p.po_id }}</td>
-                <td class="text-left">{{ momentFormatDate(p.po_date) }}</td>
-                <td class="text-left">{{ p.vendor }}</td>
-                <td>{{ p.qty }} {{ p.unit }}</td>
-                <td class="text-left">
-                  {{
-                    setCurrency(
-                      parseFloat(p.price) / parseFloat(p.qty),
-                      p.currency
-                    )
-                  }}
-                  / {{ p.unit }}
-                </td>
-              </tr>
-            </tbody>
+          </thead>
+          <tbody>
+            <tr v-for="(p, i) in priceList" :key="i">
+              <td class="text-left">{{ p.po_id }}</td>
+              <td class="text-left">{{ momentFormatDate(p.po_date) }}</td>
+              <td class="text-left">{{ p.vendor }}</td>
+              <td>{{ p.qty }} {{ p.unit }}</td>
+              <td class="text-left">
+                {{
+                  setCurrency(
+                    parseFloat(p.price) / parseFloat(p.qty),
+                    p.currency
+                  )
+                }}
+                / {{ p.unit }}
+              </td>
+            </tr>
+          </tbody>
         </q-markup-table>
         <div class="text-h6 text-center" v-else>
           Belum Ada Histori Pembelian
@@ -89,7 +84,7 @@ export default {
       this.hide();
     },
 
-    async fetchData(){
+    async fetchData() {
       console.log(this.spp.item);
       try {
         this.$q.loading.show();
@@ -127,7 +122,7 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2,
+          minimumFractionDigits: 3,
         });
         return formatter.format(price);
       }

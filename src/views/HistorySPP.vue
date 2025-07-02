@@ -1,7 +1,7 @@
 <template>
   <div class="row relative q-px-lg ">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
-      <q-card-section class="row justify-between no-wrap">
+      <q-card-section class="row justify-between q-gutter-x-md no-wrap">
         <q-input
           outlined
           dense
@@ -9,7 +9,7 @@
           clearable
           @clear="searchTerm = ''"
           placeholder="Cari Nama Barang"
-          style="width: 30%;"
+          class="l-grow"
           @input="
             pagination.current = 1;
             replaceRoute();
@@ -26,7 +26,7 @@
           clearable
           dense
           outlined
-          style="width: 33%;"
+          class="l-grow"
           @clear="
             pagination.current = 1;
             replaceRoute();
@@ -76,7 +76,7 @@
           :options="filteredVD"
           @filter="filterVD"
           label="Pilih Vendor"
-          style="width:33%"
+          class="l-grow"
           @input="
             pagination.current = 1;
             replaceRoute();
@@ -104,6 +104,64 @@
             ></q-btn>
           </template>
         </q-select>
+
+        <q-select
+          outlined
+          dense
+          v-model="selectUser"
+          map-options
+          emit-value
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="0"
+          :options="filteredUser"
+          @filter="filterUser"
+          label="Pilih User"
+          class="l-grow"
+          @input="
+            pagination.current = 1;
+            replaceRoute();
+            change();
+          "
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">No results</q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:append>
+            <q-btn
+              v-if="selectUser != null"
+              icon="close"
+              dense
+              @click="
+                selectUser = null;
+                pagination.current = 1;
+                replaceRoute();
+                change();
+              "
+              flat
+              size="sm"
+            ></q-btn>
+          </template>
+        </q-select>
+
+        <q-select
+          outlined
+          dense
+          label="Urut Per-"
+          class="l-grow"
+          v-model="selSort"
+          :options="optSort"
+          map-options
+          emit-value
+          @input="
+            pagination.current = 1;
+            replaceRoute();
+            change();
+          "
+        ></q-select>
       </q-card-section>
       <div v-if="priceList.length">
         <q-markup-table
@@ -118,11 +176,12 @@
               <th class="text-left">No</th>
               <th class="text-left">Nomor PO</th>
               <th class="text-left">Tanggal PO</th>
+              <th class="text-left">Nama User</th>
               <th class="text-left">Nama Vendor</th>
               <th class="text-left">Nama Items</th>
               <th class="text-right">Harga Items</th>
               <th class="text-center">Keterangan</th>
-              <th class="text-center">Action</th>
+              <!-- <th class="text-center">Action</th> -->
             </tr>
           </thead>
           <tbody>
@@ -132,6 +191,7 @@
               </td>
               <td class="text-left">{{ p.po_id }}</td>
               <td class="text-left">{{ momentFormatDate(p.po_date) }}</td>
+              <td class="text-left">{{ p.user_name }}</td>
               <td class="text-left">
                 <!-- {{ p.vendor }} -->
                 <div class="l-wrap-cell" style="width: 150px !important;">
@@ -200,7 +260,7 @@
                 </div>
                 <div v-else class="l-grow text-center">-</div>
               </td>
-              <td class="text-center">
+              <!-- <td class="text-center">
                 <q-btn
                   label="Detail"
                   flat
@@ -209,7 +269,7 @@
                   dense
                   :to="`/po/detail/${encodeURIComponent(p.po_id)}`"
                 />
-              </td>
+              </td> -->
             </tr>
           </tbody>
           <!-- <tbody v-else class="bg-green-1">
@@ -261,6 +321,17 @@ export default {
       optVendor: [],
       filteredVD: [],
       selectVendor: null,
+      optUser: [],
+      filteredUser: [],
+      selectUser: null,
+
+      optSort: [
+        { label: "Tanggal PO ASC", value: "po_date ASC" },
+        { label: "Tanggal PO DESC", value: "po_date DESC" },
+        { label: "Harga Barang ASC", value: "item_price ASC" },
+        { label: "Harga Barang DESC", value: "item_price DESC" },
+      ],
+      selSort: "po_date DESC",
 
       pagination: {
         current: 1,
@@ -295,7 +366,6 @@ export default {
   },
   methods: {
     filterOP(val, update, abort) {
-      console.log(this.option);
       update(() => {
         const needle = val.toLowerCase();
         this.filtered = this.option.filter(
@@ -311,12 +381,24 @@ export default {
         );
       });
     },
+    filterUser(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.filteredUser = this.optUser.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
     async fetchData() {
       await this.$http.get("/list_item", {}).then((result) => {
         this.option = result.data;
       });
       await this.$http.get("/list_vendor", {}).then((result) => {
         this.optVendor = result.data;
+      });
+      await this.$http.get("/list/user", {}).then((result) => {
+        this.optUser = result.data;
+        this.filteredUser = result.data;
       });
     },
     async change(val) {
@@ -335,6 +417,8 @@ export default {
                   to: moment(this.date.to).format("YYYY-MM-DD"),
                 }
             : "",
+          user: this.selectUser ? this.selectUser : "",
+          sort: this.selSort ? this.selSort : "",
         };
         await this.$http.post("/pricelist/new", payload).then((result) => {
           this.priceList = result.data.items;
@@ -373,7 +457,7 @@ export default {
     },
     replaceRoute() {
       this.$router.replace({
-        path: `/price/list?vendor=${encodeURIComponent(
+        path: `/history/spp?vendor=${encodeURIComponent(
           this.selectVendor
         )}&search=${
           this.searchTerm ? encodeURIComponent(this.searchTerm) : ""
@@ -385,7 +469,9 @@ export default {
                 "to" +
                 moment(this.date.to).format("YYYY-MM-DD")
             : ""
-        }&page=${this.pagination.current}`,
+        }&page=${this.pagination.current}&user=${
+          this.selectUser ? encodeURIComponent(this.selectUser) : ""
+        }&sort=${this.selSort}`,
       });
     },
     async replaceFilter() {
@@ -409,6 +495,13 @@ export default {
       }
       if (this.$route.query?.page) {
         this.pagination.current = this.$route.query.page;
+      }
+      if (this.$route.query?.user) {
+        this.selectUser =
+          this.$route.query.user == "" ? null : this.$route.query.user;
+      }
+      if (this.$route.query?.sort) {
+        this.selSort = this.$route.query.sort;
       }
     },
   },

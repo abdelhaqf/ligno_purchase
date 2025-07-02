@@ -317,7 +317,7 @@ export default {
     },
     createSPP() {
       this.spp.user_id = this.$store.state.currentUser.user_id;
-      this.$http.post("/new_spp", this.spp, {}).then((result) => {
+      this.$http.post("/new_spp", this.spp, {}).then(async (result) => {
         this.spp = {
           // deadline: moment()
           //   .add(1, "days")
@@ -330,7 +330,7 @@ export default {
           status: "created",
           content: "Dibuat oleh " + this.$store.state.currentUser.username,
         };
-        this.$http.post("/new_history", history, {}).then((result) => {});
+        await this.$http.post("/new_history", history, {}).then((result) => {});
 
         this.$q.notify("SPP Berhasil Dibuat!");
 
@@ -342,7 +342,9 @@ export default {
           spp_id: result.data,
           reference_page: "/approval/manager",
         };
-        this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
+        await this.$http
+          .post("/notifikasi", notifikasi, {})
+          .then((result) => {});
       });
     },
     filterOP(val, update, abort) {

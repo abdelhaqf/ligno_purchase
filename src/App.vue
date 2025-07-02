@@ -421,6 +421,31 @@
             </q-item-label>
           </q-item-section>
         </q-item>
+        <q-item
+          clickable
+          v-ripple
+          :active="$route.name == 'HistorySPP'"
+          class="inactive-menu"
+          :active-class="
+            miniState ? 'text-primary' : 'text-primary active-menu'
+          "
+          to="/history/spp"
+          v-can="['IT']"
+        >
+          <q-item-section avatar>
+            <q-icon
+              :name="
+                `${$route.name == 'HistorySPP' ? '' : 'o_'}local_grocery_store`
+              "
+            />
+            <!-- <q-icon name="price_check" /> -->
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="row items-center">
+              <div>History SPP</div>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
         <q-separator />
         <div style="flex-grow: 99 !important;"></div>
       </q-list>

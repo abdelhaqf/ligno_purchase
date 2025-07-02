@@ -1,21 +1,25 @@
 <template>
   <div class="q-pa-md">
-    <div class="text-h6">{{date | moment('MMMM YYYY')}}</div>
+    <div class="text-h6">{{ date | moment("MMMM YYYY") }}</div>
     <div class="row q-gutter-xl">
       <q-card>
-        <q-card-section>{{summary.count_spp}}</q-card-section>
+        <q-card-section>{{ summary.count_spp }}</q-card-section>
         <q-card-section>SPP Diproses</q-card-section>
       </q-card>
       <q-card>
-        <q-card-section>{{summary.on_process}}</q-card-section>
+        <q-card-section>{{ summary.on_process }}</q-card-section>
         <q-card-section>SPP Dalam Persetujuan</q-card-section>
       </q-card>
       <q-card>
-        <q-card-section>{{setCurrency(summary.value_idr, 'IDR')}}</q-card-section>
+        <q-card-section>{{
+          setCurrency(summary.value_idr, "IDR")
+        }}</q-card-section>
         <q-card-section>Pembelian (IDR)</q-card-section>
       </q-card>
       <q-card>
-        <q-card-section>{{setCurrency(summary.value_usd, 'USD')}}</q-card-section>
+        <q-card-section>{{
+          setCurrency(summary.value_usd, "USD")
+        }}</q-card-section>
         <q-card-section>Pembelian (USD)</q-card-section>
       </q-card>
     </div>
@@ -35,33 +39,69 @@
           </div>
           <div class="col-8">
             <div v-if="!showListMonth" class="row">
-              <q-input outlined dense class="col-5" v-model="dateFrom" label="Tanggal Dari">
+              <q-input
+                outlined
+                dense
+                class="col-5"
+                v-model="dateFrom"
+                label="Tanggal Dari"
+              >
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                    <q-popup-proxy
+                      ref="qDateProxy"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
                       <q-date minimal v-model="dateFrom" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
                         </div>
                       </q-date>
                     </q-popup-proxy>
                   </q-icon>
                 </template>
               </q-input>
-              <q-input outlined dense class="col-5" v-model="dateTo" label="Tanggal Sampai">
+              <q-input
+                outlined
+                dense
+                class="col-5"
+                v-model="dateTo"
+                label="Tanggal Sampai"
+              >
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                    <q-popup-proxy
+                      ref="qDateProxy"
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
                       <q-date minimal v-model="dateTo" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
                         </div>
                       </q-date>
                     </q-popup-proxy>
                   </q-icon>
                 </template>
               </q-input>
-              <q-btn dense outline class="col-2" @click="showDaily" label="OK" />
+              <q-btn
+                dense
+                outline
+                class="col-2"
+                @click="showDaily"
+                label="OK"
+              />
             </div>
             <div v-else class="row">
               <q-select
@@ -84,12 +124,18 @@
                 emit-value
                 map-options
               />
-              <q-btn dense outline style="width: 100px;" @click="showMonthly" label="OK" />
+              <q-btn
+                dense
+                outline
+                style="width: 100px;"
+                @click="showMonthly"
+                label="OK"
+              />
             </div>
           </div>
         </div>
       </div>
-      <div>{{listSummary}}</div>
+      <div>{{ listSummary }}</div>
     </div>
   </div>
 </template>
@@ -109,7 +155,7 @@ export default {
       monthFrom: "",
       monthTo: "",
       dateFrom: "",
-      dateTo: ""
+      dateTo: "",
     };
   },
   mounted() {
@@ -117,18 +163,18 @@ export default {
   },
   methods: {
     fetchData() {
-      this.$http.get("/summary", {}).then(result => {
+      this.$http.get("/summary", {}).then((result) => {
         this.summary = result.data;
       });
 
-      this.$http.get("/list_month", {}).then(result => {
+      this.$http.get("/list_month", {}).then((result) => {
         this.listMonth = result.data;
       });
     },
     showDaily() {
       var from = this.dateFrom + " 00:00";
       var to = this.dateTo + " 23:59";
-      this.$http.get("/daily_summary/" + from + "/" + to, {}).then(result => {
+      this.$http.get("/daily_summary/" + from + "/" + to, {}).then((result) => {
         this.listSummary = result.data;
       });
     },
@@ -144,9 +190,11 @@ export default {
         this.monthTo.split("-")[1] +
         "-31 23:59";
 
-      this.$http.get("/monthly_summary/" + from + "/" + to, {}).then(result => {
-        this.listSummary = result.data;
-      });
+      this.$http
+        .get("/monthly_summary/" + from + "/" + to, {})
+        .then((result) => {
+          this.listSummary = result.data;
+        });
     },
     changeType() {
       if (this.summaryType == "per hari") this.showListMonth = false;
@@ -158,7 +206,7 @@ export default {
           style: "currency",
           currency: "IDR",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 0
+          minimumFractionDigits: 0,
         });
         return formatter.format(price);
       } else if (cur == "USD") {
@@ -166,14 +214,13 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2
+          minimumFractionDigits: 3,
         });
         return formatter.format(price);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

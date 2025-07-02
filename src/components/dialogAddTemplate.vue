@@ -30,6 +30,56 @@
             placeholder="e.g keperluan maintanance..."
           />
         </div>
+        <div class="row items-center l-grow">
+          <div style="width: 125px;"></div>
+          <q-card flat bordered class="bg-grey-2 l-grow">
+            <q-card-section class="q-pa-sm row items-center ">
+              <div style="width: 42px;"></div>
+              <div class="q-px-md">
+                <q-input
+                  outlined
+                  class="bg-white"
+                  dense
+                  style="width: 269px;"
+                  placeholder="Masukan Nama Barang"
+                  v-model="template_masal.item"
+                ></q-input>
+              </div>
+              <div class="q-px-md">
+                <q-input
+                  outlined
+                  class="bg-white"
+                  dense
+                  style="width: 100px;"
+                  placeholder="Masukan Qty"
+                  v-model="template_masal.qty"
+                  type="number"
+                ></q-input>
+              </div>
+              <div class="q-px-md">
+                <q-input
+                  outlined
+                  class="bg-white"
+                  dense
+                  style="width: 150px;"
+                  placeholder="Masukan Unit"
+                  v-model="template_masal.unit"
+                ></q-input>
+              </div>
+              <div class="q-px-sm">
+                <q-btn
+                  flat
+                  dense
+                  label="Apply"
+                  no-caps
+                  color="primary"
+                  class="text-bold"
+                  @click="applyMasal"
+                ></q-btn>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
         <div class="row l-grow no-wrap">
           <div style="width: 125px;">Barang</div>
           <q-markup-table wrap-cells flat bordered class="stickyTable l-grow">
@@ -43,105 +93,116 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(val, i) in template.template_detail" :key="i">
-                <q-tr style="display: contents;" v-if="!val.id">
-                  <td class="text-center">
-                    {{ i + 1 }}
-                  </td>
-                  <td>
-                    <q-input
-                      outlined
-                      v-model="val.item"
-                      v-if="toggleStats[i]"
-                      dense
-                      class="l-grow"
-                      placeholder="Masukan Nama Barang"
-                    >
-                      <template v-slot:append>
-                        <q-toggle
-                          v-model="toggleStats[i]"
-                          color="green"
-                          icon="add"
-                          keep-color
-                        />
-                      </template>
-                    </q-input>
-                    <q-select
-                      v-else
-                      outlined
-                      dense
-                      v-model="val.item"
-                      map-options
-                      emit-value
-                      use-input
-                      hide-selected
-                      fill-input
-                      @input-value="setModel"
-                      input-debounce="0"
-                      :options="filtered"
-                      @filter="filterOP"
-                      class="l-grow"
-                      placeholder="Pilih Nama Barang"
-                    >
-                      <template v-slot:append>
-                        <q-toggle
-                          v-model="toggleStats[i]"
-                          color="green"
-                          icon="add"
-                          keep-color
-                        />
-                      </template>
-                    </q-select>
-                  </td>
-                  <td>
-                    <q-input
-                      outlined
-                      dense
-                      type="number"
-                      v-model="val.qty"
-                      style="width:100px"
-                    ></q-input>
-                  </td>
-                  <td>
-                    <q-input
-                      outlined
-                      dense
-                      v-model="val.unit"
-                      style="width:150px"
-                    ></q-input>
-                  </td>
-                  <td>
-                    <q-btn
-                      label="Hapus"
-                      flat
-                      no-caps
-                      color="negative"
-                      dense
-                      @click="deleteSPPItem(i)"
-                    ></q-btn>
-                  </td>
-                </q-tr>
-                <q-tr style="display: contents;" v-else>
-                  <td>
-                    {{ i + 1 }}
-                  </td>
-                  <td>
-                    {{ val.item }}
-                  </td>
-                  <td>{{ val.qty }}</td>
-                  <td>{{ val.unit }}</td>
-                  <td>
-                    <q-btn
-                      label="Hapus"
-                      flat
-                      no-caps
-                      color="negative"
-                      dense
-                      @click="deleteSPPItem(i)"
-                    ></q-btn>
-                  </td>
-                </q-tr>
-              </tr>
+              <draggable v-model="template.template_detail" @end="updateOrder">
+                <tr
+                  v-for="(val, i) in template.template_detail"
+                  :key="i"
+                  class="cursor-pointer"
+                >
+                  <q-tr style="display: contents;" v-if="!val.id">
+                    <td class="text-center">
+                      {{ i + 1 }}
+                    </td>
+                    <td>
+                      <q-input
+                        outlined
+                        v-model="val.item"
+                        v-if="toggleStats[i]"
+                        dense
+                        class="l-grow"
+                        placeholder="Masukan Nama Barang"
+                      >
+                        <template v-slot:append>
+                          <q-toggle
+                            v-model="toggleStats[i]"
+                            color="green"
+                            icon="add"
+                            keep-color
+                          />
+                        </template>
+                      </q-input>
+                      <q-select
+                        v-else
+                        outlined
+                        dense
+                        v-model="val.item"
+                        map-options
+                        emit-value
+                        use-input
+                        hide-selected
+                        fill-input
+                        @input-value="
+                          (str) => {
+                            setModel(str, i);
+                          }
+                        "
+                        input-debounce="0"
+                        :options="filtered"
+                        @filter="filterOP"
+                        class="l-grow"
+                        placeholder="Pilih Nama Barang"
+                      >
+                        <template v-slot:append>
+                          <q-toggle
+                            v-model="toggleStats[i]"
+                            color="green"
+                            icon="add"
+                            keep-color
+                          />
+                        </template>
+                      </q-select>
+                    </td>
+                    <td>
+                      <q-input
+                        outlined
+                        dense
+                        type="number"
+                        v-model="val.qty"
+                        style="width:100px"
+                      ></q-input>
+                    </td>
+                    <td>
+                      <q-input
+                        outlined
+                        dense
+                        v-model="val.unit"
+                        style="width:150px"
+                      ></q-input>
+                    </td>
+                    <td>
+                      <q-btn
+                        label="Hapus"
+                        flat
+                        no-caps
+                        color="negative"
+                        dense
+                        @click="deleteSPPItem(i)"
+                      ></q-btn>
+                    </td>
+                  </q-tr>
+                  <q-tr style="display: contents;" v-else>
+                    <td>
+                      {{ i + 1 }}
+                    </td>
+                    <td>
+                      {{ val.item }}
+                    </td>
+                    <td>{{ val.qty }}</td>
+                    <td>{{ val.unit }}</td>
+                    <td>
+                      <q-btn
+                        label="Hapus"
+                        flat
+                        no-caps
+                        color="negative"
+                        dense
+                        @click="deleteSPPItem(i)"
+                      ></q-btn>
+                    </td>
+                  </q-tr>
+                </tr>
+              </draggable>
+
               <tr class="cursor-pointer">
                 <td
                   colspan="5"
@@ -152,6 +213,7 @@
                       item: '',
                       qty: 0,
                       unit: '',
+                      order: template.template_detail.length + 1,
                     });
                     toggleStats.push(false);
                   "
@@ -162,8 +224,6 @@
             </tbody>
           </q-markup-table>
         </div>
-
-        
       </q-card-section>
 
       <q-card-actions
@@ -211,10 +271,20 @@
 </template>
 
 <script>
+import draggable from "vuedraggable";
 export default {
   props: ["id_template"],
+  components: {
+    draggable,
+  },
   data() {
     return {
+      template_masal: {
+        item: "",
+        qty: 0,
+        unit: "",
+      },
+
       option: [],
       filtered: [],
       showInput: false,
@@ -241,6 +311,12 @@ export default {
     this.toggleStats = Array(this.template.template_detail.length).fill(false);
   },
   methods: {
+    updateOrder() {
+      this.template.template_detail.forEach((row, index) => {
+        row.order = index + 1;
+      });
+      console.log("Order updated:", this.template.template_detail);
+    },
     filterOP(val, update, abort) {
       update(() => {
         const needle = val.toLowerCase();
@@ -278,10 +354,23 @@ export default {
         this.onOKClick();
       });
     },
-    setModel(val, id) {
-      // console.log(val);
-      // this.spp_detail[id].item = val;
+    setModel(str, i) {
+      this.template.template_detail[i].item = str;
     },
+    applyMasal() {
+      for (let el of this.template.template_detail) {
+        if (this.template_masal.item != "") el.item = this.template_masal.item;
+        if (this.template_masal.qty > 0) el.qty = this.template_masal.qty;
+        if (this.template_masal.unit != "") el.unit = this.template_masal.unit;
+      }
+
+      this.template_masal = {
+        item: "",
+        qty: 0,
+        unit: "",
+      };
+    },
+
     show() {
       this.$refs.dialog.show();
     },

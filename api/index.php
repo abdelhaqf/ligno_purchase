@@ -16,6 +16,26 @@ function getLink()
 
 //---------------------------------------------------------------------------------------------
 
+Flight::route('POST /reorder-template', function () {
+  $link = getLink();
+  $q =  "SELECT * FROM template";
+  $result = mysqli_query($link, $q);
+  $templates = mysqli_fetch_all($result, MYSQLI_ASSOC);
+  foreach ($templates as $template) {
+    $id = $template['id'];
+    $q_update = "SELECT * FROM template_detail WHERE id_template = '$id' ORDER BY `order` ASC";
+    $q_detaiil = mysqli_query($link, $q_update);
+    $details = mysqli_fetch_all($q_detaiil, MYSQLI_ASSOC);
+
+    foreach ($details as $index => $detail) {
+      $new_order = $index + 1;
+      $q_update_order = "UPDATE template_detail SET `order` = '$new_order' WHERE id = '{$detail['id']}'";
+      mysqli_query($link, $q_update_order);
+    }
+  }
+  Flight::json(['status' => 'success', 'message' => 'Template details reordered successfully']);
+});
+
 Flight::route('GET /list/user', function () {
   $q = "SELECT user_id,user_id as value,concat(dept , ' - ' , name) as label FROM user 
   ORDER BY dept, name";
@@ -147,7 +167,7 @@ Flight::route('GET /template_detail/@id', function ($id) {
   $q = "SELECT * FROM template WHERE id = $id";
   $template = getRows($q)[0];
 
-  $q_detail = "SELECT item, qty, unit FROM template_detail WHERE id_template = $id";
+  $q_detail = "SELECT item, qty, unit FROM template_detail WHERE id_template = $id ORDER BY `order` ASC";
   $template['template_detail'] = getRows($q_detail);
 
   Flight::json($template);
@@ -170,7 +190,8 @@ Flight::route('POST /new_template', function () {
       $q_detail = "INSERT INTO template_detail SET item = '{$detail['item']}',
       id_template = $id_template,
       qty = '{$detail['qty']}',
-      unit = '{$detail['unit']}'";
+      unit = '{$detail['unit']}',
+      `order` = $i";
       mysqli_query($link, $q_detail);
     }
 
@@ -209,8 +230,10 @@ Flight::route('PUT /update_template', function () {
       $q_detail = "INSERT INTO template_detail SET item = '{$detail['item']}',
       id_template = $data->id,
       qty = '{$detail['qty']}',
-      unit = '{$detail['unit']}'";
+      unit = '{$detail['unit']}',
+      `order` = $i";
       mysqli_query($link, $q_detail);
+      // var_dump($q_detail);
     }
 
     mysqli_commit($link);
@@ -524,16 +547,20 @@ Flight::route('POST /pricelist/new', function () {
   $vendor = $data['vendor'];
   $search = $data['search'];
   $date = $data['date'];
+  $user = $data['user'];
+  $sort = $data['sort'];
 
   $ofset = ((int) $data['current'] - 1) * 25;
 
-  $whereClause = "";
-  if ($search != "null" && $vendor != "null") {
-    $whereClause = "WHERE spp.item like '%$search%' AND po.vendor like '%$vendor%'";
-  } else if ($search != "null") {
-    $whereClause = "WHERE spp.item like '%$search%' ";
-  } else if ($vendor != "null") {
-    $whereClause = "WHERE  po.vendor like '%$vendor%'";
+  $whereClause = "WHERE 1 = 1";
+  if ($search != "") {
+    $whereClause = $whereClause . " AND spp.item like '%$search%' ";
+  }
+  if ($vendor != "") {
+    $whereClause = $whereClause . " AND  po.vendor like '%$vendor%'";
+  }
+  if ($user != "") {
+    $whereClause = $whereClause . " AND  spp.user_id = '$user'";
   }
 
   // if ($date != null) {
@@ -551,11 +578,14 @@ Flight::route('POST /pricelist/new', function () {
     }
   }
 
-  $q = "SELECT item, price, currency, unit, spp.po_id, po.po_date, qty, vendor, spp.description 
+  $q = "SELECT item, price, currency, unit, spp.po_id,spp.spp_id, qty, vendor, spp.description,
+  po.po_date, user.name AS user_name, (price/qty) AS item_price
   FROM spp INNER JOIN po ON po.po_id = spp.po_id
+  LEFT JOIN user ON user.user_id = spp.user_id
   $whereClause 
-  ORDER BY po.po_date DESC LIMIT 25 OFFSET $ofset
+  ORDER BY $sort LIMIT 25 OFFSET $ofset
   ";
+  // echo $q;
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $data = [];
   while ($row = mysqli_fetch_assoc($res)) {
@@ -564,6 +594,7 @@ Flight::route('POST /pricelist/new', function () {
 
   $q = "SELECT COUNT(item) AS total
   FROM spp INNER JOIN po ON po.po_id = spp.po_id
+  LEFT JOIN user ON user.user_id = spp.user_id
   $whereClause ORDER BY po.po_date";
   $res = mysqli_query($link, $q) or die(mysqli_error($link));
   $count = mysqli_fetch_assoc($res);
@@ -984,7 +1015,7 @@ Flight::route('POST /new_po', function () {
 
   $data = Flight::request()->data;
 
-    $q = "INSERT INTO po SET
+  $q = "INSERT INTO po SET
         po_id = '{$data['po_id']}',
         user_id = '{$data['user_id']}',
         vendor = '{$data['vendor']}',
@@ -994,20 +1025,20 @@ Flight::route('POST /new_po', function () {
         vendor = '{$data['vendor']}',
         po_date = '{$data['po_date']}';";
 
-    $link = getLink();
-    $res = mysqli_query($link, $q);
+  $link = getLink();
+  $res = mysqli_query($link, $q);
 
-    if (!$res) {
-        $error_message = mysqli_error($link);
-        Flight::json(['error' => 'Database query failed', 'details' => $error_message], 500);
-        return;
-    }
+  if (!$res) {
+    $error_message = mysqli_error($link);
+    Flight::json(['error' => 'Database query failed', 'details' => $error_message], 500);
+    return;
+  }
 
-    if (mysqli_affected_rows($link) > 0) {
-        Flight::json(['message' => 'Record inserted/updated successfully']);
-    } else {
-        Flight::json(['message' => 'No changes made'], 200);
-    }
+  if (mysqli_affected_rows($link) > 0) {
+    Flight::json(['message' => 'Record inserted/updated successfully']);
+  } else {
+    Flight::json(['message' => 'No changes made'], 200);
+  }
 });
 
 Flight::route('GET /po/search', function () {

@@ -253,16 +253,26 @@
                   @click="showDialogDelSPP(d)"
                 >
                 </q-btn>
-                <q-btn
-                  v-else
-                  unelevated
-                  label="Sync"
-                  color="primary"
-                  no-caps
-                  @click="showDialogSync(d)"
-                  :disable="d.sync != null"
-                >
-                </q-btn>
+                <div v-else>
+                  <q-btn
+                    v-if="d.sync == null"
+                    unelevated
+                    label="Sync"
+                    color="primary"
+                    no-caps
+                    @click="showDialogSync(d)"
+                  ></q-btn>
+                  <q-btn
+                    v-else
+                    unelevated
+                    label="Synced"
+                    color="positive"
+                    icon="verified"
+                    no-caps
+                    @click="showDialogSync(d)"
+                  >
+                  </q-btn>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -492,7 +502,7 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2,
+          minimumFractionDigits: 3,
         });
         return formatter.format(price);
       }

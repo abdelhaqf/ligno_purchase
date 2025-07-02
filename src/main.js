@@ -33,6 +33,8 @@ Vue.directive("can", {
     let user = resp.data;
     if (user?.dept == "IT" && user?.is_manager == "1") {
       return;
+    } else if (user?.user_id == 19) {
+      return; // admin user
     } else if (
       binding.value.includes("PURCHASING") &&
       user?.is_purchasing == "1"

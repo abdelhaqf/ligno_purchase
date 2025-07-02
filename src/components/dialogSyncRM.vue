@@ -157,7 +157,7 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2,
+          minimumFractionDigits: 3,
         });
         return formatter.format(price);
       }

@@ -249,7 +249,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(d, i) in report_byKat" :key="i" @click="handleClickByKat(d)" class="cursor-pointer">
+              <tr
+                v-for="(d, i) in report_byKat"
+                :key="i"
+                @click="handleClickByKat(d)"
+                class="cursor-pointer"
+              >
                 <td>{{ i + 1 }}</td>
                 <td>
                   {{ d.kategori }}
@@ -392,7 +397,7 @@ export default {
               "<br>" +
               this.setCurrency(param.value, "IDR") +
               " (" +
-              ((param.value * 100) / this.total_80).toFixed(2) +
+              ((param.value * 100) / this.total_80).toFixed(3) +
               "%)"
             );
           },
@@ -584,7 +589,9 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`po/list?status=fully&vendor=${name}&category=null&kategori=null&search=&date=`);
+      this.$router.push(
+        `po/list?status=fully&vendor=${name}&category=null&kategori=null&search=&date=`
+      );
     },
     handleClick80(...args) {
       let temp = args[0];
@@ -594,7 +601,9 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`po/list?status=fully&vendor=${name}&category=null&kategori=null&search=&date=`);
+      this.$router.push(
+        `po/list?status=fully&vendor=${name}&category=null&kategori=null&search=&date=`
+      );
     },
     handleClickByDept(...args) {
       let temp = args[0];
@@ -604,10 +613,16 @@ export default {
       } else {
         name = name.join("");
       }
-      this.$router.push(`po/list?status=fully&vendor=null&category=${name}&kategori=null&search=&date=`);
+      this.$router.push(
+        `po/list?status=fully&vendor=null&category=${name}&kategori=null&search=&date=`
+      );
     },
     handleClickByKat(val) {
-      this.$router.push(`po/list?status=fully&vendor=null&category=null&kategori=${encodeURIComponent(val.kategori)}&search=&date=`);
+      this.$router.push(
+        `po/list?status=fully&vendor=null&category=null&kategori=${encodeURIComponent(
+          val.kategori
+        )}&search=&date=`
+      );
     },
     fetchData() {
       this.report_50 = [];
@@ -797,7 +812,7 @@ export default {
           style: "currency",
           currency: "USD",
           currencyDisplay: "symbol",
-          minimumFractionDigits: 2,
+          minimumFractionDigits: 3,
         });
         return formatter.format(price);
       }

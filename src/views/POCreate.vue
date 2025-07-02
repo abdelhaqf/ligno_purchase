@@ -114,7 +114,7 @@
           <!-- <div class="row items-center">
             <div style="width: 150px;">Kategori Biaya</div>
             <div class="l-grow"></div>
-          </div>
+          </div> -->
           <div class="l-grow row items-center">
             <div style="width: 150px;">Tanggal PO</div>
             <q-field dense outlined class="l-grow">
@@ -139,7 +139,7 @@
                 </q-date>
               </q-popup-proxy>
             </q-field>
-          </div> -->
+          </div>
           <div class="l-grow row items-center">
             <div style="width: 150px;">Currency</div>
             <div class="q-gutter-sm">
@@ -692,6 +692,7 @@ export default {
     selectSuggestion(suggestion) {
       this.po.po_id = suggestion.po_id;
       this.po.vendor = suggestion.vendor;
+      this.po.po_date = suggestion.po_date;
       this.isSearch = false;
     },
   },
