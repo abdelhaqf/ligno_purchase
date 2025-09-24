@@ -14,7 +14,8 @@
           fit="contain"
         ></q-img>
         <q-space></q-space>
-        <div class="relative-position q-mr-lg">
+        <div class="text-grey-6">v.{{ version }}</div>
+        <div class="relative-position q-mx-md">
           <q-btn
             flat
             dense
@@ -537,9 +538,11 @@ export default {
 
       curRoute: {},
       routeMeta: null,
+      version: "",
     };
   },
   async mounted() {
+    this.version = process.env.VUE_APP_VERSION;
     this.$root.$on("refresh", async () => {
       // this.menu = []
       await this.fetchData();

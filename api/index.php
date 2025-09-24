@@ -550,6 +550,10 @@ Flight::route('POST /pricelist/new', function () {
   $user = $data['user'];
   $sort = $data['sort'];
 
+  if ($sort == null || $sort == "") {
+    $sort = "po.po_date DESC";
+  }
+
   $ofset = ((int) $data['current'] - 1) * 25;
 
   $whereClause = "WHERE 1 = 1";

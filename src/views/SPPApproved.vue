@@ -8,11 +8,14 @@
             outlined
             dense
             v-model="searchTerm"
-            @input="fetchData"
             clearable
-            @clear="searchTerm = ''"
+            @clear="
+              searchTerm = '';
+              filterSPP();
+            "
             placeholder="Cari Nama Barang"
             style="width: 400px;"
+            @input="filterSPP"
           >
             <template v-slot:prepend>
               <q-icon name="search"></q-icon>
@@ -29,8 +32,11 @@
             :options="optUrgency"
             v-model="selUrgency"
             clearable
-            @clear="selUrgency = ''"
-            @input="fetchData"
+            @clear="
+              selUrgency = '';
+              filterSPP();
+            "
+            @input="filterSPP"
             label="Pilih Urgency"
             style="width: 230px;"
           ></q-select>
@@ -43,7 +49,7 @@
             v-model="selDivisi"
             clearable
             @clear="selDivisi = ''"
-            @input="fetchData"
+            
             label="Pilih Divisi"
             style="width: 230px;"
           ></q-select> -->
@@ -54,8 +60,8 @@
             map-options
             :options="optSort"
             v-model="selSort"
-            @input="fetchData"
             label="Urutkan"
+            @input="filterSPP"
             style="width: 230px;"
           ></q-select>
         </div>
@@ -97,9 +103,12 @@
             </thead>
 
             <tbody>
-              <tr v-for="(d, i) in sppList" :key="i">
+              <tr v-for="(d, i) in filteredSPP" :key="i">
                 <td>
-                  <q-checkbox v-model="d.select" />
+                  <q-checkbox
+                    v-model="d.select"
+                    @input="(val) => checkRow(val, d)"
+                  />
                 </td>
                 <td class="text-left">
                   {{ d.name }}
@@ -382,6 +391,7 @@ export default {
   data() {
     return {
       sppList: [],
+      filteredSPP: [],
       sppSelectID: [],
 
       show_detail: false,
@@ -422,7 +432,7 @@ export default {
       },
       confirmCancel: false,
       content: "",
-      selOrder: "create_at",
+      selOrder: "create_at ASC",
 
       // new data
       formulation_rm: [],
@@ -446,7 +456,7 @@ export default {
       confirmReject: false,
       content: "",
 
-      selUrgency: null,
+      selUrgency: "",
       optUrgency: ["HIGH", "MIDDLE", "LOW"],
 
       myTimeout: null,
@@ -522,24 +532,21 @@ export default {
       this.sppList = temp;
     },
     checkAll(val) {
-      let temp = JSON.parse(JSON.stringify(this.sppList));
-      for (let item of temp) {
+      for (let item of this.filteredSPP) {
         item.select = val;
+        let idx = this.sppList.findIndex((e) => e.spp_id == item.spp_id);
+        if (idx !== -1) {
+          this.sppList[idx].select = val;
+        }
       }
-      this.sppList = temp;
     },
-    // async getDept() {
-    //   // let resp = this.$http.get("/dept")
-    //   this.$http.get("/dept").then((resp) => {
-    //     let dept = resp.data.map((a) => a.dept);
-    //     this.optDept = dept;
-    //   });
-    // },
     async fetchData() {
       this.sppList = [];
-      let q_filter = `?sort=${this.selSort}&search=${
-        this.searchTerm ? this.searchTerm : "" //}&dept=${this.selDivisi ? this.selDivisi : ""
-      }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
+      this.filteredSPP = [];
+      // let q_filter = `?sort=${this.selSort}&search=${
+      //   this.searchTerm ? this.searchTerm : "" //}&dept=${this.selDivisi ? this.selDivisi : ""
+      // }&urgency=${this.selUrgency ? this.selUrgency : ""}`;
+      let q_filter = "";
 
       await this.$http
         .get(
@@ -552,10 +559,14 @@ export default {
           {}
         )
         .then((result) => {
+          let temp = [];
           for (var i = 0; i < result.data.length; i++) {
             result.data[i].select = false;
-            this.sppList.push(result.data[i]);
+            temp.push(result.data[i]);
           }
+          this.sppList = JSON.parse(JSON.stringify(temp));
+          // this.filteredSPP = JSON.parse(JSON.stringify(temp));
+          this.filterSPP();
         });
     },
     async toPreview() {
@@ -604,6 +615,46 @@ export default {
       this.$root.$emit("refresh");
       this.$q.notify("SPP ditolak!");
     },
+    checkRow(val, row) {
+      let idx = this.sppList.findIndex((el) => el.spp_id == row.spp_id);
+
+      this.sppList[idx].select = val;
+    },
+    filterSPP() {
+      let temp = [...this.sppList]; // cukup shallow copy
+
+      // filter nama item
+      if (this.searchTerm?.trim()) {
+        const q = this.searchTerm.toLowerCase();
+        temp = temp.filter((item) => item.item?.toLowerCase().includes(q));
+      }
+
+      // filter urgency
+      if (this.selUrgency) {
+        temp = temp.filter((item) => item.urgency == this.selUrgency);
+      }
+
+      // helper ambil timestamp ms dari created/create_at
+      const getDateMs = (it) => {
+        const s = it.created_at ?? it.create_at ?? ""; // dukung dua nama kolom
+        const m = moment(s, "YYYY-MM-DD HH:mm:ss", true); // strict parsing
+        return m.isValid() ? m.valueOf() : -Infinity; // invalid -> paling awal
+      };
+
+      if (
+        this.selSort === "create_at ASC" ||
+        this.selSort === "created_at ASC"
+      ) {
+        temp.sort((a, b) => getDateMs(a) - getDateMs(b));
+      } else if (
+        this.selSort === "create_at DESC" ||
+        this.selSort === "created_at DESC"
+      ) {
+        temp.sort((a, b) => getDateMs(b) - getDateMs(a));
+      }
+
+      this.filteredSPP = temp;
+    },
   },
   computed: {
     selectCount() {
@@ -614,6 +665,7 @@ export default {
 
       return count;
     },
+    filteredData() {},
   },
 };
 </script>
