@@ -12,7 +12,7 @@
           :options="showOption"
           map-options
           emit-value
-          style="width: 200px;"
+          style="width: 200px"
           class="bg-white"
           @input="fetchData"
         />
@@ -23,12 +23,12 @@
       <q-card flat bordered class="l-grow">
         <q-card-section
           class="row justify-between text-left q-pb-none"
-          style="min-width: 200px;"
+          style="min-width: 200px"
         >
           <div>SPP Diproses</div>
           <div
             class="items-center text-center q-pa-xs"
-            style="border-radius: 20%; background: #E0DCFE;"
+            style="border-radius: 20%; background: #e0dcfe"
           >
             <q-icon size="xs" color="deep-purple-13" name="list_alt" />
           </div>
@@ -41,12 +41,12 @@
       <q-card flat bordered class="l-grow">
         <q-card-section
           class="row justify-between text-left q-pb-none"
-          style="min-width: 250px;"
+          style="min-width: 250px"
         >
           <div>SPP Dalam Persetujuan</div>
           <div
             class="items-center text-center q-pa-xs"
-            style="border-radius: 20%; background: #E7FAFE;"
+            style="border-radius: 20%; background: #e7fafe"
           >
             <q-icon size="xs" color="blue-12" name="o_assignment_turned_in" />
           </div>
@@ -59,12 +59,12 @@
       <q-card flat bordered class="l-grow">
         <q-card-section
           class="row justify-between text-left q-pb-none"
-          style="min-width: 300px;"
+          style="min-width: 300px"
         >
           <div>Pembelian (IDR)</div>
           <div
             class="items-center text-center q-pa-xs"
-            style="border-radius: 20%; background: #FBEBEC;"
+            style="border-radius: 20%; background: #fbebec"
           >
             <q-icon size="xs" color="red-6" name="o_local_mall" />
           </div>
@@ -77,12 +77,12 @@
       <q-card flat bordered class="l-grow">
         <q-card-section
           class="row justify-between text-left q-pb-none"
-          style="min-width: 250px;"
+          style="min-width: 250px"
         >
           <div>Pembelian (USD)</div>
           <div
             class="items-center text-center q-pa-xs"
-            style="border-radius: 20%; background: #EAF6EC;"
+            style="border-radius: 20%; background: #eaf6ec"
           >
             <q-icon size="xs" color="green-6" name="attach_money" />
           </div>
@@ -94,19 +94,19 @@
     </div>
 
     <div class="row q-gutter-md q-pa-md l-grow no-wrap justify-between">
-      <q-card flat bordered style="width: 53%;">
+      <q-card flat bordered style="width: 53%">
         <q-card-section>
           <v-chart
             ref="chart1"
             :options="optionByAct"
             theme="default"
             :autoresize="true"
-            style="width: 100%;"
+            style="width: 100%"
             class="q-mx-auto"
           />
         </q-card-section>
       </q-card>
-      <q-card flat bordered style="width: 45%;">
+      <q-card flat bordered style="width: 45%">
         <q-card-section>
           <v-chart
             ref="chart1"
@@ -132,7 +132,7 @@
     </div>
 
     <div class="row q-gutter-md q-pa-md l-grow no-wrap justify-between">
-      <q-card flat bordered style="width: 40%;">
+      <q-card flat bordered style="width: 40%">
         <q-card-section>
           <v-chart
             :options="option50"
@@ -149,14 +149,14 @@
           <div
             v-if="!optionBydept.series[0].data.length"
             class="text-h5 text-bold row items-center justify-center"
-            style="height: 200px; vertical-align: middle;"
+            style="height: 200px; vertical-align: middle"
           >
             <div>Data Masih Kosong</div>
           </div>
         </q-card-section>
       </q-card>
 
-      <q-card flat bordered style="width: 58%;">
+      <q-card flat bordered style="width: 58%">
         <q-card-section>
           <v-chart
             :options="option80"
@@ -173,7 +173,7 @@
           <div
             v-if="!option80.series[0].data.length"
             class="text-h5 text-bold row items-center justify-center"
-            style="height: 200px; vertical-align: middle;"
+            style="height: 200px; vertical-align: middle"
           >
             <div>Data Masih Kosong</div>
           </div>
@@ -206,6 +206,7 @@
                 <th>Tanggal Pengajuan</th>
                 <th>Deadline</th>
                 <th>Barang</th>
+                <th>Keterangan</th>
                 <th>Jumlah</th>
               </tr>
             </thead>
@@ -222,6 +223,25 @@
                   {{ d.deadline | moment("DD MMM YYYY") }}
                 </td>
                 <td class="text-left">{{ d.item }}</td>
+                <td class="text-left">
+                  <div class="l-wrap-cell" style="width: 200px !important">
+                    <span>
+                      {{
+                        d.description.length > 55
+                          ? d.description.slice(0, 50)
+                          : d.description
+                      }}
+                    </span>
+                    <span v-if="d.description.length > 55" class="no-wrap">
+                      ...
+                      <q-tooltip
+                        content-style="width:300px"
+                        content-class="l-text-detail bg-white text-black shadow-2"
+                        >{{ d.description }}</q-tooltip
+                      >
+                    </span>
+                  </div>
+                </td>
                 <td class="text-center">{{ d.qty }} {{ d.unit }}</td>
               </tr>
             </tbody>
@@ -229,7 +249,7 @@
         </q-card-section>
         <q-card-section class="text-center" v-else>
           <div>
-            <q-img :src="`./empty.png`" style="width: 200px;"></q-img>
+            <q-img :src="`./empty.png`" style="width: 200px"></q-img>
           </div>
           <div class="text-h6 text-bold">Data Masih Kosong</div>
         </q-card-section>
@@ -272,7 +292,7 @@
         </q-card-section>
         <q-card-section class="text-center" v-else>
           <div>
-            <q-img :src="`./empty.png`" style="width: 200px;"></q-img>
+            <q-img :src="`./empty.png`" style="width: 200px"></q-img>
           </div>
           <div class="text-h6 text-bold">Data Masih Kosong</div>
         </q-card-section>

@@ -1,17 +1,17 @@
 <template>
   <div class="q-px-lg rounded-borders full-width">
     <q-card flat bordered class="bg-white">
-      <q-scroll-area style="height:calc(100vh - 240px)">
+      <q-scroll-area style="height: calc(100vh - 240px)">
         <q-card-section class="column q-gutter-y-sm">
           <div class="row items-center">
-            <div style="width: 150px;">Jenis PO</div>
+            <div style="width: 150px">Jenis PO</div>
             <div class="q-gutter-sm">
               <q-radio v-model="type" val="po" label="PO" />
               <q-radio v-model="type" val="nonpo" label="Non-PO" />
             </div>
           </div>
           <div class="row items-center">
-            <div style="width: 150px;">
+            <div style="width: 150px">
               Nomor {{ type == "po" ? "PO" : "Non-PO" }}
             </div>
             <q-input
@@ -26,7 +26,7 @@
             >
               <q-scroll-area
                 class="shadow-5 suggestions-list"
-                style="height: 250px;"
+                style="height: 250px"
                 v-if="isSearch"
               >
                 <q-list bordered>
@@ -73,7 +73,7 @@
             -->
           </div>
           <div class="row items-center">
-            <div style="width: 150px;">Nama Vendor</div>
+            <div style="width: 150px">Nama Vendor</div>
             <div class="l-grow">
               <q-input outlined v-model="po.vendor" dense v-if="showInput">
                 <template v-slot:append>
@@ -116,7 +116,7 @@
             <div class="l-grow"></div>
           </div> -->
           <div class="l-grow row items-center">
-            <div style="width: 150px;">Tanggal PO</div>
+            <div style="width: 150px">Tanggal PO</div>
             <q-field dense outlined class="l-grow">
               <template v-slot:prepend>
                 <q-icon name="date_range" />
@@ -128,7 +128,7 @@
                 </div>
               </template>
               <q-popup-proxy
-                style="width:fit-content"
+                style="width: fit-content"
                 transition-show="scale"
                 transition-hide="scale"
               >
@@ -141,14 +141,14 @@
             </q-field>
           </div>
           <div class="l-grow row items-center">
-            <div style="width: 150px;">Currency</div>
+            <div style="width: 150px">Currency</div>
             <div class="q-gutter-sm">
               <q-radio v-model="curr" val="IDR" label="IDR" />
               <q-radio v-model="curr" val="USD" label="USD" />
             </div>
           </div>
           <div class="l-grow row items-start no-wrap">
-            <div class="q-pt-lg" style="height: fit-content; width: 150px;">
+            <div class="q-pt-lg" style="height: fit-content; width: 150px">
               Daftar SPP
             </div>
             <div class="column q-gutter-y-sm l-grow">
@@ -159,7 +159,7 @@
                 <div class="text-weight-thin l-grow q-mx-md">
                   Atur dan terapkan ke semua
                 </div>
-                <div class="q-px-md no-wrap q-mr-md" style="width:200px">
+                <div class="q-px-md no-wrap q-mr-md" style="width: 200px">
                   <q-select
                     outlined
                     v-model="cost_category"
@@ -174,10 +174,10 @@
                   >
                   </q-select>
                 </div>
-                <div class="q-px-md no-wrap q-mr-md" style="width:200px">
+                <div class="q-px-md no-wrap q-mr-md" style="width: 200px">
                   <money v-model="price" v-bind="money"></money>
                 </div>
-                <div class="q-px-md no-wrap" style="width:200px">
+                <div class="q-px-md no-wrap" style="width: 200px">
                   <q-input
                     outlined
                     v-model="date"
@@ -207,7 +207,7 @@
                     </template>
                   </q-input>
                 </div>
-                <div class="q-px-md" style="width: 175px;">
+                <div class="q-px-md" style="width: 175px">
                   <q-btn
                     unelevated
                     label="Ubah Massal"
@@ -219,7 +219,7 @@
                 </div>
               </div>
 
-              <q-markup-table class=" l-grow" flat bordered wrap-cells>
+              <q-markup-table class="l-grow" flat bordered wrap-cells>
                 <!-- table head -->
                 <thead class="text-black text-bold">
                   <tr>
@@ -238,7 +238,7 @@
                     <td class="l-grow">
                       {{ x.item }} ({{ x.qty }} {{ x.unit }})
                     </td>
-                    <td style="width:200px;" class="text-center">
+                    <td style="width: 200px" class="text-center">
                       <q-select
                         outlined
                         v-model="x.cost_category"
@@ -253,7 +253,7 @@
                       >
                       </q-select>
                     </td>
-                    <td style="width:200px;" class="items-center">
+                    <td style="width: 200px" class="items-center">
                       <money
                         v-model="x.price"
                         v-bind="money"
@@ -262,7 +262,7 @@
                     </td>
                     <td
                       class="text-center items-center q-px-none"
-                      style="width:200px;"
+                      style="width: 200px"
                     >
                       <q-input
                         outlined
@@ -298,7 +298,7 @@
                         </template>
                       </q-input>
                     </td>
-                    <td class="text-center" style="width: 175px;">
+                    <td class="text-center" style="width: 175px">
                       <q-btn
                         label="Hapus"
                         flat
@@ -325,7 +325,7 @@
             color="white"
             text-color="black"
             outline
-            style="color: black;"
+            style="color: black"
             @click="$router.go(-1)"
             no-caps
           >
@@ -413,9 +413,7 @@ export default {
   data() {
     return {
       spp: {
-        deadline: moment()
-          .add(1, "days")
-          .format("YYYY/MM/DD"),
+        deadline: moment().add(1, "days").format("YYYY/MM/DD"),
         item: "",
       },
       po: {
@@ -541,9 +539,7 @@ export default {
           unit: result.data.unit,
           price: 0,
           currency: "IDR",
-          est_arrival: moment()
-            .add(1, "days")
-            .format("YYYY/MM/DD"),
+          est_arrival: moment().add(1, "days").format("YYYY/MM/DD"),
           cost_category: "",
         };
         this.sppSelect.push(data);
@@ -608,6 +604,8 @@ export default {
       this.cost_category = "";
     },
     async createPO() {
+      // console.log(this.sppSelect);
+      // return;
       this.po.user_id = this.$store.state.currentUser.user_id;
       try {
         this.$q.loading.show();

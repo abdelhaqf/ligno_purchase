@@ -1,9 +1,9 @@
 <template>
-  <div class="row relative q-px-lg ">
+  <div class="row relative q-px-lg">
     <q-card flat bordered class="col-12 bg-white rounded-borders">
       <!-- table control -->
       <q-card-section class="row justify-between q-gutter-x-md no-wrap">
-        <div>
+        <div class="row items-center q-gutter-x-sm">
           <q-input
             outlined
             dense
@@ -13,33 +13,30 @@
               searchTerm = '';
               filterSPP();
             "
-            placeholder="Cari Nama Barang"
-            style="width: 400px;"
+            placeholder="Cari Nama Barang/User"
+            style="width: 250px"
             @input="filterSPP"
           >
             <template v-slot:prepend>
               <q-icon name="search"></q-icon>
             </template>
           </q-input>
+
+          <q-btn
+            outline
+            :label="isFiltered ? `Filter (${isFiltered})` : 'Filter'"
+            :color="isFiltered ? 'primary' : 'grey-8'"
+            icon="filter_list"
+            @click="
+              tempFilter.selUrgency = selUrgency;
+              tempFilter.selPIC = selPic;
+              tempFilter.selDate = selDate;
+              dialogFilter = true;
+            "
+          ></q-btn>
         </div>
 
         <div class="row items-center q-gutter-x-sm">
-          <q-select
-            outlined
-            dense
-            emit-value
-            map-options
-            :options="optUrgency"
-            v-model="selUrgency"
-            clearable
-            @clear="
-              selUrgency = '';
-              filterSPP();
-            "
-            @input="filterSPP"
-            label="Pilih Urgency"
-            style="width: 230px;"
-          ></q-select>
           <!-- <q-select
             outlinedfetchData
             dense
@@ -62,7 +59,7 @@
             v-model="selSort"
             label="Urutkan"
             @input="filterSPP"
-            style="width: 230px;"
+            style="width: 230px"
           ></q-select>
         </div>
       </q-card-section>
@@ -73,7 +70,7 @@
         <q-scroll-area
           @scroll="getpos"
           class="l-grow q-pa-none"
-          style="width: 100% !important;"
+          style="width: 100% !important"
           :style="
             selectCount > 0
               ? 'height: calc(100vh - 325px);'
@@ -85,7 +82,7 @@
             <!-- table head -->
             <thead class="text-white">
               <tr>
-                <th style="width:20px;">
+                <th style="width: 20px">
                   <q-checkbox
                     v-model="check_all"
                     @input="checkAll"
@@ -128,11 +125,11 @@
                   {{ d.urgency }}
                 </td>
                 <td class="text-left">
-                  <div class="l-wrap-cell" style="width: 200px !important;">
+                  <div class="l-wrap-cell" style="width: 200px !important">
                     <span>
                       {{ d.item.length > 55 ? d.item.slice(0, 50) : d.item }}
                     </span>
-                    <span v-if="d.item.length > 55" class=" no-wrap ">
+                    <span v-if="d.item.length > 55" class="no-wrap">
                       ...
                       <q-tooltip
                         content-style="width:300px"
@@ -144,7 +141,7 @@
                   <div class="text-grey">{{ d.qty }} {{ d.unit }}</div>
                 </td>
                 <td class="text-left">
-                  <div class="l-wrap-cell" style="width: 200px !important;">
+                  <div class="l-wrap-cell" style="width: 200px !important">
                     <span>
                       {{
                         d.description.length > 55
@@ -152,7 +149,7 @@
                           : d.description
                       }}
                     </span>
-                    <span v-if="d.description.length > 55" class=" no-wrap ">
+                    <span v-if="d.description.length > 55" class="no-wrap">
                       ...
                       <q-tooltip
                         content-style="width:300px"
@@ -225,7 +222,7 @@
 
       <q-card-section
         class="column items-center justify-center"
-        style="height: calc(100vh - 250px);"
+        style="height: calc(100vh - 250px)"
         v-else
       >
         <q-img width="400px" :src="`./empty.png`"></q-img>
@@ -247,7 +244,7 @@
             color="white"
             text-color="black"
             outline
-            style="color: black;"
+            style="color: black"
             @click="toPreview"
             no-caps
             icon="print"
@@ -321,7 +318,7 @@
 
     <!-- penolakan  -->
     <q-dialog v-model="confirmReject" persistent>
-      <q-card style="min-width: 350px;">
+      <q-card style="min-width: 350px">
         <q-card-section class="row justify-center q-pb-none">
           <q-avatar
             color="grey-3"
@@ -369,12 +366,112 @@
             no-caps
             color="primary"
             label="Ya, Tolak SPP"
-            class=" l-grow"
+            class="l-grow"
             @click="rejectSelected()"
             v-close-popup
             style="width: calc(50% - 16px)"
           />
         </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="dialogFilter" persistent position="bottom">
+      <q-card style="width: 350px">
+        <q-card-section class="bg-grey-2 row justify-between items-center">
+          <div class="text-bold text-h6">Filter SPP</div>
+          <q-btn flat icon="close" @click="dialogFilter = false"></q-btn>
+        </q-card-section>
+        <q-card-section class="q-py-none column q-gutter-y-sm">
+          <div class="column q-gutter-y-xs">
+            <div class="text-body1">Level Urgency</div>
+            <q-select
+              outlined
+              dense
+              emit-value
+              map-options
+              :options="optUrgency"
+              v-model="tempFilter.selUrgency"
+              clearable
+              @clear="tempFilter.selUrgency = null"
+              label="Pilih Urgency"
+            ></q-select>
+          </div>
+          <div class="column q-gutter-y-xs">
+            <div class="text-body1">PIC</div>
+            <q-select
+              outlined
+              dense
+              emit-value
+              map-options
+              :options="optPic"
+              v-model="tempFilter.selPIC"
+              clearable
+              @clear="tempFilter.selPIC = null"
+              label="Pilih PIC"
+            ></q-select>
+          </div>
+          <div class="column q-gutter-y-xs">
+            <div class="text-body1">Tanggal Pengajuan</div>
+            <q-field
+              dense
+              outlined
+              clearable
+              v-model="tempFilter.selDate"
+              @clear="tempFilter.selDate = null"
+            >
+              <template v-slot:prepend>
+                <q-icon name="event" />
+              </template>
+
+              <template v-slot:control>
+                <div v-if="tempFilter.selDate">
+                  {{ dateFormat(tempFilter.selDate) }}
+                </div>
+                <div v-else class="text-grey-7">Pilih Tanggal</div>
+              </template>
+              <q-popup-proxy
+                cover
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-date
+                  minimal
+                  v-model="tempFilter.selDate"
+                  mask="YYYY-MM-DD"
+                  color="brand"
+                  range
+                  @update:model-value="tempFilter.current = 1"
+                >
+                  <div class="row items-center justify-end">
+                    <q-btn
+                      v-close-popup
+                      label="Close"
+                      color="brand"
+                      flat
+                      no-caps
+                    />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-field>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <q-btn
+            class="full-width"
+            unelevated
+            label="Terapkan Filter"
+            no-caps
+            color="primary"
+            @click="
+              selUrgency = tempFilter.selUrgency;
+              selPic = tempFilter.selPIC;
+              selDate = tempFilter.selDate;
+              filterSPP();
+              dialogFilter = false;
+            "
+          ></q-btn>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </div>
@@ -386,6 +483,7 @@ import { Money } from "v-money";
 import axios from "axios";
 import { mapActions } from "vuex";
 import dialogHistorySpp from "../components/dialogHistorySpp.vue";
+import { date } from "quasar";
 export default {
   components: { Money },
   data() {
@@ -456,10 +554,21 @@ export default {
       confirmReject: false,
       content: "",
 
-      selUrgency: "",
+      selUrgency: null,
       optUrgency: ["HIGH", "MIDDLE", "LOW"],
 
+      selPic: null,
+      optPic: [],
+
+      selDate: null,
+
       myTimeout: null,
+      dialogFilter: false,
+      tempFilter: {
+        selUrgency: null,
+        selPIC: null,
+        selDate: null,
+      },
     };
   },
   async mounted() {
@@ -467,7 +576,7 @@ export default {
     if (this.$route.query.scroll) {
       this.$refs.tableScroll.setScrollPercentage(this.$route.query.scroll);
     }
-    // this.getDept();
+    this.getPic();
   },
   watch: {
     sppList: {
@@ -620,18 +729,48 @@ export default {
 
       this.sppList[idx].select = val;
     },
+    async getPic() {
+      this.optPic = [];
+      await this.$http.get("/list_user", {}).then((result) => {
+        this.optPic = result.data;
+      });
+    },
     filterSPP() {
       let temp = [...this.sppList]; // cukup shallow copy
 
       // filter nama item
       if (this.searchTerm?.trim()) {
         const q = this.searchTerm.toLowerCase();
-        temp = temp.filter((item) => item.item?.toLowerCase().includes(q));
+        temp = temp.filter(
+          (item) =>
+            item.item?.toLowerCase().includes(q) ||
+            item.name?.toLowerCase().includes(q)
+        );
       }
 
       // filter urgency
       if (this.selUrgency) {
         temp = temp.filter((item) => item.urgency == this.selUrgency);
+      }
+
+      // filter PIC
+      if (this.selPic) {
+        temp = temp.filter((item) => item.handle_by == this.selPic);
+      }
+
+      if (this.selDate) {
+        if (this.selDate.from && this.selDate.to) {
+          const start = moment(this.selDate.from).startOf("day");
+          const end = moment(this.selDate.to).endOf("day");
+
+          temp = temp.filter((item) => {
+            return moment(item.create_at).isBetween(start, end, null, "[]");
+          });
+        } else if (this.selDate) {
+          temp = temp.filter((item) => {
+            return moment(item.create_at).isSame(this.selDate, "day");
+          });
+        }
       }
 
       // helper ambil timestamp ms dari created/create_at
@@ -655,6 +794,13 @@ export default {
 
       this.filteredSPP = temp;
     },
+    dateFormat(val) {
+      return val.from
+        ? `${moment(val.from).format("DD MMM YYYY")} - ${moment(val.to).format(
+            "DD MMM YYYY"
+          )}`
+        : moment(val).format("DD MMM YYYY");
+    },
   },
   computed: {
     selectCount() {
@@ -665,7 +811,13 @@ export default {
 
       return count;
     },
-    filteredData() {},
+    isFiltered() {
+      let c = 0;
+      if (this.selUrgency) c++;
+      if (this.selPic) c++;
+      if (this.selDate) c++;
+      return c;
+    },
   },
 };
 </script>

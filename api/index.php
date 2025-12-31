@@ -517,7 +517,7 @@ Flight::route('GET /list_vendor', function () {
 
 Flight::route('GET /list_user', function () {
   $q = "SELECT DISTINCT `user_id` as 'value', `name` as 'label' FROM user
-          WHERE is_purchasing = 1
+          WHERE is_purchasing = 1 AND is_active = 1
           ORDER BY name ASC";
   runQuery($q);
 });
@@ -1154,8 +1154,19 @@ Flight::route('POST /print/getdata', function () {
     LEFT JOIN user hnd on hnd.user_id = spp.handle_by
     WHERE spp_id = '{$data[$i]}'";
     $res = mysqli_query($link, $q) or die(mysqli_error($link));
+    $spp = mysqli_fetch_assoc($res);
 
-    $ret[] = mysqli_fetch_assoc($res);
+
+    $q_history = "SELECT * FROM spp
+    WHERE item = '{$spp['item']}' AND spp_id <> '{$spp['spp_id']}' ORDER BY spp_id DESC LIMIT 3";
+    $res_history = mysqli_query($link, $q_history) or die(mysqli_error($link));
+    $history = [];
+    while ($row = mysqli_fetch_assoc($res_history)) {
+      $history[] = $row;
+    }
+    $spp["history"] = $history;
+
+    $ret[] = $spp;
   }
   $date2 = new DateTime();
   log_query($link, $q, $date1, $date2);

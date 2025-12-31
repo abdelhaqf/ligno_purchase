@@ -21,20 +21,18 @@
       <q-separator size="2px" inset></q-separator>
       <q-card-section class="q-ma-md bg-grey-2 column q-gutter-y-sm">
         <div class="row justify-between items-center">
-          <div class="text-grey-8" style="min-width: 150px ;">
-            Ditangani Oleh
-          </div>
+          <div class="text-grey-8" style="min-width: 150px">Ditangani Oleh</div>
           <div class="text-bold text-right">{{ po.handler_name }}</div>
         </div>
         <div class="row justify-between items-center">
-          <div class="text-grey-8" style="min-width: 150px ;">Vendor</div>
+          <div class="text-grey-8" style="min-width: 150px">Vendor</div>
           <div v-if="!isEdit" class="text-right">{{ po.vendor }}</div>
           <div class="text-right" v-else>
             <q-input
               outlined
               v-model="po.vendor"
               dense
-              style="min-width: 350px ;"
+              style="min-width: 350px"
               class="bg-white"
               v-if="showInput"
             >
@@ -61,7 +59,7 @@
               :options="filteredVD"
               @filter="filterVD"
               @input-value="setModel"
-              style="min-width: 350px ;"
+              style="min-width: 350px"
               class="bg-white"
             >
               <template v-slot:append>
@@ -104,7 +102,7 @@
           flat
           bordered
           class="stickyTable"
-          style="height: calc(100vh - 495px);"
+          style="height: calc(100vh - 495px)"
         >
           <!-- table head -->
           <thead class="text-white">
@@ -129,7 +127,7 @@
               <td v-if="!isEdit">{{ d.item }}</td>
               <td v-else class="text-center">
                 <q-input
-                  style="min-width: 150px;"
+                  style="min-width: 150px"
                   outlined
                   dense
                   v-model="d.item"
@@ -140,7 +138,7 @@
               </td>
               <td v-else class="text-center">
                 <q-input
-                  style="min-width: 100px;"
+                  style="min-width: 100px"
                   outlined
                   dense
                   v-model="d.qty"
@@ -163,7 +161,7 @@
                   bg-color="white"
                   v-model="d.est_arrival"
                   class="l-grow"
-                  style="min-width: 150px;"
+                  style="min-width: 150px"
                 >
                   <template v-slot:append>
                     <q-icon name="event" class="cursor-pointer">
@@ -204,13 +202,13 @@
                 </q-select>
                 <div v-else>{{ d.cost_category }}</div>
               </td>
-              <td v-if="!isEdit" class="text-left" style="max-width: 150px;">
+              <td v-if="!isEdit" class="text-left" style="max-width: 150px">
                 <!-- {{d.note}} -->
                 <div class="l-wrap-cell" v-if="d.note">
                   <span>
                     {{ d.note.length > 40 ? d.note.slice(0, 33) : d.note }}
                   </span>
-                  <span v-if="d.note.length > 40" class=" no-wrap ">
+                  <span v-if="d.note.length > 40" class="no-wrap">
                     ...
                     <q-tooltip
                       content-style="width:300px"
@@ -221,7 +219,7 @@
                 </div>
                 <div v-else class="text-center l-grow">-</div>
               </td>
-              <td v-else class="text-center" style="min-width: 200px;">
+              <td v-else class="text-center" style="min-width: 200px">
                 <q-input
                   outlined
                   dense
@@ -253,24 +251,37 @@
                   @click="showDialogDelSPP(d)"
                 >
                 </q-btn>
-                <div v-else>
+                <div class="row items-center no-wrap q-gutter-x-sm" v-else>
                   <q-btn
+                    outline
+                    dense
+                    icon="visibility"
+                    color="primary"
+                    :to="`/spp/detail/${d.spp_id}`"
+                  >
+                    <q-tooltip> View SPP Detail </q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    dense
                     v-if="d.sync == null"
                     unelevated
-                    label="Sync"
+                    icon="sync"
                     color="primary"
                     no-caps
                     @click="showDialogSync(d)"
-                  ></q-btn>
+                  >
+                    <q-tooltip> Sync Harga </q-tooltip>
+                  </q-btn>
                   <q-btn
+                    dense
                     v-else
                     unelevated
-                    label="Synced"
-                    color="positive"
                     icon="verified"
+                    color="positive"
                     no-caps
                     @click="showDialogSync(d)"
                   >
+                    <q-tooltip> Sudah di Sync </q-tooltip>
                   </q-btn>
                 </div>
               </td>
@@ -298,7 +309,7 @@
             color="white"
             text-color="black"
             outline
-            style="color: black;"
+            style="color: black"
             no-caps
             @click="isEdit = true"
           >
