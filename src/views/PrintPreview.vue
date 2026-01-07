@@ -35,25 +35,25 @@
         <q-markup-table flat separator="none" class="q-mt-md" dense wrap-cells>
           <thead>
             <tr>
-              <th class="text-center trow" style="font-weight: 600;">
+              <th class="text-center trow" style="font-weight: 600">
                 Nama Barang
               </th>
               <th
                 class="text-center trow"
-                style="font-weight: 600;width:100px;"
+                style="font-weight: 600; width: 100px"
               >
                 Urgency
               </th>
               <th
                 class="text-center trow"
-                style="font-weight: 600;width:100px;"
+                style="font-weight: 600; width: 100px"
               >
                 Qty
               </th>
-              <th class="text-center trow" style="font-weight: 600;">
+              <th class="text-center trow" style="font-weight: 600">
                 Diproses Oleh
               </th>
-              <th class="text-center trow" style="font-weight: 600;">
+              <th class="text-center trow" style="font-weight: 600">
                 Kategori Barang/Jasa
               </th>
             </tr>
@@ -62,14 +62,14 @@
             <tr>
               <td>{{ val.item }}</td>
               <!-- <td>{{ momentMask(val.deadline) }}</td> -->
-              <td class="text-center" style="width: 100px;">
+              <td class="text-center" style="width: 100px">
                 {{ val.urgency }}
               </td>
-              <td style="width: 100px;">{{ `${val.qty} ${val.unit}` }}</td>
-              <td class="text-capitalize" style="width: 125px;">
+              <td style="width: 100px">{{ `${val.qty} ${val.unit}` }}</td>
+              <td class="text-capitalize" style="width: 125px">
                 {{ val.handler_name }}
               </td>
-              <td class="text-center" style="width: 165px;">
+              <td class="text-center" style="width: 165px">
                 {{ val.kategori }}
               </td>
             </tr>
@@ -81,35 +81,32 @@
         <q-markup-table flat separator="none" dense wrap-cells>
           <thead>
             <tr>
-              <th class="text-center trow" style="font-weight: 600;">
-                No. PO
-              </th>
+              <th class="text-center trow" style="font-weight: 600">No. PO</th>
               <th
                 class="text-center trow"
-                style="font-weight: 600;width:100px;"
+                style="font-weight: 600; width: 100px"
               >
                 Tanngal PO
               </th>
-              <th class="text-center trow" style="font-weight: 600;">
+              <th class="text-center trow" style="font-weight: 600">
                 Nama Vendor
               </th>
               <th
                 class="text-center trow"
-                style="font-weight: 600;width:100px;"
+                style="font-weight: 600; width: 100px"
               >
                 Qty
               </th>
-              <th class="text-center trow" style="font-weight: 600;">
-                Harga
-              </th>
+              <th class="text-center trow" style="font-weight: 600">Harga</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(el, j) in val.history" :key="j">
-              <td style="width:150px;">{{ el.po_id }}</td>
-              <td class="text-center" style="width:100px;">{{ el.po_date }}</td>
+              <td style="width: 150px">{{ el.po_id }}</td>
+              <td class="text-center" style="width: 100px">{{ el.po_date }}</td>
               <td>
-                <div v-if="el.vendor.length <= 25">
+                <div v-if="!el.vendor">-</div>
+                <div v-else-if="el.vendor.length <= 25">
                   {{ el.vendor }}
                 </div>
                 <div class="cursor-pointer" v-else>
@@ -117,10 +114,10 @@
                   <span>....</span>
                 </div>
               </td>
-              <td class="text-center" style="width:115px;">
+              <td class="text-center" style="width: 115px">
                 {{ `${el.qty} ${el.unit}` }}
               </td>
-              <td class="text-right" style="width:130px;">
+              <td class="text-right" style="width: 130px">
                 {{
                   setCurrency(
                     parseFloat(el.price) / parseFloat(el.qty),

@@ -1158,7 +1158,7 @@ Flight::route('POST /print/getdata', function () {
 
 
     $q_history = "SELECT spp.*, po_date, vendor FROM spp
-    LEFT JOIN po ON po.po_id = spp.po_id
+    INNER JOIN po ON po.po_id = spp.po_id
     WHERE item = '{$spp['item']}' AND spp_id <> '{$spp['spp_id']}' ORDER BY spp_id DESC LIMIT 3";
     $res_history = mysqli_query($link, $q_history) or die(mysqli_error($link));
     $history = [];
