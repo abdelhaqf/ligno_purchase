@@ -95,9 +95,11 @@
                 class="text-center trow"
                 style="font-weight: 600; width: 100px"
               >
-                Qty
+                Qty (unit)
               </th>
-              <th class="text-center trow" style="font-weight: 600">Harga</th>
+              <th class="text-center trow" style="font-weight: 600">
+                Harga /unit
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -110,7 +112,7 @@
                   {{ el.vendor }}
                 </div>
                 <div class="cursor-pointer" v-else>
-                  {{ el.vendor.slice(0, 23) }}
+                  {{ el.vendor.slice(0, 23) }}``
                   <span>....</span>
                 </div>
               </td>
@@ -124,7 +126,6 @@
                     el.currency
                   )
                 }}
-                / {{ el.unit }}
               </td>
             </tr>
             <tr v-if="val.history.length == 0">

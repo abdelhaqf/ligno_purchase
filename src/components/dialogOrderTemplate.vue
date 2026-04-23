@@ -223,34 +223,36 @@ props: ["id_template"],
                 this.template = result.data;
             });
         },
-        createSPP() {
-            for (var i = 0; i < this.template.template_detail.length; i++) {
-                this.template.template_detail[i].user_id = this.$store.state.currentUser.user_id;
-                // this.template.template_detail[i].deadline = this.deadline;
-                this.template.template_detail[i].cc = this.cc;
-                this.$http.post("/new_spp", this.template.template_detail[i], {}).then((result) => {
-                    
-                    var history = {
-                        spp_id: result.data,
-                        status: "created",
-                        content: "Dibuat oleh " + this.$store.state.currentUser.username,
-                    };
-                    this.$http.post("/new_history", history, {}).then((result) => {});
+        async createSPP() {
+            const items = this.template.template_detail.map((d) => ({
+                ...d,
+                user_id: this.$store.state.currentUser.user_id,
+                cc: this.cc,
+            }));
 
-                    this.$q.notify("SPP Berhasil Dibuat!");
+            const result = await this.$http.post("/new_spp_batch", items, {});
+            const sppIds = result.data;
 
-                    var notifikasi = {
-                        from_id: this.$store.state.currentUser.user_id,
-                        to_id: this.$store.state.currentUser.manager_id,
-                        notif: this.$store.state.currentUser.username + " membuat SPP baru",
-                        note: "",
-                        spp_id: result.data,
-                        reference_page: "/approval/manager",
-                    };
-                    this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-                });
+            for (const spp_id of sppIds) {
+                const history = {
+                    spp_id,
+                    status: "created",
+                    content: "Dibuat oleh " + this.$store.state.currentUser.username,
+                };
+                this.$http.post("/new_history", history, {});
+
+                const notifikasi = {
+                    from_id: this.$store.state.currentUser.user_id,
+                    to_id: this.$store.state.currentUser.manager_id,
+                    notif: this.$store.state.currentUser.username + " membuat SPP baru",
+                    note: "",
+                    spp_id,
+                    reference_page: "/approval/manager",
+                };
+                this.$http.post("/notifikasi", notifikasi, {});
             }
-            
+
+            this.$q.notify(`${sppIds.length} SPP Berhasil Dibuat!`);
         },
     },
 };

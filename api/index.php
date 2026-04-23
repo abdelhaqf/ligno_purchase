@@ -14,6 +14,8 @@ function getLink()
   return $link;
 }
 
+require_once 'wa-api.php';
+
 //---------------------------------------------------------------------------------------------
 
 Flight::route('POST /reorder-template', function () {
@@ -988,8 +990,84 @@ Flight::route('POST /new_spp', function () {
     $x = mysqli_real_escape_string($link, $x);
   }
 
-  runQuery3('POST', 'spp', $data, '');
+  $columns = array_keys($data);
+  $values  = array_values($data);
+  $set = '';
+  for ($i = 0; $i < count($columns); $i++) {
+    $set .= ($i > 0 ? ',' : '') . '`' . $columns[$i] . '`=';
+    $set .= ($values[$i] === null ? 'NULL' : '"' . $values[$i] . '"');
+  }
+  $result = mysqli_query($link, "INSERT INTO `spp` SET $set");
+  if (!$result) {
+    http_response_code(404);
+    die(mysqli_error($link));
+  }
+  $spp_id = mysqli_insert_id($link);
+  echo $spp_id;
+
+  // Kirim WA ke manager pembuat SPP
+  $user_id = $data['user_id'];
+  $item    = $data['item'] ?? '-';
+  $q_mgr = "SELECT u2.phone, u2.name AS manager_name, u1.name AS user_name, u1.dept
+            FROM user u1
+            JOIN user u2 ON u2.user_id = u1.manager_id
+            WHERE u1.user_id = '$user_id'";
+  $res_mgr = mysqli_query($link, $q_mgr);
+  if ($res_mgr && $row = mysqli_fetch_assoc($res_mgr)) {
+    $phone        = $row['phone'];
+    $manager_name = $row['manager_name'];
+    $user_name    = $row['user_name'];
+    $dept         = $row['dept'];
+    $msg = "Halo $manager_name,\n\n"
+      . "$user_name ($dept) baru saja membuat SPP #$spp_id.\n"
+      . "Item: $item\n\n"
+      . "Silakan buka aplikasi untuk mereview dan menyetujui.";
+    sendWAMessage($phone, $msg);
+  }
 });
+Flight::route('POST /new_spp_batch', function () {
+  $items = json_decode(Flight::request()->getBody());
+  $link  = getLink();
+  $spp_ids = [];
+
+  foreach ($items as $data) {
+    $data = (array) $data;
+    $columns = array_keys($data);
+    $values  = array_values($data);
+    $set = '';
+    for ($i = 0; $i < count($columns); $i++) {
+      $set .= ($i > 0 ? ',' : '') . '`' . $columns[$i] . '`=';
+      $set .= ($values[$i] === null ? 'NULL' : '"' . $values[$i] . '"');
+    }
+    $result = mysqli_query($link, "INSERT INTO `spp` SET $set");
+    if (!$result) {
+      http_response_code(500);
+      die(mysqli_error($link));
+    }
+    $spp_ids[] = mysqli_insert_id($link);
+  }
+
+  // Kirim 1 WA ke manager setelah semua SPP berhasil dibuat
+  $user_id = isset($items[0]) ? ($items[0]->user_id ?? null) : null;
+  if ($user_id) {
+    $q_mgr = "SELECT u2.phone, u2.name AS manager_name, u1.name AS user_name, u1.dept
+              FROM user u1 JOIN user u2 ON u2.user_id = u1.manager_id
+              WHERE u1.user_id = '$user_id'";
+    $res = mysqli_query($link, $q_mgr);
+    if ($res && $row = mysqli_fetch_assoc($res)) {
+      $list  = implode("\n", array_map(function ($it) { return "- " . (is_array($it) ? ($it["item"] ?? '-') : ($it->item ?? '-')); }, $items));
+      $count = count($items);
+      $msg = "Halo {$row['manager_name']},\n\n"
+        . "{$row['user_name']} ({$row['dept']}) baru saja membuat $count SPP baru:\n"
+        . "$list\n\n"
+        . "Silakan buka aplikasi untuk mereview dan menyetujui.";
+      sendWAMessage($row['phone'], $msg);
+    }
+  }
+
+  Flight::json($spp_ids);
+});
+
 // Flight::route('POST /new_po', function () {
 //   $data = Flight::request()->getBody();
 //   $data = (array) json_decode($data);

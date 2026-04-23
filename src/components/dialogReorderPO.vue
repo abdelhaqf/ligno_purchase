@@ -212,31 +212,30 @@ props: ["newSpp", "from"],
                 id_user: 0,
             });
         },
-        createSPP() {
-            for (var i = 0; i < this.spp.length; i++) {
-                this.$http.post("/new_spp", this.spp[i], {}).then((result) => {
-                    
-                    var history = {
-                        spp_id: result.data,
-                        status: "created",
-                        content: "Dibuat oleh " + this.$store.state.currentUser.username,
-                    };
-                    this.$http.post("/new_history", history, {}).then((result) => {});
+        async createSPP() {
+            const result = await this.$http.post("/new_spp_batch", this.spp, {});
+            const sppIds = result.data;
 
-                    this.$q.notify("SPP Berhasil Dibuat!");
+            for (const spp_id of sppIds) {
+                const history = {
+                    spp_id,
+                    status: "created",
+                    content: "Dibuat oleh " + this.$store.state.currentUser.username,
+                };
+                this.$http.post("/new_history", history, {});
 
-                    var notifikasi = {
+                const notifikasi = {
                     from_id: this.$store.state.currentUser.user_id,
                     to_id: this.$store.state.currentUser.manager_id,
                     notif: this.$store.state.currentUser.username + " membuat SPP baru",
                     note: "",
-                    spp_id: result.data,
+                    spp_id,
                     reference_page: "/approval/manager",
-                    };
-                    this.$http.post("/notifikasi", notifikasi, {}).then((result) => {});
-                });
+                };
+                this.$http.post("/notifikasi", notifikasi, {});
             }
-            
+
+            this.$q.notify(`${sppIds.length} SPP Berhasil Dibuat!`);
         },
     },
 };
